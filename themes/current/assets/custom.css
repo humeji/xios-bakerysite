@@ -1,0 +1,11 @@
+/* Homepage - Embed Instagram Feed */
+
+#custom-homepage-instagram-feed-container {
+  width: calc(100% - 2rem);
+  max-width: 1024px;
+  margin: auto;
+}
+
+#custom-homepage-instagram-feed-container a {
+  text-decoration: none;
+}

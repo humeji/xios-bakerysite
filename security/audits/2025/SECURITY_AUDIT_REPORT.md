@@ -1,4 +1,4 @@
-# Security Audit Report - Xios Bakery Site Theme
+# Security Audit Report - Xiosbakery Site Theme
 
 **Audit Date:** August 2025  
 **Theme Type:** Shopify Theme (Dawn-based)  

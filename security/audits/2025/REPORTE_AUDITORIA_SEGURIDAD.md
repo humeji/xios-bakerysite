@@ -1,4 +1,4 @@
-# Reporte de Auditoría de Seguridad - Tema Sitio Web Xios Bakery
+# Reporte de Auditoría de Seguridad - Tema Sitio Web Xiosbakery
 
 **Fecha de Auditoría:** Agosto 2025  
 **Tipo de Tema:** Tema de Shopify (basado en Dawn)  

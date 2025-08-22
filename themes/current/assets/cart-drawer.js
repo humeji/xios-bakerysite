@@ -76,7 +76,15 @@ class CartDrawer extends HTMLElement {
       const sectionElement = section.selector
         ? document.querySelector(section.selector)
         : document.getElementById(section.id);
-      sectionElement.innerHTML = this.getSectionInnerHTML(parsedState.sections[section.id], section.selector);
+      const safeHTML = this.getSectionInnerHTML(parsedState.sections[section.id], section.selector);
+      if (window.safeSetHTML && sectionElement) {
+        window.safeSetHTML(sectionElement, safeHTML);
+      } else if (sectionElement) {
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = safeHTML;
+        tempContainer.querySelectorAll('script').forEach((s) => s.remove());
+        sectionElement.replaceChildren(...tempContainer.childNodes);
+      }
     });
 
     setTimeout(() => {

@@ -80,9 +80,19 @@ class FacetFiltersForm extends HTMLElement {
   }
 
   static renderProductGridContainer(html) {
-    document.getElementById('ProductGridContainer').innerHTML = new DOMParser()
-      .parseFromString(html, 'text/html')
-      .getElementById('ProductGridContainer').innerHTML;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const sourceContainer = doc.getElementById('ProductGridContainer');
+    const targetContainer = document.getElementById('ProductGridContainer');
+    if (sourceContainer && targetContainer) {
+      if (window.safeSetHTML) {
+        window.safeSetHTML(targetContainer, sourceContainer.innerHTML);
+      } else {
+        const temp = document.createElement('div');
+        temp.innerHTML = sourceContainer.innerHTML;
+        temp.querySelectorAll('script').forEach((s) => s.remove());
+        targetContainer.replaceChildren(...temp.childNodes);
+      }
+    }
 
     document
       .getElementById('ProductGridContainer')
@@ -96,10 +106,24 @@ class FacetFiltersForm extends HTMLElement {
     const count = new DOMParser().parseFromString(html, 'text/html').getElementById('ProductCount').innerHTML;
     const container = document.getElementById('ProductCount');
     const containerDesktop = document.getElementById('ProductCountDesktop');
-    container.innerHTML = count;
+    if (window.safeSetHTML) {
+      window.safeSetHTML(container, count);
+    } else {
+      const temp = document.createElement('div');
+      temp.innerHTML = count;
+      temp.querySelectorAll('script').forEach((s) => s.remove());
+      container.replaceChildren(...temp.childNodes);
+    }
     container.classList.remove('loading');
     if (containerDesktop) {
-      containerDesktop.innerHTML = count;
+      if (window.safeSetHTML) {
+        window.safeSetHTML(containerDesktop, count);
+      } else {
+        const temp2 = document.createElement('div');
+        temp2.innerHTML = count;
+        temp2.querySelectorAll('script').forEach((s) => s.remove());
+        containerDesktop.replaceChildren(...temp2.childNodes);
+      }
       containerDesktop.classList.remove('loading');
     }
     const loadingSpinners = document.querySelectorAll(
@@ -135,7 +159,15 @@ class FacetFiltersForm extends HTMLElement {
       const currentElement = document.getElementById(elementToRender.id);
       // Element already rendered in the DOM so just update the innerHTML
       if (currentElement) {
-        document.getElementById(elementToRender.id).innerHTML = elementToRender.innerHTML;
+        const target = document.getElementById(elementToRender.id);
+        if (window.safeSetHTML) {
+          window.safeSetHTML(target, elementToRender.innerHTML);
+        } else {
+          const temp = document.createElement('div');
+          temp.innerHTML = elementToRender.innerHTML;
+          temp.querySelectorAll('script').forEach((s) => s.remove());
+          target.replaceChildren(...temp.childNodes);
+        }
       } else {
         if (index > 0) {
           const { className: previousElementClassName, id: previousElementId } = facetsToRender[index - 1];
@@ -178,7 +210,17 @@ class FacetFiltersForm extends HTMLElement {
     activeFacetElementSelectors.forEach((selector) => {
       const activeFacetsElement = html.querySelector(selector);
       if (!activeFacetsElement) return;
-      document.querySelector(selector).innerHTML = activeFacetsElement.innerHTML;
+      const target = document.querySelector(selector);
+      if (target) {
+        if (window.safeSetHTML) {
+          window.safeSetHTML(target, activeFacetsElement.innerHTML);
+        } else {
+          const temp = document.createElement('div');
+          temp.innerHTML = activeFacetsElement.innerHTML;
+          temp.querySelectorAll('script').forEach((s) => s.remove());
+          target.replaceChildren(...temp.childNodes);
+        }
+      }
     });
 
     FacetFiltersForm.toggleActiveFacets(false);
@@ -189,7 +231,18 @@ class FacetFiltersForm extends HTMLElement {
 
     mobileElementSelectors.forEach((selector) => {
       if (!html.querySelector(selector)) return;
-      document.querySelector(selector).innerHTML = html.querySelector(selector).innerHTML;
+      const target = document.querySelector(selector);
+      const sourceHTML = html.querySelector(selector).innerHTML;
+      if (target) {
+        if (window.safeSetHTML) {
+          window.safeSetHTML(target, sourceHTML);
+        } else {
+          const temp = document.createElement('div');
+          temp.innerHTML = sourceHTML;
+          temp.querySelectorAll('script').forEach((s) => s.remove());
+          target.replaceChildren(...temp.childNodes);
+        }
+      }
     });
 
     document.getElementById('FacetFiltersFormMobile').closest('menu-drawer').bindEvents();
@@ -200,14 +253,22 @@ class FacetFiltersForm extends HTMLElement {
     const sourceSummary = source.querySelector('.facets__summary');
 
     if (sourceSummary && targetSummary) {
-      targetSummary.outerHTML = sourceSummary.outerHTML;
+      if (window.safeReplaceWithSanitizedElement) {
+        window.safeReplaceWithSanitizedElement(targetSummary, sourceSummary);
+      } else {
+        targetSummary.outerHTML = sourceSummary.outerHTML;
+      }
     }
 
     const targetHeaderElement = target.querySelector('.facets__header');
     const sourceHeaderElement = source.querySelector('.facets__header');
 
     if (sourceHeaderElement && targetHeaderElement) {
-      targetHeaderElement.outerHTML = sourceHeaderElement.outerHTML;
+      if (window.safeReplaceWithSanitizedElement) {
+        window.safeReplaceWithSanitizedElement(targetHeaderElement, sourceHeaderElement);
+      } else {
+        targetHeaderElement.outerHTML = sourceHeaderElement.outerHTML;
+      }
     }
 
     const targetWrapElement = target.querySelector('.facets-wrap');
@@ -221,7 +282,11 @@ class FacetFiltersForm extends HTMLElement {
           .forEach((hiddenItem) => hiddenItem.classList.replace('hidden', 'show-more-item'));
       }
 
-      targetWrapElement.outerHTML = sourceWrapElement.outerHTML;
+      if (window.safeReplaceWithSanitizedElement) {
+        window.safeReplaceWithSanitizedElement(targetWrapElement, sourceWrapElement);
+      } else {
+        targetWrapElement.outerHTML = sourceWrapElement.outerHTML;
+      }
     }
   }
 
@@ -230,7 +295,11 @@ class FacetFiltersForm extends HTMLElement {
     const sourceFacetsList = source.querySelector('.mobile-facets__list');
 
     if (sourceFacetsList && targetFacetsList) {
-      targetFacetsList.outerHTML = sourceFacetsList.outerHTML;
+      if (window.safeReplaceWithSanitizedElement) {
+        window.safeReplaceWithSanitizedElement(targetFacetsList, sourceFacetsList);
+      } else {
+        targetFacetsList.outerHTML = sourceFacetsList.outerHTML;
+      }
     }
   }
 

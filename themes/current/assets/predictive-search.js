@@ -226,7 +226,14 @@ class PredictiveSearch extends SearchForm {
   }
 
   renderSearchResults(resultsMarkup) {
-    this.predictiveSearchResults.innerHTML = resultsMarkup;
+    if (window.safeSetHTML) {
+      window.safeSetHTML(this.predictiveSearchResults, resultsMarkup);
+    } else {
+      const temp = document.createElement('div');
+      temp.innerHTML = resultsMarkup;
+      temp.querySelectorAll('script').forEach((s) => s.remove());
+      this.predictiveSearchResults.replaceChildren(...temp.childNodes);
+    }
     this.setAttribute('results', true);
 
     this.setLiveRegionResults();

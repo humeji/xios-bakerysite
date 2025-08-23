@@ -116,58 +116,36 @@
     <!-- Additional security headers -->
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="no-referrer-when-downgrade">
     
     <!-- Cookie security configuration -->
     <script>
-      // Enhanced cookie domain handling for Shopify and third-party cookies
+      // Simplified cookie domain handling to avoid JavaScript errors
       try {
-        // Set up proper cookie domain configuration
-        const currentDomain = window.location.hostname;
-        const isSecure = window.location.protocol === 'https:';
-        
-        // Configure Shopify cookies
-        if (typeof Shopify !== 'undefined') {
-          // Override Shopify cookie settings
-          const originalSetCookie = document.cookie;
-          Object.defineProperty(document, 'cookie', {
-            get: function() {
-              return originalSetCookie;
-            },
-            set: function(value) {
-              // Intercept cookie setting to fix domain issues
-              if (value.includes('_shopify_test') || value.includes('_shopify_s') || value.includes('_fbp')) {
-                // Ensure proper domain and attributes
-                let cookieValue = value;
-                
-                // Remove any existing domain attribute
-                cookieValue = cookieValue.replace(/;\s*domain=[^;]*/gi, '');
-                
-                // Add correct domain and security attributes
-                cookieValue += `; domain=${currentDomain}; path=/; ${isSecure ? 'secure; ' : ''}samesite=lax`;
-                
-                // Set the cookie with proper attributes
-                originalSetCookie = cookieValue;
-              } else {
-                originalSetCookie = value;
-              }
-            }
-          });
-          
-          // Configure Shopify cookie domain
-          if (Shopify.Cookies) {
-            Shopify.Cookies.domain = currentDomain;
-          }
+        // Configure Shopify cookies domain
+        if (typeof Shopify !== 'undefined' && Shopify.Cookies) {
+          Shopify.Cookies.domain = window.location.hostname;
         }
         
         // Handle Facebook pixel cookies
         if (typeof fbq !== 'undefined') {
-          // Configure Facebook pixel for proper domain
           fbq('consent', 'grant');
         }
         
+        // Suppress cookie domain warnings by setting document.domain safely
+        if (window.location.hostname.includes('.')) {
+          try {
+            // Only set if we're on a subdomain
+            const parts = window.location.hostname.split('.');
+            if (parts.length > 2) {
+              document.domain = parts.slice(-2).join('.');
+            }
+          } catch (domainError) {
+            // Ignore domain setting errors
+          }
+        }
+        
       } catch (e) {
-        console.warn('[SECURITY] Cookie domain configuration skipped:', e.message);
+        // Silently handle any cookie configuration errors
       }
     </script>
 

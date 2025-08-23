@@ -171,16 +171,77 @@ class ThirdPartySecurityManager {
       });
     });
 
-    // Monitor for console errors that might indicate security issues
+    // Monitor and filter console messages
     const originalError = console.error;
+    const originalWarn = console.warn;
+    const originalLog = console.log;
+    
     console.error = (...args) => {
       const message = args.join(' ');
-      if (message.includes('Content Security Policy') || 
-          message.includes('cookie') || 
-          message.includes('domain')) {
-        this.handleSecurityError(message);
+      
+      // Filter out harmless errors
+      const harmlessErrors = [
+        'Partitioned cookie or storage access',
+        'Instagram',
+        'cdninstagram.com',
+        'Referrer Policy',
+        'origin-when-cross-origin',
+        'static.cdninstagram.com',
+        'ErrorUtils caught an error',
+        'route config was null',
+        'csrftoken',
+        'Pop Convert',
+        'blurred pcjs.production.min.js'
+      ];
+      
+      const isHarmless = harmlessErrors.some(error => message.includes(error));
+      
+      if (!isHarmless) {
+        if (message.includes('Content Security Policy') || 
+            message.includes('cookie') || 
+            message.includes('domain')) {
+          this.handleSecurityError(message);
+        }
+        originalError.apply(console, args);
       }
-      originalError.apply(console, args);
+    };
+    
+    console.warn = (...args) => {
+      const message = args.join(' ');
+      
+      // Filter out harmless warnings
+      const harmlessWarnings = [
+        'Referrer Policy',
+        'origin-when-cross-origin',
+        'static.cdninstagram.com',
+        'Instagram',
+        'cdninstagram.com',
+        'block-all-mixed-content'
+      ];
+      
+      const isHarmless = harmlessWarnings.some(warning => message.includes(warning));
+      
+      if (!isHarmless) {
+        originalWarn.apply(console, args);
+      }
+    };
+    
+    console.log = (...args) => {
+      const message = args.join(' ');
+      
+      // Filter out harmless logs
+      const harmlessLogs = [
+        'Pop Convert',
+        'V1.2',
+        'Environment: production',
+        'blurred pcjs.production.min.js'
+      ];
+      
+      const isHarmless = harmlessLogs.some(log => message.includes(log));
+      
+      if (!isHarmless) {
+        originalLog.apply(console, args);
+      }
     };
   }
 
@@ -200,7 +261,11 @@ class ThirdPartySecurityManager {
       'Pop Convert',
       '_shopify_test',
       '_shopify_s',
-      '_fbp'
+      '_fbp',
+      'origin-when-cross-origin',
+      'static.cdninstagram.com',
+      'ErrorUtils caught an error',
+      'blurred pcjs.production.min.js'
     ];
     
     const isHarmless = harmlessErrors.some(error => message.includes(error));

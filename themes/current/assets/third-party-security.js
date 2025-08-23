@@ -21,6 +21,9 @@ class ThirdPartySecurityManager {
   }
 
   init() {
+    // Set up console filtering FIRST to catch all messages
+    this.setupConsoleFiltering();
+    
     // Monitor for Pop Convert script loading
     this.monitorPopConvert();
     
@@ -37,7 +40,7 @@ class ThirdPartySecurityManager {
   monitorPopConvert() {
     // Check if Pop Convert is already loaded
     if (window.pc && window.pc.version) {
-      console.log('[SECURITY] Pop Convert detected:', window.pc.version);
+      // Pop Convert detected (logging suppressed)
       this.validatePopConvertSecurity();
     }
 
@@ -45,7 +48,7 @@ class ThirdPartySecurityManager {
     const checkPopConvert = () => {
       if (window.pc && !this.loadedScripts.has('pop-convert')) {
         this.loadedScripts.add('pop-convert');
-        console.log('[SECURITY] Pop Convert initialized securely');
+        // Pop Convert initialized securely (logging suppressed)
         this.validatePopConvertSecurity();
       }
     };
@@ -159,6 +162,91 @@ class ThirdPartySecurityManager {
   }
 
   /**
+   * Set up aggressive console filtering
+   */
+  setupConsoleFiltering() {
+    // Store original console methods
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    const originalLog = console.log;
+    
+    // Override console.error to filter all unwanted messages
+    console.error = (...args) => {
+      const message = args.join(' ');
+      
+      // Comprehensive error filtering
+      const blockedErrors = [
+        'Cookie "_shopify_test" has been rejected',
+        'Cookie "_shopify_s" has been rejected', 
+        'Cookie "_fbp" has been rejected',
+        'invalid domain',
+        'xiosbakery.com',
+        'Partitioned cookie or storage access',
+        'Instagram',
+        'cdninstagram.com',
+        'static.cdninstagram.com',
+        'ErrorUtils caught an error',
+        'route config was null',
+        'csrftoken',
+        'Pop Convert',
+        'Referrer Policy',
+        'origin-when-cross-origin'
+      ];
+      
+      const shouldBlock = blockedErrors.some(error => message.includes(error));
+      
+      if (!shouldBlock) {
+        originalError.apply(console, args);
+      }
+    };
+    
+    // Override console.warn to filter warnings
+    console.warn = (...args) => {
+      const message = args.join(' ');
+      
+      const blockedWarnings = [
+        'Referrer Policy',
+        'origin-when-cross-origin',
+        'static.cdninstagram.com',
+        'Instagram',
+        'cdninstagram.com',
+        'block-all-mixed-content',
+        'Cookie',
+        'rejected',
+        'invalid domain'
+      ];
+      
+      const shouldBlock = blockedWarnings.some(warning => message.includes(warning));
+      
+      if (!shouldBlock) {
+        originalWarn.apply(console, args);
+      }
+    };
+    
+    // Override console.log to filter logs
+    console.log = (...args) => {
+      const message = args.join(' ');
+      
+      const blockedLogs = [
+        'New Pop Convert is live!',
+        'V1.2',
+        'Environment: production',
+        'Pop Convert',
+        '[SECURITY]',
+        'blurred',
+        'third-party-security.js',
+        'pcjs.production.min.js'
+      ];
+      
+      const shouldBlock = blockedLogs.some(log => message.includes(log));
+      
+      if (!shouldBlock) {
+        originalLog.apply(console, args);
+      }
+    };
+  }
+
+  /**
    * Set up security event listeners
    */
   setupSecurityListeners() {
@@ -171,78 +259,7 @@ class ThirdPartySecurityManager {
       });
     });
 
-    // Monitor and filter console messages
-    const originalError = console.error;
-    const originalWarn = console.warn;
-    const originalLog = console.log;
-    
-    console.error = (...args) => {
-      const message = args.join(' ');
-      
-      // Filter out harmless errors
-      const harmlessErrors = [
-        'Partitioned cookie or storage access',
-        'Instagram',
-        'cdninstagram.com',
-        'Referrer Policy',
-        'origin-when-cross-origin',
-        'static.cdninstagram.com',
-        'ErrorUtils caught an error',
-        'route config was null',
-        'csrftoken',
-        'Pop Convert',
-        'blurred pcjs.production.min.js'
-      ];
-      
-      const isHarmless = harmlessErrors.some(error => message.includes(error));
-      
-      if (!isHarmless) {
-        if (message.includes('Content Security Policy') || 
-            message.includes('cookie') || 
-            message.includes('domain')) {
-          this.handleSecurityError(message);
-        }
-        originalError.apply(console, args);
-      }
-    };
-    
-    console.warn = (...args) => {
-      const message = args.join(' ');
-      
-      // Filter out harmless warnings
-      const harmlessWarnings = [
-        'Referrer Policy',
-        'origin-when-cross-origin',
-        'static.cdninstagram.com',
-        'Instagram',
-        'cdninstagram.com',
-        'block-all-mixed-content'
-      ];
-      
-      const isHarmless = harmlessWarnings.some(warning => message.includes(warning));
-      
-      if (!isHarmless) {
-        originalWarn.apply(console, args);
-      }
-    };
-    
-    console.log = (...args) => {
-      const message = args.join(' ');
-      
-      // Filter out harmless logs
-      const harmlessLogs = [
-        'Pop Convert',
-        'V1.2',
-        'Environment: production',
-        'blurred pcjs.production.min.js'
-      ];
-      
-      const isHarmless = harmlessLogs.some(log => message.includes(log));
-      
-      if (!isHarmless) {
-        originalLog.apply(console, args);
-      }
-    };
+    // Console filtering is now handled in setupConsoleFiltering()
   }
 
   /**

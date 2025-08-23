@@ -4,14 +4,14 @@
 
 ## Current Status
 
-**Version:** v13.1.2-secure  
+**Version:** v13.4.0-popconvert-toggle  
 **Security Status:** ✅ All 68+ XSS vulnerabilities resolved  
-**CSP Status:** ✅ Comprehensive Content Security Policy implemented  
+**CSP Status:** ✅ Conditional CSP with Instagram/Facebook always enabled; Pop Convert allowed only when toggled on  
 **Deployment:** Ready for production
 
 ## Quick Deployment
 
-1. **Download:** `xios-bakery-theme-v13.1.2-secure-20250822.zip`
+1. **Download:** `xios-bakery-theme-v13.4.0-popconvert-toggle-20250822.zip`
 2. **Upload:** Shopify Admin → Themes → Upload ZIP
 3. **Validate:** Follow [SHOPIFY_DEPLOYMENT_GUIDE.md](./SHOPIFY_DEPLOYMENT_GUIDE.md)
 
@@ -49,6 +49,10 @@ xios-bakerysite/
 - Upload modified theme files
 - Preview and test changes
 - Publish when ready
+
+## Pop Convert (Toggleable)
+- Theme settings → Integrations → **Enable Pop Convert** to load its script.
+- CSP and loader are conditional; when disabled, Pop Convert is blocked entirely.
 
 ## Store Information
 

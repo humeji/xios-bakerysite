@@ -11,7 +11,10 @@ class ThirdPartySecurityManager {
       'cdn.s3.pop-convert.com',
       'cdn.pop-convert.com',
       'cdn.micro.pop-convert.com',
-      'micro.pop-convert.com'
+      'micro.pop-convert.com',
+      'static.cdninstagram.com',
+      'www.instagram.com',
+      'instagram.com'
     ];
     this.loadedScripts = new Set();
     this.init();
@@ -185,16 +188,28 @@ class ThirdPartySecurityManager {
    * Handle security-related errors
    */
   handleSecurityError(message) {
-    // Log security errors for monitoring
-    if (window.Shopify && window.Shopify.analytics) {
-      try {
-        window.Shopify.analytics.publish('security_error', {
-          message: message,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent
-        });
-      } catch (e) {
-        // Fail silently if analytics is not available
+    // Filter out known harmless errors
+    const harmlessErrors = [
+      'Partitioned cookie or storage access',
+      'Instagram',
+      'cdninstagram.com',
+      'Referrer Policy'
+    ];
+    
+    const isHarmless = harmlessErrors.some(error => message.includes(error));
+    
+    if (!isHarmless) {
+      // Log security errors for monitoring
+      if (window.Shopify && window.Shopify.analytics) {
+        try {
+          window.Shopify.analytics.publish('security_error', {
+            message: message,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          });
+        } catch (e) {
+          // Fail silently if analytics is not available
+        }
       }
     }
   }

@@ -57,19 +57,23 @@
         script.pop-convert.com
         cdn.s3.pop-convert.com
         www.instagram.com
-        monorail-edge.shopifysvc.com
-        production.pc.min.js;
+        *.instagram.com
+        static.cdninstagram.com
+        monorail-edge.shopifysvc.com;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
         code.jquery.com
         https://fonts.googleapis.com 
         https://fonts.gstatic.com
         *.shopify.com 
-        *.shopifycdn.com;
+        *.shopifycdn.com
+        static.cdninstagram.com;
       img-src 'self' data: blob:
         *.shopify.com 
         *.shopifycdn.com
-        www.facebook.com;
+        www.facebook.com
+        *.instagram.com
+        static.cdninstagram.com;
       font-src 'self' 
         https://fonts.googleapis.com 
         https://fonts.gstatic.com
@@ -87,24 +91,53 @@
         shop.app
         *.facebook.com
         connect.facebook.net
+        *.instagram.com
+        static.cdninstagram.com
+        www.instagram.com
         xiosbakery.com;
       frame-src 'self'
         *.shopify.com 
         checkout.shopifycs.com
         shop.app
-        www.instagram.com;
+        www.instagram.com
+        *.instagram.com;
     ">
     
     <!-- Additional security headers -->
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Referrer-Policy" content="origin-when-cross-origin">
     
     <!-- Cookie security configuration -->
     <script>
-      // Fix Shopify cookie domain issues
-      if (typeof Shopify !== 'undefined' && Shopify.shop) {
-        document.domain = Shopify.shop.replace('.myshopify.com', '');
+      // Fix Shopify cookie domain issues safely
+      try {
+        if (typeof Shopify !== 'undefined' && Shopify.shop) {
+          const shopDomain = Shopify.shop.replace('.myshopify.com', '');
+          if (shopDomain && shopDomain !== window.location.hostname) {
+            // Only set document.domain if it's safe and necessary
+            if (window.location.hostname.includes(shopDomain)) {
+              document.domain = shopDomain;
+            }
+          }
+        }
+        
+        // Alternative approach: Set cookie attributes properly
+        if (typeof Shopify !== 'undefined') {
+          // Ensure Shopify cookies use correct domain
+          const cookieOptions = {
+            domain: window.location.hostname,
+            secure: window.location.protocol === 'https:',
+            sameSite: 'Lax'
+          };
+          
+          // Apply to Shopify cookie handling
+          if (Shopify.Cookies) {
+            Shopify.Cookies.domain = cookieOptions.domain;
+          }
+        }
+      } catch (e) {
+        console.warn('[SECURITY] Cookie domain configuration skipped:', e.message);
       }
     </script>
 
@@ -326,19 +359,9 @@
     {{ 'custom.css' | asset_url | stylesheet_tag }} 
 
     {%- comment -%}
-      Optimized font loading: Use font-display: swap and conditional preloading
-      to eliminate unused preload warnings while maintaining performance
+      Optimized font loading: Use font-display: swap without preloading
+      to eliminate unused preload warnings. Fonts will load on-demand with swap behavior.
     {%- endcomment -%}
-    {%- unless settings.type_body_font.system? -%}
-      {%- if template.name == 'index' or template.name == 'product' or template.name == 'collection' -%}
-        <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
-      {%- endif -%}
-    {%- endunless -%}
-    {%- if settings.type_header_font != settings.type_body_font and settings.type_header_font.system? == false -%}
-      {%- if template.name == 'index' or template.name == 'product' or template.name == 'collection' -%}
-        <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-      {%- endif -%}
-    {%- endif -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
       <link rel="stylesheet" href="{{ 'component-localization-form.css' | asset_url }}" media="print" onload="this.media='all'">

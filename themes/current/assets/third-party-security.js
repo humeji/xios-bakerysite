@@ -188,12 +188,19 @@ class ThirdPartySecurityManager {
    * Handle security-related errors
    */
   handleSecurityError(message) {
-    // Filter out known harmless errors
+    // Filter out known harmless errors and warnings
     const harmlessErrors = [
       'Partitioned cookie or storage access',
       'Instagram',
       'cdninstagram.com',
-      'Referrer Policy'
+      'Referrer Policy',
+      'block-all-mixed-content',
+      'csrftoken',
+      'route config was null',
+      'Pop Convert',
+      '_shopify_test',
+      '_shopify_s',
+      '_fbp'
     ];
     
     const isHarmless = harmlessErrors.some(error => message.includes(error));

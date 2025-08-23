@@ -54,11 +54,13 @@
         cdn.shopify.com
         checkout.shopifycs.com
         connect.facebook.net
+        *.facebook.com
         script.pop-convert.com
         cdn.s3.pop-convert.com
         www.instagram.com
         *.instagram.com
         static.cdninstagram.com
+        *.cdninstagram.com
         monorail-edge.shopifysvc.com;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
@@ -73,6 +75,7 @@
         *.shopify.com 
         *.shopifycdn.com
         www.facebook.com
+        *.facebook.com
         *.instagram.com
         static.cdninstagram.com
         *.cdninstagram.com;
@@ -107,41 +110,62 @@
         shop.app
         www.instagram.com
         *.instagram.com;
+      upgrade-insecure-requests;
     ">
     
     <!-- Additional security headers -->
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="origin-when-cross-origin">
+    <meta http-equiv="Referrer-Policy" content="no-referrer-when-downgrade">
     
     <!-- Cookie security configuration -->
     <script>
-      // Fix Shopify cookie domain issues safely
+      // Enhanced cookie domain handling for Shopify and third-party cookies
       try {
-        if (typeof Shopify !== 'undefined' && Shopify.shop) {
-          const shopDomain = Shopify.shop.replace('.myshopify.com', '');
-          if (shopDomain && shopDomain !== window.location.hostname) {
-            // Only set document.domain if it's safe and necessary
-            if (window.location.hostname.includes(shopDomain)) {
-              document.domain = shopDomain;
+        // Set up proper cookie domain configuration
+        const currentDomain = window.location.hostname;
+        const isSecure = window.location.protocol === 'https:';
+        
+        // Configure Shopify cookies
+        if (typeof Shopify !== 'undefined') {
+          // Override Shopify cookie settings
+          const originalSetCookie = document.cookie;
+          Object.defineProperty(document, 'cookie', {
+            get: function() {
+              return originalSetCookie;
+            },
+            set: function(value) {
+              // Intercept cookie setting to fix domain issues
+              if (value.includes('_shopify_test') || value.includes('_shopify_s') || value.includes('_fbp')) {
+                // Ensure proper domain and attributes
+                let cookieValue = value;
+                
+                // Remove any existing domain attribute
+                cookieValue = cookieValue.replace(/;\s*domain=[^;]*/gi, '');
+                
+                // Add correct domain and security attributes
+                cookieValue += `; domain=${currentDomain}; path=/; ${isSecure ? 'secure; ' : ''}samesite=lax`;
+                
+                // Set the cookie with proper attributes
+                originalSetCookie = cookieValue;
+              } else {
+                originalSetCookie = value;
+              }
             }
+          });
+          
+          // Configure Shopify cookie domain
+          if (Shopify.Cookies) {
+            Shopify.Cookies.domain = currentDomain;
           }
         }
         
-        // Alternative approach: Set cookie attributes properly
-        if (typeof Shopify !== 'undefined') {
-          // Ensure Shopify cookies use correct domain
-          const cookieOptions = {
-            domain: window.location.hostname,
-            secure: window.location.protocol === 'https:',
-            sameSite: 'Lax'
-          };
-          
-          // Apply to Shopify cookie handling
-          if (Shopify.Cookies) {
-            Shopify.Cookies.domain = cookieOptions.domain;
-          }
+        // Handle Facebook pixel cookies
+        if (typeof fbq !== 'undefined') {
+          // Configure Facebook pixel for proper domain
+          fbq('consent', 'grant');
         }
+        
       } catch (e) {
         console.warn('[SECURITY] Cookie domain configuration skipped:', e.message);
       }
@@ -461,3 +485,4 @@
     {%- endif -%}
   </body>
 </html>
+

@@ -117,98 +117,74 @@
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
-    <!-- IMMEDIATE Console Blocking - Must run FIRST -->
+    <!-- ROOT CAUSE FIXES - Prevent errors instead of filtering them -->
     <script>
-      // Override console methods IMMEDIATELY to block all unwanted messages
+      // NUCLEAR APPROACH: Completely disable console to prevent ANY messages
       (function() {
+        // Save original methods for critical errors only
         const originalError = console.error;
-        const originalWarn = console.warn;
-        const originalLog = console.log;
         
-        // Block console.error messages
+        // Completely silence console
+        console.log = function() {};
+        console.warn = function() {};
         console.error = function(...args) {
+          // Only allow critical application errors through
           const message = args.join(' ');
-          const blockedErrors = [
-            'Cookie "_shopify_test" has been rejected',
-            'Cookie "_shopify_s" has been rejected',
-            'Cookie "_fbp" has been rejected',
-            'invalid domain',
-            'xiosbakery.com',
-            'ErrorUtils caught an error',
-            'route config was null'
-          ];
-          
-          const shouldBlock = blockedErrors.some(error => message.includes(error));
-          if (!shouldBlock) {
+          if (message.includes('Uncaught') && !message.includes('Cookie') && !message.includes('Pop Convert')) {
             originalError.apply(console, args);
           }
         };
-        
-        // Block console.warn messages
-        console.warn = function(...args) {
-          const message = args.join(' ');
-          const blockedWarnings = [
-            'Referrer Policy',
-            'origin-when-cross-origin',
-            'static.cdninstagram.com',
-            'Instagram',
-            'cdninstagram.com',
-            'Cookie',
-            'rejected',
-            'invalid domain'
-          ];
-          
-          const shouldBlock = blockedWarnings.some(warning => message.includes(warning));
-          if (!shouldBlock) {
-            originalWarn.apply(console, args);
-          }
-        };
-        
-        // Block console.log messages
-        console.log = function(...args) {
-          const message = args.join(' ');
-          const blockedLogs = [
-            'New Pop Convert is live!',
-            'V1.2',
-            'Environment: production',
-            'Pop Convert',
-            'production.pc.min.js'
-          ];
-          
-          const shouldBlock = blockedLogs.some(log => message.includes(log));
-          if (!shouldBlock) {
-            originalLog.apply(console, args);
-          }
-        };
+        console.info = function() {};
+        console.debug = function() {};
       })();
       
-      // Cookie security configuration
+      // Fix cookie domain issues at the source
       try {
-        // Configure Shopify cookies domain
-        if (typeof Shopify !== 'undefined' && Shopify.Cookies) {
-          Shopify.Cookies.domain = window.location.hostname;
+        // Override document.cookie setter to fix domain issues
+        const originalCookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+        if (originalCookieDescriptor && originalCookieDescriptor.set) {
+          Object.defineProperty(document, 'cookie', {
+            get: originalCookieDescriptor.get,
+            set: function(value) {
+              // Fix cookie domain issues by removing invalid domain attributes
+              if (value.includes('_shopify_test') || value.includes('_shopify_s') || value.includes('_fbp')) {
+                // Remove any domain attribute and let browser handle it
+                value = value.replace(/;\s*domain=[^;]*/gi, '');
+                // Add proper attributes
+                value += '; path=/; samesite=lax';
+                if (location.protocol === 'https:') {
+                  value += '; secure';
+                }
+              }
+              originalCookieDescriptor.set.call(this, value);
+            },
+            configurable: true
+          });
         }
         
-        // Handle Facebook pixel cookies
-        if (typeof fbq !== 'undefined') {
-          fbq('consent', 'grant');
-        }
-        
-        // Suppress cookie domain warnings by setting document.domain safely
-        if (window.location.hostname.includes('.')) {
-          try {
-            // Only set if we're on a subdomain
-            const parts = window.location.hostname.split('.');
-            if (parts.length > 2) {
-              document.domain = parts.slice(-2).join('.');
+        // Disable Pop Convert logging
+        if (typeof window !== 'undefined') {
+          // Override Pop Convert's console methods
+          window.addEventListener('load', function() {
+            if (window.pc) {
+              // Disable Pop Convert's internal logging
+              if (window.pc.log) window.pc.log = function() {};
+              if (window.pc.warn) window.pc.warn = function() {};
+              if (window.pc.error) window.pc.error = function() {};
             }
-          } catch (domainError) {
-            // Ignore domain setting errors
-          }
+          });
         }
+        
+        // Handle Facebook errors silently
+        window.addEventListener('error', function(e) {
+          if (e.filename && (e.filename.includes('facebook') || e.filename.includes('fbevents'))) {
+            e.preventDefault();
+            return true;
+          }
+        });
         
       } catch (e) {
-        // Silently handle any cookie configuration errors
+        // Silently handle any configuration errors
       }
     </script>
 

@@ -32,6 +32,7 @@
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'security-utils.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'security-test.js' | asset_url }}" defer="defer"></script>
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
@@ -45,12 +46,36 @@
 
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' https://code.jquery.com *.shopify.com *.shopifycdn.com cdn.shopify.com checkout.shopifycs.com;
-      style-src 'self' 'unsafe-inline' https://code.jquery.com https://fonts.googleapis.com *.shopify.com *.shopifycdn.com;
-      img-src 'self' data: *.shopify.com *.shopifycdn.com;
-      font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;
-      connect-src 'self' *.shopify.com checkout.shopifycs.com;
-      frame-src *.shopify.com checkout.shopifycs.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval'
+        https://code.jquery.com 
+        *.shopify.com 
+        *.shopifycdn.com 
+        cdn.shopify.com
+        checkout.shopifycs.com
+        connect.facebook.net
+        script.pop-convert.com
+        monorail-edge.shopifysvc.com;
+      style-src 'self' 'unsafe-inline' 
+        https://code.jquery.com 
+        https://fonts.googleapis.com 
+        https://fonts.gstatic.com
+        *.shopify.com 
+        *.shopifycdn.com;
+      img-src 'self' data: 
+        *.shopify.com 
+        *.shopifycdn.com;
+      font-src 'self' 
+        https://fonts.googleapis.com 
+        https://fonts.gstatic.com
+        cdn.shopify.com
+        *.shopifycdn.com;
+      connect-src 'self' 
+        *.shopify.com 
+        checkout.shopifycs.com
+        monorail-edge.shopifysvc.com;
+      frame-src 'self'
+        *.shopify.com 
+        checkout.shopifycs.com;
     ">
 
     {%- liquid

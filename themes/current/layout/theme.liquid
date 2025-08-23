@@ -32,6 +32,7 @@
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'security-utils.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'third-party-security.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'security-test.js' | asset_url }}" defer="defer"></script>
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -56,7 +57,8 @@
         script.pop-convert.com
         cdn.s3.pop-convert.com
         www.instagram.com
-        monorail-edge.shopifysvc.com;
+        monorail-edge.shopifysvc.com
+        production.pc.min.js;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
         code.jquery.com
@@ -72,7 +74,8 @@
         https://fonts.googleapis.com 
         https://fonts.gstatic.com
         cdn.shopify.com
-        *.shopifycdn.com;
+        *.shopifycdn.com
+        xiosbakery.com;
       connect-src 'self' 
         *.shopify.com 
         checkout.shopifycs.com
@@ -83,13 +86,27 @@
         micro.pop-convert.com
         shop.app
         *.facebook.com
-        connect.facebook.net;
+        connect.facebook.net
+        xiosbakery.com;
       frame-src 'self'
         *.shopify.com 
         checkout.shopifycs.com
         shop.app
         www.instagram.com;
     ">
+    
+    <!-- Additional security headers -->
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <!-- Cookie security configuration -->
+    <script>
+      // Fix Shopify cookie domain issues
+      if (typeof Shopify !== 'undefined' && Shopify.shop) {
+        document.domain = Shopify.shop.replace('.myshopify.com', '');
+      }
+    </script>
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
@@ -309,14 +326,18 @@
     {{ 'custom.css' | asset_url | stylesheet_tag }} 
 
     {%- comment -%}
-      Optimized font loading: Use font-display: swap and remove aggressive preloading
+      Optimized font loading: Use font-display: swap and conditional preloading
       to eliminate unused preload warnings while maintaining performance
     {%- endcomment -%}
     {%- unless settings.type_body_font.system? -%}
-      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
+      {%- if template.name == 'index' or template.name == 'product' or template.name == 'collection' -%}
+        <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
+      {%- endif -%}
     {%- endunless -%}
     {%- if settings.type_header_font != settings.type_body_font and settings.type_header_font.system? == false -%}
-      <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
+      {%- if template.name == 'index' or template.name == 'product' or template.name == 'collection' -%}
+        <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
+      {%- endif -%}
     {%- endif -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}

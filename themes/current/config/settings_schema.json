@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Dawn",
-    "theme_version": "13.3.9-thirdparty-disabled",
+    "theme_version": "13.4.0-popconvert-toggle",
     "theme_author": "Shopify",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1463,6 +1463,24 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Integrations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "pop_convert_enabled",
+        "label": "Enable Pop Convert",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "pop_convert_script_url",
+        "label": "Pop Convert script URL",
+        "default": "https://script.pop-convert.com/production.pc.min.js",
+        "info": "Override only if instructed by Pop Convert"
       }
     ]
   }

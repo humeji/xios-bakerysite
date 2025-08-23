@@ -8,7 +8,7 @@
     <link rel="canonical" href="{{ canonical_url }}">
 
     {%- if settings.favicon != blank -%}
-      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
@@ -53,6 +53,16 @@
         *.shopifycdn.com 
         cdn.shopify.com
         checkout.shopifycs.com
+        connect.facebook.net
+        *.facebook.com
+        www.instagram.com
+        *.instagram.com
+        static.cdninstagram.com
+        *.cdninstagram.com
+        {% if settings.pop_convert_enabled %}
+        script.pop-convert.com
+        cdn.s3.pop-convert.com
+        {% endif %}
         monorail-edge.shopifysvc.com;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
@@ -66,6 +76,8 @@
       img-src 'self' data: blob:
         *.shopify.com 
         *.shopifycdn.com
+        www.facebook.com
+        *.facebook.com
         *.instagram.com
         static.cdninstagram.com
         *.cdninstagram.com;
@@ -83,9 +95,16 @@
         monorail-edge.shopifysvc.com
         error-analytics-sessions-production.shopifysvc.com
         shop.app
+        *.facebook.com
+        connect.facebook.net
         *.instagram.com
         static.cdninstagram.com
         *.cdninstagram.com
+        {% if settings.pop_convert_enabled %}
+        cdn.pop-convert.com
+        cdn.micro.pop-convert.com
+        micro.pop-convert.com
+        {% endif %}
         www.instagram.com
         xiosbakery.com
         https://xiosbakery.com;
@@ -97,6 +116,48 @@
         *.instagram.com;
       upgrade-insecure-requests;
     ">
+
+    <!-- Pop Convert conditional loader -->
+    {% if settings.pop_convert_enabled %}
+      <script>
+        (function(){
+          var src = '{{ settings.pop_convert_script_url | escape }}';
+          if (!/^https:\/\//.test(src)) { src = 'https://script.pop-convert.com/production.pc.min.js'; }
+          var s = document.createElement('script');
+          s.async = true; s.defer = true; s.src = src;
+          document.head.appendChild(s);
+        })();
+      </script>
+    {% endif %}
+
+    <!-- Third-party neutralizer respects toggle -->
+    <script>
+      (function() {
+        var POP_ENABLED = {{ settings.pop_convert_enabled | json }};
+        var BLOCKED_HOSTS = [
+          POP_ENABLED ? '' : 'script.pop-convert.com',
+          POP_ENABLED ? '' : 'cdn.s3.pop-convert.com',
+          POP_ENABLED ? '' : 'cdn.pop-convert.com',
+          POP_ENABLED ? '' : 'cdn.micro.pop-convert.com',
+          POP_ENABLED ? '' : 'micro.pop-convert.com'
+        ].filter(Boolean);
+        function isBlocked(url) {
+          try { var host = new URL(url, document.baseURI).hostname; return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); }); } catch (e) { return false; }
+        }
+        var originalCreateElement = document.createElement;
+        document.createElement = function(name){
+          var el = originalCreateElement.call(document, name);
+          if (name && name.toLowerCase() === 'script') {
+            var originalSetAttribute = el.setAttribute;
+            el.setAttribute = function(attr, value){ if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) { return; } return originalSetAttribute.call(this, attr, value); };
+            Object.defineProperty(el, 'src', { set: function(v){ if (!isBlocked(v)) { originalSetAttribute.call(el, 'src', v); } }, get: function(){ return el.getAttribute('src'); } });
+          }
+          return el;
+        };
+        function wrapAppend(fnName){ var original = Node.prototype[fnName]; Node.prototype[fnName] = function(child){ try { if (child && child.tagName === 'SCRIPT') { var s = child.getAttribute('src'); if (s && isBlocked(s)) { return child; } } } catch(e) {} return original.apply(this, arguments); }; }
+        wrapAppend('appendChild'); wrapAppend('insertBefore');
+      })();
+    </script>
     
     <!-- Additional security headers -->
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">

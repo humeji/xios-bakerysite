@@ -53,14 +53,6 @@
         *.shopifycdn.com 
         cdn.shopify.com
         checkout.shopifycs.com
-        connect.facebook.net
-        *.facebook.com
-        script.pop-convert.com
-        cdn.s3.pop-convert.com
-        www.instagram.com
-        *.instagram.com
-        static.cdninstagram.com
-        *.cdninstagram.com
         monorail-edge.shopifysvc.com;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
@@ -74,8 +66,6 @@
       img-src 'self' data: blob:
         *.shopify.com 
         *.shopifycdn.com
-        www.facebook.com
-        *.facebook.com
         *.instagram.com
         static.cdninstagram.com
         *.cdninstagram.com;
@@ -92,12 +82,7 @@
         checkout.shopifycs.com
         monorail-edge.shopifysvc.com
         error-analytics-sessions-production.shopifysvc.com
-        cdn.pop-convert.com
-        cdn.micro.pop-convert.com
-        micro.pop-convert.com
         shop.app
-        *.facebook.com
-        connect.facebook.net
         *.instagram.com
         static.cdninstagram.com
         *.cdninstagram.com
@@ -119,73 +104,64 @@
     
     <!-- ROOT CAUSE FIXES - Prevent errors instead of filtering them -->
     <script>
-      // NUCLEAR APPROACH: Completely disable console to prevent ANY messages
+      // Third-party neutralizer: block Pop Convert and Facebook Pixel script injection early
       (function() {
-        // Save original methods for critical errors only
-        const originalError = console.error;
-        
-        // Completely silence console
-        console.log = function() {};
-        console.warn = function() {};
-        console.error = function(...args) {
-          // Only allow critical application errors through
-          const message = args.join(' ');
-          if (message.includes('Uncaught') && !message.includes('Cookie') && !message.includes('Pop Convert')) {
-            originalError.apply(console, args);
-          }
-        };
-        console.info = function() {};
-        console.debug = function() {};
-      })();
-      
-      // Fix cookie domain issues at the source
-      try {
-        // Override document.cookie setter to fix domain issues
-        const originalCookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
-        if (originalCookieDescriptor && originalCookieDescriptor.set) {
-          Object.defineProperty(document, 'cookie', {
-            get: originalCookieDescriptor.get,
-            set: function(value) {
-              // Fix cookie domain issues by removing invalid domain attributes
-              if (value.includes('_shopify_test') || value.includes('_shopify_s') || value.includes('_fbp')) {
-                // Remove any domain attribute and let browser handle it
-                value = value.replace(/;\s*domain=[^;]*/gi, '');
-                // Add proper attributes
-                value += '; path=/; samesite=lax';
-                if (location.protocol === 'https:') {
-                  value += '; secure';
-                }
+        var BLOCKED_HOSTS = [
+          'script.pop-convert.com',
+          'cdn.s3.pop-convert.com',
+          'cdn.pop-convert.com',
+          'cdn.micro.pop-convert.com',
+          'micro.pop-convert.com',
+          'connect.facebook.net',
+          'www.facebook.com',
+          'facebook.com'
+        ];
+
+        function isBlocked(url) {
+          try {
+            var host = new URL(url, document.baseURI).hostname;
+            return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); });
+          } catch (e) { return false; }
+        }
+
+        // Neutralize fbq if present/created later
+        Object.defineProperty(window, 'fbq', { value: function(){}, writable: true, configurable: true });
+
+        var originalCreateElement = document.createElement;
+        document.createElement = function(name){
+          var el = originalCreateElement.call(document, name);
+          if (name && name.toLowerCase() === 'script') {
+            var originalSetAttribute = el.setAttribute;
+            el.setAttribute = function(attr, value){
+              if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) {
+                // Skip setting blocked src
+                return;
               }
-              originalCookieDescriptor.set.call(this, value);
-            },
-            configurable: true
-          });
-        }
-        
-        // Disable Pop Convert logging
-        if (typeof window !== 'undefined') {
-          // Override Pop Convert's console methods
-          window.addEventListener('load', function() {
-            if (window.pc) {
-              // Disable Pop Convert's internal logging
-              if (window.pc.log) window.pc.log = function() {};
-              if (window.pc.warn) window.pc.warn = function() {};
-              if (window.pc.error) window.pc.error = function() {};
-            }
-          });
-        }
-        
-        // Handle Facebook errors silently
-        window.addEventListener('error', function(e) {
-          if (e.filename && (e.filename.includes('facebook') || e.filename.includes('fbevents'))) {
-            e.preventDefault();
-            return true;
+              return originalSetAttribute.call(this, attr, value);
+            };
+            Object.defineProperty(el, 'src', {
+              set: function(v){ if (!isBlocked(v)) { originalSetAttribute.call(el, 'src', v); } },
+              get: function(){ return el.getAttribute('src'); }
+            });
           }
-        });
-        
-      } catch (e) {
-        // Silently handle any configuration errors
-      }
+          return el;
+        };
+
+        function wrapAppend(fnName){
+          var original = Node.prototype[fnName];
+          Node.prototype[fnName] = function(child){
+            try {
+              if (child && child.tagName === 'SCRIPT') {
+                var s = child.getAttribute('src');
+                if (s && isBlocked(s)) { return child; }
+              }
+            } catch(e) {}
+            return original.apply(this, arguments);
+          };
+        }
+        wrapAppend('appendChild');
+        wrapAppend('insertBefore');
+      })();
     </script>
 
     {%- liquid

@@ -57,22 +57,54 @@
     {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
       <span class="product__media-icon motion-reduce quick-add-hidden">{% render 'icon-play' %}</span>
       <div class="product__media media">
-        {{ media.preview_image | image_url: width: 1946 | image_tag:
-          loading: lazy,
-          sizes: sizes,
-          widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
-        }}
+        <img
+          src="{{ media.preview_image | image_url: width: 1946 }}"
+          srcset="{% if media.preview_image and media.preview_image.width %}
+            {% if media.preview_image.width >= 246 %}{{ media.preview_image | image_url: width: 246 }} 246w,{% endif %}
+            {% if media.preview_image.width >= 493 %}{{ media.preview_image | image_url: width: 493 }} 493w,{% endif %}
+            {% if media.preview_image.width >= 600 %}{{ media.preview_image | image_url: width: 600 }} 600w,{% endif %}
+            {% if media.preview_image.width >= 713 %}{{ media.preview_image | image_url: width: 713 }} 713w,{% endif %}
+            {% if media.preview_image.width >= 823 %}{{ media.preview_image | image_url: width: 823 }} 823w,{% endif %}
+            {% if media.preview_image.width >= 990 %}{{ media.preview_image | image_url: width: 990 }} 990w,{% endif %}
+            {% if media.preview_image.width >= 1100 %}{{ media.preview_image | image_url: width: 1100 }} 1100w,{% endif %}
+            {% if media.preview_image.width >= 1206 %}{{ media.preview_image | image_url: width: 1206 }} 1206w,{% endif %}
+            {% if media.preview_image.width >= 1346 %}{{ media.preview_image | image_url: width: 1346 }} 1346w,{% endif %}
+            {% if media.preview_image.width >= 1426 %}{{ media.preview_image | image_url: width: 1426 }} 1426w,{% endif %}
+            {% if media.preview_image.width >= 1646 %}{{ media.preview_image | image_url: width: 1646 }} 1646w,{% endif %}
+            {% if media.preview_image.width >= 1946 %}{{ media.preview_image | image_url: width: 1946 }} 1946w,{% endif %}
+            {{ media.preview_image | image_url }} {{ media.preview_image.width }}w
+          {% else %}{{ media.preview_image | image_url: width: 1946 }} 1946w{% endif %}"
+          sizes="{{ sizes }}"
+          loading="lazy"
+          alt="{{ media.alt | escape }}"
+        >
       </div>
       <a href="{% if media.media_type == 'video' %}{{ media.sources[1].url }}{% else %}{{ media | external_video_url }}{% endif %}" class="product__media-toggle">
         <span class="visually-hidden">{{ 'products.product.video_exit_message' | t: title: product.title | escape }}</span>
       </a>
     {%- else -%}
       <div class="product__media media">
-        {{ media.preview_image | image_url: width: 1946 | image_tag:
-          loading: lazy,
-          sizes: sizes,
-          widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
-        }}
+        <img
+          src="{{ media.preview_image | image_url: width: 1946 }}"
+          srcset="{% if media.preview_image and media.preview_image.width %}
+            {% if media.preview_image.width >= 246 %}{{ media.preview_image | image_url: width: 246 }} 246w,{% endif %}
+            {% if media.preview_image.width >= 493 %}{{ media.preview_image | image_url: width: 493 }} 493w,{% endif %}
+            {% if media.preview_image.width >= 600 %}{{ media.preview_image | image_url: width: 600 }} 600w,{% endif %}
+            {% if media.preview_image.width >= 713 %}{{ media.preview_image | image_url: width: 713 }} 713w,{% endif %}
+            {% if media.preview_image.width >= 823 %}{{ media.preview_image | image_url: width: 823 }} 823w,{% endif %}
+            {% if media.preview_image.width >= 990 %}{{ media.preview_image | image_url: width: 990 }} 990w,{% endif %}
+            {% if media.preview_image.width >= 1100 %}{{ media.preview_image | image_url: width: 1100 }} 1100w,{% endif %}
+            {% if media.preview_image.width >= 1206 %}{{ media.preview_image | image_url: width: 1206 }} 1206w,{% endif %}
+            {% if media.preview_image.width >= 1346 %}{{ media.preview_image | image_url: width: 1346 }} 1346w,{% endif %}
+            {% if media.preview_image.width >= 1426 %}{{ media.preview_image | image_url: width: 1426 }} 1426w,{% endif %}
+            {% if media.preview_image.width >= 1646 %}{{ media.preview_image | image_url: width: 1646 }} 1646w,{% endif %}
+            {% if media.preview_image.width >= 1946 %}{{ media.preview_image | image_url: width: 1946 }} 1946w,{% endif %}
+            {{ media.preview_image | image_url }} {{ media.preview_image.width }}w
+          {% else %}{{ media.preview_image | image_url: width: 1946 }} 1946w{% endif %}"
+          sizes="{{ sizes }}"
+          loading="lazy"
+          alt="{{ media.alt | escape }}"
+        >
       </div>
     {%- endif -%}
   </noscript>
@@ -92,12 +124,28 @@
     </span>
     {%- render 'loading-spinner' -%}
     <div class="product__media media media--transparent">
-      {{ media.preview_image | image_url: width: 1946 | image_tag:
-        class: image_class,
-        loading: lazy,
-        sizes: sizes,
-        widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
-      }}
+      <img
+        class="{{ image_class }}"
+        src="{{ media.preview_image | image_url: width: 1946 }}"
+        srcset="{% if media.preview_image and media.preview_image.width %}
+          {% if media.preview_image.width >= 246 %}{{ media.preview_image | image_url: width: 246 }} 246w,{% endif %}
+          {% if media.preview_image.width >= 493 %}{{ media.preview_image | image_url: width: 493 }} 493w,{% endif %}
+          {% if media.preview_image.width >= 600 %}{{ media.preview_image | image_url: width: 600 }} 600w,{% endif %}
+          {% if media.preview_image.width >= 713 %}{{ media.preview_image | image_url: width: 713 }} 713w,{% endif %}
+          {% if media.preview_image.width >= 823 %}{{ media.preview_image | image_url: width: 823 }} 823w,{% endif %}
+          {% if media.preview_image.width >= 990 %}{{ media.preview_image | image_url: width: 990 }} 990w,{% endif %}
+          {% if media.preview_image.width >= 1100 %}{{ media.preview_image | image_url: width: 1100 }} 1100w,{% endif %}
+          {% if media.preview_image.width >= 1206 %}{{ media.preview_image | image_url: width: 1206 }} 1206w,{% endif %}
+          {% if media.preview_image.width >= 1346 %}{{ media.preview_image | image_url: width: 1346 }} 1346w,{% endif %}
+          {% if media.preview_image.width >= 1426 %}{{ media.preview_image | image_url: width: 1426 }} 1426w,{% endif %}
+          {% if media.preview_image.width >= 1646 %}{{ media.preview_image | image_url: width: 1646 }} 1646w,{% endif %}
+          {% if media.preview_image.width >= 1946 %}{{ media.preview_image | image_url: width: 1946 }} 1946w,{% endif %}
+          {{ media.preview_image | image_url }} {{ media.preview_image.width }}w
+        {% else %}{{ media.preview_image | image_url: width: 1946 }} 1946w{% endif %}"
+        sizes="{{ sizes }}"
+        loading="lazy"
+        alt="{{ media.alt | escape }}"
+      >
     </div>
     <button class="product__media-toggle quick-add-hidden product__media-zoom-{{ section.settings.image_zoom }}" type="button" aria-haspopup="dialog" data-media-id="{{ media.id }}">
       <span class="visually-hidden">
@@ -122,11 +170,27 @@
           {%- render 'icon-play' -%}
         {%- endif -%}
       </span>
-      {{ media.preview_image | image_url: width: 1946 | image_tag:
-        loading: lazy,
-        sizes: sizes,
-        widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
-      }}
+      <img
+        src="{{ media.preview_image | image_url: width: 1946 }}"
+        srcset="{% if media.preview_image and media.preview_image.width %}
+          {% if media.preview_image.width >= 246 %}{{ media.preview_image | image_url: width: 246 }} 246w,{% endif %}
+          {% if media.preview_image.width >= 493 %}{{ media.preview_image | image_url: width: 493 }} 493w,{% endif %}
+          {% if media.preview_image.width >= 600 %}{{ media.preview_image | image_url: width: 600 }} 600w,{% endif %}
+          {% if media.preview_image.width >= 713 %}{{ media.preview_image | image_url: width: 713 }} 713w,{% endif %}
+          {% if media.preview_image.width >= 823 %}{{ media.preview_image | image_url: width: 823 }} 823w,{% endif %}
+          {% if media.preview_image.width >= 990 %}{{ media.preview_image | image_url: width: 990 }} 990w,{% endif %}
+          {% if media.preview_image.width >= 1100 %}{{ media.preview_image | image_url: width: 1100 }} 1100w,{% endif %}
+          {% if media.preview_image.width >= 1206 %}{{ media.preview_image | image_url: width: 1206 }} 1206w,{% endif %}
+          {% if media.preview_image.width >= 1346 %}{{ media.preview_image | image_url: width: 1346 }} 1346w,{% endif %}
+          {% if media.preview_image.width >= 1426 %}{{ media.preview_image | image_url: width: 1426 }} 1426w,{% endif %}
+          {% if media.preview_image.width >= 1646 %}{{ media.preview_image | image_url: width: 1646 }} 1646w,{% endif %}
+          {% if media.preview_image.width >= 1946 %}{{ media.preview_image | image_url: width: 1946 }} 1946w,{% endif %}
+          {{ media.preview_image | image_url }} {{ media.preview_image.width }}w
+        {% else %}{{ media.preview_image | image_url: width: 1946 }} 1946w{% endif %}"
+        sizes="{{ sizes }}"
+        loading="lazy"
+        alt="{{ media.alt | escape }}"
+      >
     </button>
     <template>
       {%- liquid

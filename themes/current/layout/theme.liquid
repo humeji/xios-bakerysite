@@ -59,6 +59,7 @@
         monorail-edge.shopifysvc.com;
       style-src 'self' 'unsafe-inline' 
         https://code.jquery.com 
+        code.jquery.com
         https://fonts.googleapis.com 
         https://fonts.gstatic.com
         *.shopify.com 
@@ -77,11 +78,17 @@
         checkout.shopifycs.com
         monorail-edge.shopifysvc.com
         error-analytics-sessions-production.shopifysvc.com
-        cdn.pop-convert.com;
+        cdn.pop-convert.com
+        cdn.micro.pop-convert.com
+        micro.pop-convert.com
+        shop.app
+        *.facebook.com
+        connect.facebook.net;
       frame-src 'self'
         *.shopify.com 
         checkout.shopifycs.com
-        shop.app;
+        shop.app
+        www.instagram.com;
     ">
 
     {%- liquid
@@ -301,15 +308,20 @@
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'custom.css' | asset_url | stylesheet_tag }} 
 
+    {%- comment -%}
+      Optimized font loading: Use font-display: swap and remove aggressive preloading
+      to eliminate unused preload warnings while maintaining performance
+    {%- endcomment -%}
     {%- unless settings.type_body_font.system? -%}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
     {%- endunless -%}
-    {%- unless settings.type_header_font.system? -%}
+    {%- if settings.type_header_font != settings.type_body_font and settings.type_header_font.system? == false -%}
       <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-    {%- endunless -%}
+    {%- endif -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
-      {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'component-localization-form.css' | asset_url }}" media="print" onload="this.media='all'">
+      <noscript>{{ 'component-localization-form.css' | asset_url | stylesheet_tag }}</noscript>
       <script src="{{ 'localization-form.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 

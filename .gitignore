@@ -5,6 +5,7 @@
 *.tar.gz
 *.rar
 *.7z
+*.har
 
 # Downloaded theme exports
 theme_export__*.zip

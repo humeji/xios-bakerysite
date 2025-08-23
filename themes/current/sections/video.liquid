@@ -64,11 +64,22 @@
             class="video-section__poster media media--transparent{% if poster == null %} video-section__placeholder{% endif %}"
           >
             {%- if poster != null -%}
-              {{
-                poster
-                | image_url: width: 3840
-                | image_tag: sizes: sizes, widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: alt
-              }}
+              <img
+                src="{{ poster | image_url: width: 3840 }}"
+                srcset="{% if poster and poster.width %}
+                  {% if poster.width >= 375 %}{{ poster | image_url: width: 375 }} 375w,{% endif %}
+                  {% if poster.width >= 750 %}{{ poster | image_url: width: 750 }} 750w,{% endif %}
+                  {% if poster.width >= 1100 %}{{ poster | image_url: width: 1100 }} 1100w,{% endif %}
+                  {% if poster.width >= 1500 %}{{ poster | image_url: width: 1500 }} 1500w,{% endif %}
+                  {% if poster.width >= 1780 %}{{ poster | image_url: width: 1780 }} 1780w,{% endif %}
+                  {% if poster.width >= 2000 %}{{ poster | image_url: width: 2000 }} 2000w,{% endif %}
+                  {% if poster.width >= 3000 %}{{ poster | image_url: width: 3000 }} 3000w,{% endif %}
+                  {% if poster.width >= 3840 %}{{ poster | image_url: width: 3840 }} 3840w,{% endif %}
+                  {{ poster | image_url }} {{ poster.width }}w
+                {% else %}{{ poster | image_url: width: 3840 }} 3840w{% endif %}"
+                sizes="{{ sizes }}"
+                alt="{{ alt }}"
+              >
             {%- else -%}
               {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
             {%- endif -%}
@@ -95,11 +106,22 @@
         aria-label="{{ alt }}"
       >
         {%- if poster != null -%}
-          {{
-            poster
-            | image_url: width: 3840
-            | image_tag: sizes: sizes, widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: alt
-          }}
+          <img
+            src="{{ poster | image_url: width: 3840 }}"
+            srcset="{% if poster and poster.width %}
+              {% if poster.width >= 375 %}{{ poster | image_url: width: 375 }} 375w,{% endif %}
+              {% if poster.width >= 750 %}{{ poster | image_url: width: 750 }} 750w,{% endif %}
+              {% if poster.width >= 1100 %}{{ poster | image_url: width: 1100 }} 1100w,{% endif %}
+              {% if poster.width >= 1500 %}{{ poster | image_url: width: 1500 }} 1500w,{% endif %}
+              {% if poster.width >= 1780 %}{{ poster | image_url: width: 1780 }} 1780w,{% endif %}
+              {% if poster.width >= 2000 %}{{ poster | image_url: width: 2000 }} 2000w,{% endif %}
+              {% if poster.width >= 3000 %}{{ poster | image_url: width: 3000 }} 3000w,{% endif %}
+              {% if poster.width >= 3840 %}{{ poster | image_url: width: 3840 }} 3840w,{% endif %}
+              {{ poster | image_url }} {{ poster.width }}w
+            {% else %}{{ poster | image_url: width: 3840 }} 3840w{% endif %}"
+            sizes="{{ sizes }}"
+            alt="{{ alt }}"
+          >
         {%- else -%}
           {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
         {%- endif -%}

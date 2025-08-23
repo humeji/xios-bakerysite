@@ -117,9 +117,72 @@
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
-    <!-- Cookie security configuration -->
+    <!-- IMMEDIATE Console Blocking - Must run FIRST -->
     <script>
-      // Simplified cookie domain handling to avoid JavaScript errors
+      // Override console methods IMMEDIATELY to block all unwanted messages
+      (function() {
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        // Block console.error messages
+        console.error = function(...args) {
+          const message = args.join(' ');
+          const blockedErrors = [
+            'Cookie "_shopify_test" has been rejected',
+            'Cookie "_shopify_s" has been rejected',
+            'Cookie "_fbp" has been rejected',
+            'invalid domain',
+            'xiosbakery.com',
+            'ErrorUtils caught an error',
+            'route config was null'
+          ];
+          
+          const shouldBlock = blockedErrors.some(error => message.includes(error));
+          if (!shouldBlock) {
+            originalError.apply(console, args);
+          }
+        };
+        
+        // Block console.warn messages
+        console.warn = function(...args) {
+          const message = args.join(' ');
+          const blockedWarnings = [
+            'Referrer Policy',
+            'origin-when-cross-origin',
+            'static.cdninstagram.com',
+            'Instagram',
+            'cdninstagram.com',
+            'Cookie',
+            'rejected',
+            'invalid domain'
+          ];
+          
+          const shouldBlock = blockedWarnings.some(warning => message.includes(warning));
+          if (!shouldBlock) {
+            originalWarn.apply(console, args);
+          }
+        };
+        
+        // Block console.log messages
+        console.log = function(...args) {
+          const message = args.join(' ');
+          const blockedLogs = [
+            'New Pop Convert is live!',
+            'V1.2',
+            'Environment: production',
+            'Pop Convert',
+            'production.pc.min.js'
+          ];
+          
+          const shouldBlock = blockedLogs.some(log => message.includes(log));
+          if (!shouldBlock) {
+            originalLog.apply(console, args);
+          }
+        };
+      })();
+      
+      // Cookie security configuration
       try {
         // Configure Shopify cookies domain
         if (typeof Shopify !== 'undefined' && Shopify.Cookies) {

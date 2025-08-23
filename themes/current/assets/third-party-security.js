@@ -21,9 +21,6 @@ class ThirdPartySecurityManager {
   }
 
   init() {
-    // Set up console filtering FIRST to catch all messages
-    this.setupConsoleFiltering();
-    
     // Monitor for Pop Convert script loading
     this.monitorPopConvert();
     
@@ -161,90 +158,7 @@ class ThirdPartySecurityManager {
     }
   }
 
-  /**
-   * Set up aggressive console filtering
-   */
-  setupConsoleFiltering() {
-    // Store original console methods
-    const originalError = console.error;
-    const originalWarn = console.warn;
-    const originalLog = console.log;
-    
-    // Override console.error to filter all unwanted messages
-    console.error = (...args) => {
-      const message = args.join(' ');
-      
-      // Comprehensive error filtering
-      const blockedErrors = [
-        'Cookie "_shopify_test" has been rejected',
-        'Cookie "_shopify_s" has been rejected', 
-        'Cookie "_fbp" has been rejected',
-        'invalid domain',
-        'xiosbakery.com',
-        'Partitioned cookie or storage access',
-        'Instagram',
-        'cdninstagram.com',
-        'static.cdninstagram.com',
-        'ErrorUtils caught an error',
-        'route config was null',
-        'csrftoken',
-        'Pop Convert',
-        'Referrer Policy',
-        'origin-when-cross-origin'
-      ];
-      
-      const shouldBlock = blockedErrors.some(error => message.includes(error));
-      
-      if (!shouldBlock) {
-        originalError.apply(console, args);
-      }
-    };
-    
-    // Override console.warn to filter warnings
-    console.warn = (...args) => {
-      const message = args.join(' ');
-      
-      const blockedWarnings = [
-        'Referrer Policy',
-        'origin-when-cross-origin',
-        'static.cdninstagram.com',
-        'Instagram',
-        'cdninstagram.com',
-        'block-all-mixed-content',
-        'Cookie',
-        'rejected',
-        'invalid domain'
-      ];
-      
-      const shouldBlock = blockedWarnings.some(warning => message.includes(warning));
-      
-      if (!shouldBlock) {
-        originalWarn.apply(console, args);
-      }
-    };
-    
-    // Override console.log to filter logs
-    console.log = (...args) => {
-      const message = args.join(' ');
-      
-      const blockedLogs = [
-        'New Pop Convert is live!',
-        'V1.2',
-        'Environment: production',
-        'Pop Convert',
-        '[SECURITY]',
-        'blurred',
-        'third-party-security.js',
-        'pcjs.production.min.js'
-      ];
-      
-      const shouldBlock = blockedLogs.some(log => message.includes(log));
-      
-      if (!shouldBlock) {
-        originalLog.apply(console, args);
-      }
-    };
-  }
+  // Console filtering is now handled directly in theme.liquid for immediate execution
 
   /**
    * Set up security event listeners

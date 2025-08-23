@@ -1,26 +1,50 @@
 #!/bin/bash
 
 # Package Theme for Upload
-# This script creates a zip file from your development theme ready for Shopify upload
+# This script creates a zip file from your current theme ready for Shopify upload
 
-echo "🎯 Packaging Xio's Bakery theme for upload..."
+set -euo pipefail
 
-# Create timestamp for unique filename
-timestamp=$(date +"%d%b%Y-%I%M%P")
+echo "Packaging Xio's Bakery theme for upload..."
 
-# Create zip file from development theme
-cd themes/development
-zip -r "../../xios-bakery-theme-${timestamp}.zip" . -x "*.DS_Store" "*.git*" "*node_modules*"
-cd ../..
+# Resolve repo root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-echo "✅ Theme packaged successfully!"
-echo "📦 File: xios-bakery-theme-${timestamp}.zip"
-echo ""
-echo "📋 Next steps:"
-echo "1. Go to your Shopify Admin → Online Store → Themes"
-echo "2. Click 'Add theme' → 'Upload theme'"
-echo "3. Select the zip file: xios-bakery-theme-${timestamp}.zip"
-echo "4. Preview your changes"
-echo "5. Publish when ready"
-echo ""
-echo "🔗 Admin URL: https://xiosbakery.myshopify.com/admin/themes"
+# Extract version from themes/current/config/settings_schema.json
+SETTINGS_JSON="$REPO_ROOT/themes/current/config/settings_schema.json"
+if [[ ! -f "$SETTINGS_JSON" ]]; then
+  echo "[ERROR] settings_schema.json not found at $SETTINGS_JSON" >&2
+  exit 1
+fi
+
+version=$(python3 - "$SETTINGS_JSON" <<'PY'
+import json,sys
+p=sys.argv[1]
+with open(p,'r',encoding='utf-8') as f:
+    data=json.load(f)
+# first block has theme_version
+ver = None
+if isinstance(data,list) and data:
+    info = data[0]
+    ver = info.get('theme_version')
+print(ver or '')
+PY
+)
+
+if [[ -z "$version" ]]; then
+  echo "[ERROR] Could not parse theme_version from settings_schema.json" >&2
+  exit 1
+fi
+
+ts=$(date +"%Y%m%d-%H%M%S")
+outfile="$REPO_ROOT/xios-bakery-theme-v$version-$ts.zip"
+
+# Create zip from themes/current
+cd "$REPO_ROOT/themes/current"
+zip -r "$outfile" . -x "*.DS_Store" "*.git*" "node_modules/*" "*.log" >/dev/null
+
+cd "$REPO_ROOT"
+
+echo "[COMPLETE] Theme packaged successfully"
+echo "[FILE] $outfile"

@@ -141,21 +141,52 @@
           POP_ENABLED ? '' : 'cdn.micro.pop-convert.com',
           POP_ENABLED ? '' : 'micro.pop-convert.com'
         ].filter(Boolean);
+
         function isBlocked(url) {
-          try { var host = new URL(url, document.baseURI).hostname; return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); }); } catch (e) { return false; }
+          try {
+            var host = new URL(url, document.baseURI).hostname;
+            return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); });
+          } catch (e) { return false; }
         }
+
         var originalCreateElement = document.createElement;
         document.createElement = function(name){
           var el = originalCreateElement.call(document, name);
           if (name && name.toLowerCase() === 'script') {
             var originalSetAttribute = el.setAttribute;
-            el.setAttribute = function(attr, value){ if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) { return; } return originalSetAttribute.call(this, attr, value); };
-            Object.defineProperty(el, 'src', { set: function(v){ if (!isBlocked(v)) { originalSetAttribute.call(el, 'src', v); } }, get: function(){ return el.getAttribute('src'); } });
+            el.setAttribute = function(attr, value){
+              try {
+                if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) {
+                  return; // skip blocked src
+                }
+              } catch(e) {}
+              return originalSetAttribute.call(this, attr, value);
+            };
+            // Do NOT redefine non-configurable properties like `src` directly
           }
           return el;
         };
-        function wrapAppend(fnName){ var original = Node.prototype[fnName]; Node.prototype[fnName] = function(child){ try { if (child && child.tagName === 'SCRIPT') { var s = child.getAttribute('src'); if (s && isBlocked(s)) { return child; } } } catch(e) {} return original.apply(this, arguments); }; }
-        wrapAppend('appendChild'); wrapAppend('insertBefore');
+
+        function shouldBlockScriptNode(node) {
+          try {
+            if (!node || node.tagName !== 'SCRIPT') return false;
+            var attrSrc = node.getAttribute('src');
+            if (attrSrc && isBlocked(attrSrc)) return true;
+            // Also check property if set directly via node.src = '...'
+            if (node.src && isBlocked(node.src)) return true;
+          } catch(e) {}
+          return false;
+        }
+
+        function wrapAppend(fnName){
+          var original = Node.prototype[fnName];
+          Node.prototype[fnName] = function(child){
+            if (shouldBlockScriptNode(child)) { return child; }
+            return original.apply(this, arguments);
+          };
+        }
+        wrapAppend('appendChild');
+        wrapAppend('insertBefore');
       })();
     </script>
     

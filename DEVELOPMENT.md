@@ -12,7 +12,7 @@ xios-bakerysite/
 │   ├── current/           # ✅ Original theme (backup)
 │   └── development/       # 🚀 Work here - your development copy
 ├── scripts/
-│   └── package-theme.sh   # 📦 Packaging script
+│   └── package-theme.sh   # 📦 Packaging script (reads version, zips themes/current)
 └── *.zip files           # 📤 Generated theme packages
 ```
 
@@ -27,7 +27,7 @@ xios-bakerysite/
 ```bash
 ./scripts/package-theme.sh
 ```
-This creates a timestamped zip file ready for Shopify upload.
+This creates a versioned, timestamped zip file from `themes/current/` ready for Shopify upload.
 
 ### 3. [UPLOAD] Deploy to Shopify
 1. Go to: https://xiosbakery.myshopify.com/admin/themes

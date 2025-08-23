@@ -18,7 +18,7 @@
 | 2025-08-22 | Security Testing Framework | ✅ Complete | `security-test.js` for XSS prevention |
 | 2025-08-22 | XSS Vulnerability Fixes | ✅ Complete | 68+ `innerHTML` instances replaced |
 
-> Current production version: **v13.4.0-popconvert-toggle**
+> Current production version: **v13.4.3-tiktok-link-fix2**
 
 ### **🟢 ADDITIONAL COMPLETED REMEDIATIONS**
 
@@ -59,7 +59,7 @@
 
 ### **🎯 NEXT IMMEDIATE ACTIONS**
 
-1. **Upload secure theme ZIP to Shopify** (`xios-bakery-theme-v13.2.8-secure-20250822.zip`) - **READY NOW**
+1. **Upload secure theme ZIP to Shopify** (`xios-bakery-theme-v13.4.3-tiktok-link-fix2-<timestamp>.zip`) - **READY NOW**
 2. **Test all theme functionality** (cart, search, products, etc.)
 3. **Run security validation** using `window.testXSSPrevention()`
 4. **Implement CSP** after confirming functionality

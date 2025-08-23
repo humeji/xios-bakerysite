@@ -65,4 +65,15 @@
 
 **Project Status:** ✅ COMPLETE - Ready for production deployment
 
+---
+
+## Discovered During Work
+- TikTok social link caused 404 when set as `@handle`. Normalized to absolute URL and open in new tab.
+- Packaged new build with consistent internal/external versioning.
+
+## Latest Packaging
+- Version bumped in `themes/current/config/settings_schema.json` to `13.4.2-tiktok-link-fix`.
+- ZIP created via `scripts/package-theme.sh` with versioned filename.
+- Output: `xios-bakery-theme-v13.4.2-tiktok-link-fix-<timestamp>.zip`.
+
 

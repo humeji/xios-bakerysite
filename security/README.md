@@ -29,9 +29,9 @@ security/
 
 ## Latest Audit Report
 
-**Date:** August 22, 2025  
+**Date:** August 23, 2025  
 **Status:** ✅ **ALL SECURITY ISSUES RESOLVED**  
-**Current Version:** v13.1.2-secure  
+**Current Version:** v13.4.3-tiktok-link-fix2  
 **Reports:** 
 - [English Version](./audits/2025/SECURITY_AUDIT_REPORT.md)
 - [Spanish Version](./audits/2025/REPORTE_AUDITORIA_SEGURIDAD.md)
@@ -45,7 +45,7 @@ security/
 
 ## Deployment Ready
 
-**Theme Package:** `xios-bakery-theme-v13.1.2-secure-20250822.zip`  
+**Theme Package:** `xios-bakery-theme-v13.4.3-tiktok-link-fix2-<timestamp>.zip`  
 **Status:** Ready for immediate production deployment  
 **Validation:** Follow [SHOPIFY_DEPLOYMENT_GUIDE.md](../SHOPIFY_DEPLOYMENT_GUIDE.md)
 

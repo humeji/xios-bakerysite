@@ -6,32 +6,31 @@
 
 ---
 
-## Problems Fixed
+## Problem
 
-### 1. Instagram Feed Was Not Loading
-The Instagram section on the homepage was broken and not displaying any content. Visitors could not see the bakery's Instagram posts.
+The Instagram feed on the Xio's Bakery homepage was **completely broken**. The @xios.bakery Instagram posts were **not loading or displaying at all** - visitors only saw an empty section where the Instagram content should have been.
 
-### 2. Instagram Feed Was Too Small on Desktop
-After fixing the loading issue, the Instagram feed appeared much smaller than the product sections above it, creating an inconsistent look on desktop browsers.
+Additionally, once fixed, the feed needed sizing adjustments to better fit the page layout on desktop view.
 
 ---
 
 ## What Was Done
 
-- Fixed the Instagram embed code so the feed now loads and displays properly
-- Adjusted the sizing so the Instagram section better matches the width of other page sections
-- Updated the website theme files to support the new layout
-- Tested on both desktop and mobile views
-- Deployed all changes to the live website
+1. **Fixed the broken Instagram embed** - Replaced the faulty code with working embed code so the Instagram posts now load and display correctly
+
+2. **Improved the layout** - Adjusted sizing so the Instagram section fits better with the rest of the homepage
+
+3. **Updated website theme** - Applied necessary changes to support the fix
+
+4. **Deployed to live site** - All changes are now live on xiosbakery.com
 
 ---
 
 ## Result
 
-The Instagram feed on [xiosbakery.com](https://xiosbakery.com) now:
-- Loads correctly and shows the latest posts from [@xios.bakery](https://www.instagram.com/xios.bakery/)
-- Automatically updates when new posts are added to Instagram (no manual updates needed)
-- Displays properly on both desktop and mobile devices
+- Instagram posts from @xios.bakery now load and display on the homepage
+- The feed automatically updates whenever new posts are added to Instagram
+- Works on both desktop and mobile devices
 
 ---
 

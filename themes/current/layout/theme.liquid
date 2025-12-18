@@ -130,129 +130,38 @@
       </script>
     {% endif %}
 
-    <!-- Third-party neutralizer respects toggle -->
-    <script>
-      (function() {
-        var POP_ENABLED = {{ settings.pop_convert_enabled | json }};
-        var BLOCKED_HOSTS = [
-          POP_ENABLED ? '' : 'script.pop-convert.com',
-          POP_ENABLED ? '' : 'cdn.s3.pop-convert.com',
-          POP_ENABLED ? '' : 'cdn.pop-convert.com',
-          POP_ENABLED ? '' : 'cdn.micro.pop-convert.com',
-          POP_ENABLED ? '' : 'micro.pop-convert.com'
-        ].filter(Boolean);
-
-        function isBlocked(url) {
-          try {
-            var host = new URL(url, document.baseURI).hostname;
-            return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); });
-          } catch (e) { return false; }
-        }
-
-        var originalCreateElement = document.createElement;
-        document.createElement = function(name){
-          var el = originalCreateElement.call(document, name);
-          if (name && name.toLowerCase() === 'script') {
-            var originalSetAttribute = el.setAttribute;
-            el.setAttribute = function(attr, value){
-              try {
-                if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) {
-                  return; // skip blocked src
-                }
-              } catch(e) {}
-              return originalSetAttribute.call(this, attr, value);
-            };
-            // Do NOT redefine non-configurable properties like `src` directly
-          }
-          return el;
-        };
-
-        function shouldBlockScriptNode(node) {
-          try {
-            if (!node || node.tagName !== 'SCRIPT') return false;
-            var attrSrc = node.getAttribute('src');
-            if (attrSrc && isBlocked(attrSrc)) return true;
-            // Also check property if set directly via node.src = '...'
-            if (node.src && isBlocked(node.src)) return true;
-          } catch(e) {}
-          return false;
-        }
-
-        function wrapAppend(fnName){
-          var original = Node.prototype[fnName];
-          Node.prototype[fnName] = function(child){
-            if (shouldBlockScriptNode(child)) { return child; }
-            return original.apply(this, arguments);
-          };
-        }
-        wrapAppend('appendChild');
-        wrapAppend('insertBefore');
-      })();
-    </script>
+    <!-- Neutralizer removed to avoid interfering with core script loading. Pop Convert is controlled via toggle above. -->
     
-    <!-- Additional security headers -->
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- Additional security headers removed here (must be server headers). -->
     
-    <!-- ROOT CAUSE FIXES - Prevent errors instead of filtering them -->
+    <!-- Unified neutralizer enabled above; redundant older block removed to prevent render issues -->
+
+    <!-- Tybo credit suppression (CSS + light JS) -->
+    <style>
+      /* Hide common Tybo elements anywhere on the page */
+      #tybofooter,
+      [id*="tybofooter" i],
+      a[href*="tybo.agency" i],
+      a[href*="tybo" i] img,
+      img[alt*="tybo" i],
+      img[src*="tybo" i] {
+        display: none !important;
+        visibility: hidden !important;
+      }
+    </style>
     <script>
-      // Third-party neutralizer: block Pop Convert and Facebook Pixel script injection early
-      (function() {
-        var BLOCKED_HOSTS = [
-          'script.pop-convert.com',
-          'cdn.s3.pop-convert.com',
-          'cdn.pop-convert.com',
-          'cdn.micro.pop-convert.com',
-          'micro.pop-convert.com',
-          'connect.facebook.net',
-          'www.facebook.com',
-          'facebook.com'
-        ];
-
-        function isBlocked(url) {
+      (function(){
+        function removeTybo(){
           try {
-            var host = new URL(url, document.baseURI).hostname;
-            return BLOCKED_HOSTS.some(function(b){ return host === b || host.endsWith('.' + b); });
-          } catch (e) { return false; }
+            var nodes = document.querySelectorAll('#tybofooter, [id*="tybofooter" i], a[href*="tybo.agency" i], a[href*="tybo" i] img, img[alt*="tybo" i], img[src*="tybo" i]');
+            nodes.forEach(function(n){ try { n.remove(); } catch(e){} });
+          } catch(e){}
         }
-
-        // Neutralize fbq if present/created later
-        Object.defineProperty(window, 'fbq', { value: function(){}, writable: true, configurable: true });
-
-        var originalCreateElement = document.createElement;
-        document.createElement = function(name){
-          var el = originalCreateElement.call(document, name);
-          if (name && name.toLowerCase() === 'script') {
-            var originalSetAttribute = el.setAttribute;
-            el.setAttribute = function(attr, value){
-              if ((attr === 'src' || attr === 'data-src') && typeof value === 'string' && isBlocked(value)) {
-                // Skip setting blocked src
-                return;
-              }
-              return originalSetAttribute.call(this, attr, value);
-            };
-            Object.defineProperty(el, 'src', {
-              set: function(v){ if (!isBlocked(v)) { originalSetAttribute.call(el, 'src', v); } },
-              get: function(){ return el.getAttribute('src'); }
-            });
-          }
-          return el;
-        };
-
-        function wrapAppend(fnName){
-          var original = Node.prototype[fnName];
-          Node.prototype[fnName] = function(child){
-            try {
-              if (child && child.tagName === 'SCRIPT') {
-                var s = child.getAttribute('src');
-                if (s && isBlocked(s)) { return child; }
-              }
-            } catch(e) {}
-            return original.apply(this, arguments);
-          };
-        }
-        wrapAppend('appendChild');
-        wrapAppend('insertBefore');
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', removeTybo); else removeTybo();
+        // Retry a few times in case it injects late
+        setTimeout(removeTybo, 1000);
+        setTimeout(removeTybo, 3000);
+        setTimeout(removeTybo, 7000);
       })();
     </script>
 

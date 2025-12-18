@@ -2,6 +2,8 @@
 
 **Date:** December 18, 2025  
 **Time Spent:** 1 hour  
+**Rate:** Friends & Family Rate  
+**Total:** $100 USD  
 **Website:** [xiosbakery.com](https://xiosbakery.com)
 
 ---

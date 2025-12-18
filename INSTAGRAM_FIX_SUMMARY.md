@@ -22,7 +22,9 @@ Additionally, once fixed, the feed needed sizing adjustments to better fit the p
 
 3. **Updated website theme** - Applied necessary changes to support the fix
 
-4. **Deployed to live site** - All changes are now live on xiosbakery.com
+4. **Created a backup** - Saved a backup copy of the updated theme in case it's needed for future recovery or rollback
+
+5. **Deployed to live site** - All changes are now live on xiosbakery.com
 
 ---
 

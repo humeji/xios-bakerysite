@@ -3,7 +3,7 @@
 **Fecha:** 18 de Diciembre, 2025  
 **Tiempo:** 1 hora  
 **Tarifa:** Tarifa de Amigos y Familia  
-**Total:** $100 USD  
+**Total:** $80 USD  
 **Sitio Web:** [xiosbakery.com](https://xiosbakery.com)
 
 ---

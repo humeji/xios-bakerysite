@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Dawn",
-    "theme_version": "13.4.8-tybo-hard-hide",
+    "theme_version": "13.4.9-checkout-minimum-fix",
     "theme_author": "Shopify",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1463,6 +1463,47 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Cart & Checkout Rules",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Minimum Order Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_minimum_order",
+        "label": "Enable minimum order amount",
+        "default": true,
+        "info": "When enabled, customers must meet the minimum order amount to checkout"
+      },
+      {
+        "type": "number",
+        "id": "minimum_order_amount",
+        "label": "Minimum order amount (USD)",
+        "default": 40,
+        "info": "Orders below this amount will not be able to checkout"
+      },
+      {
+        "type": "header",
+        "content": "Digital Products"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_digital_no_refund_message",
+        "label": "Show non-refundable notice for digital products",
+        "default": true,
+        "info": "Display a warning when cart contains digital download items"
+      },
+      {
+        "type": "textarea",
+        "id": "digital_no_refund_message",
+        "label": "Digital product refund message",
+        "default": "Digital products are non-refundable. By purchasing, you agree to this policy.",
+        "info": "This message is shown when cart contains digital download items"
       }
     ]
   },

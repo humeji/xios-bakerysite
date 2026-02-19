@@ -72,8 +72,42 @@
 - Packaged new build with consistent internal/external versioning.
 
 ## Latest Packaging
-- Version bumped in `themes/current/config/settings_schema.json` to `13.4.2-tiktok-link-fix`.
+- Version bumped in `themes/current/config/settings_schema.json` to `13.4.9-checkout-minimum-fix`.
 - ZIP created via `scripts/package-theme.sh` with versioned filename.
-- Output: `xios-bakery-theme-v13.4.2-tiktok-link-fix-<timestamp>.zip`.
+- Output: `xios-bakery-theme-v13.4.9-checkout-minimum-fix-20260219-132434.zip`.
 
+---
+
+## [COMPLETED] Checkout Minimum Order Implementation (February 2026)
+
+**Status:** COMPLETE  
+**Date:** February 19, 2026
+
+### Summary
+Replaced cookie-based cart validation with configurable minimum order amount ($40 default). Digital products now allowed without requiring cookies. Non-refundable notice displayed for digital downloads.
+
+### Files Modified
+- `themes/current/config/settings_schema.json` - Added "Cart & Checkout Rules" section
+- `themes/current/assets/custom.js` - Replaced cookie validation with minimum order validation
+- `themes/current/sections/main-cart-items.liquid` - Added data attributes and digital notice
+- `themes/current/snippets/cart-drawer.liquid` - Mirrored cart page changes
+- `themes/current/assets/custom.css` - Added styling for notices
+- `themes/development/*` - All changes synced to development theme
+
+### Features Implemented
+- [SUCCESS] Configurable minimum order amount via Theme Settings
+- [SUCCESS] Non-refundable notice for digital products
+- [SUCCESS] Digital product detection using `requires_shipping` property
+- [SUCCESS] Shop owner can update minimum amount without developer
+
+### Validation Logic
+| Cart Contents | Total | Result |
+|---------------|-------|--------|
+| Digital only | < $40 | Blocked |
+| Digital only | >= $40 | Success + No-refund notice |
+| Physical only | < $40 | Blocked |
+| Physical only | >= $40 | Success |
+| Mixed | < $40 | Blocked |
+| Mixed | >= $40 | Success + No-refund notice |
+| Empty | N/A | Blocked |
 

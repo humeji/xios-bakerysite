@@ -33,9 +33,21 @@
         {{- 'general.continue_shopping' | t -}}
       </a>
     </div>
+    <div 
+      data-minimum-order="{{ settings.minimum_order_amount | default: 40 }}"
+      data-enable-minimum-order="{{ settings.enable_minimum_order | default: true }}"
+      style="display: none;"
+    ></div>
+
     <div class="custom-cart-qty-msg">
-      <p>Please select at least 4 cookies in order to checkout</p> 
-    </div> 
+      <p>Minimum order amount is ${{ settings.minimum_order_amount | default: 40 }}</p> 
+    </div>
+
+    {%- if settings.show_digital_no_refund_message != false -%}
+    <div class="digital-no-refund-msg" style="display: none;">
+      <p>{{ settings.digital_no_refund_message | default: 'Digital products are non-refundable. By purchasing, you agree to this policy.' }}</p>
+    </div>
+    {%- endif -%}
 
     <div class="cart__warnings">
       <h1 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h1>

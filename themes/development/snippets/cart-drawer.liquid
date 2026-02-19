@@ -70,6 +70,23 @@
           {% render 'icon-close' %}
         </button>
       </div>
+
+      <div 
+        data-minimum-order="{{ settings.minimum_order_amount | default: 40 }}"
+        data-enable-minimum-order="{{ settings.enable_minimum_order | default: true }}"
+        style="display: none;"
+      ></div>
+
+      <div class="custom-cart-qty-msg drawer__cart-notice" style="display: none;">
+        <p>Minimum order amount is ${{ settings.minimum_order_amount | default: 40 }}</p>
+      </div>
+
+      {%- if settings.show_digital_no_refund_message != false -%}
+      <div class="digital-no-refund-msg drawer__cart-notice" style="display: none;">
+        <p>{{ settings.digital_no_refund_message | default: 'Digital products are non-refundable. By purchasing, you agree to this policy.' }}</p>
+      </div>
+      {%- endif -%}
+
       <cart-drawer-items
         {% if cart == empty %}
           class=" is-empty"

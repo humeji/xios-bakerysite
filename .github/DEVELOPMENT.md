@@ -143,11 +143,18 @@ git push --tags
 | CI | `.github/workflows/ci.yml` | Push to any branch, PR to main | Run tests + ESLint/SonarJS |
 | Release | `.github/workflows/release.yml` | Tag push (`v*`) | Tests + lint + ZIP + GitHub Release |
 
-### Branch Protection (Recommended)
+### Branch Protection (Active)
 
-Configure on GitHub: **Settings > Branches > Branch protection rules** for `main`:
-- Require status checks: `test-and-lint` must pass before merging
-- This ensures no code reaches `main` without passing all quality gates
+A **repository ruleset** named "Protect main" is active on this repository. It enforces:
+
+- **Pull request required**: Direct pushes to `main` are blocked; all changes must go through a PR
+- **Required status check**: The `test-and-lint` CI job must pass before merging
+
+This ensures no code reaches `main` without passing all quality gates.
+
+To view or modify the ruleset: **Settings > Rules > Rulesets > Protect main** ([direct link](https://github.com/humeji/xios-bakerysite/rules/13059466)).
+
+[NOTE] GitHub Free only enforces rulesets on **public** repositories. This repo was made public to enable enforcement. If the repo is ever changed back to private, the ruleset will become advisory-only (not enforced).
 
 ---
 

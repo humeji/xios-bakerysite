@@ -18,12 +18,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Pre-commit hook (husky + lint-staged) that blocks commits with lint errors
 - `npm run lint` and `npm run lint:ci` scripts
 - Build policy: production ZIPs are CI-only; local builds are for dev testing
+- Repository ruleset "Protect main": requires PR + passing `test-and-lint` check before merging to `main`
 
 ### Changed
+- Repository visibility changed from **private to public** (required for GitHub Free to enforce repository rulesets)
 - `scripts/package-theme.sh` now supports `--ci` flag for non-interactive CI execution
 - Local packaging script runs display a warning that builds are for development only
 - `scripts/README.md` restructured with separate Production Releases and Local Development sections
-- `.github/DEVELOPMENT.md` updated with CI/CD workflows, build policy, and release process
+- `.github/DEVELOPMENT.md` updated with CI/CD workflows, build policy, release process, and branch protection details
 - `PLANNING.md` updated with CI/CD in tech stack, deployment workflow, and documentation index
 
 ### Fixed

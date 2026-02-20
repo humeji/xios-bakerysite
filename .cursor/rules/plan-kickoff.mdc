@@ -1,0 +1,30 @@
+---
+description: Required reading when starting a new Cursor plan for this project
+alwaysApply: true
+---
+
+# Plan Kickoff -- Required Review
+
+Before writing any code for a new Cursor plan in this project, review these files to understand the project's security posture, development workflow, and CI configuration:
+
+## 1. `.github/workflows/`
+
+Read all files in this directory. Currently contains:
+
+- `security.yml.example` -- Semgrep and dependency-check CI pipeline template. Understand what security scanning is configured (or planned) so new code does not introduce patterns that would fail these checks.
+
+## 2. `.github/SECURITY.md`
+
+Review the known vulnerability list and current remediation status. New plans must not reintroduce resolved issues or ignore documented security constraints.
+
+## 3. `.github/DEVELOPMENT.md`
+
+Review the development workflow, testing requirements, SonarQube quality gate, and packaging checklist. All plans must follow these steps.
+
+## 4. `PLANNING.md`
+
+Review architecture, conventions, and constraints so new work aligns with existing patterns.
+
+## 5. `TASK.md`
+
+Read the most recent entries to understand what was last delivered and avoid conflicts or rework.

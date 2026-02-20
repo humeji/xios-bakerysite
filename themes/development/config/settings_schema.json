@@ -1485,7 +1485,7 @@
         "id": "minimum_order_amount",
         "label": "Minimum order amount (USD)",
         "default": 40,
-        "info": "Orders below this amount will not be able to checkout"
+        "info": "Must be greater than 0. Values of 0 or below default to $40. Values below $20 will show a warning in the theme editor."
       },
       {
         "type": "header",
@@ -1501,9 +1501,16 @@
       {
         "type": "textarea",
         "id": "digital_no_refund_message",
-        "label": "Digital product refund message",
+        "label": "Digital product refund message (English)",
         "default": "Digital products are non-refundable. By purchasing, you agree to this policy.",
-        "info": "This message is shown when cart contains digital download items"
+        "info": "Shown when cart contains digital items and store is viewed in English"
+      },
+      {
+        "type": "textarea",
+        "id": "digital_no_refund_message_es",
+        "label": "Digital product refund message (Spanish)",
+        "default": "Los productos digitales no son reembolsables. Al realizar la compra, usted acepta esta política.",
+        "info": "Shown when cart contains digital items and store is viewed in Spanish"
       }
     ]
   }

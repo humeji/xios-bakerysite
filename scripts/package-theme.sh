@@ -1,50 +1,129 @@
 #!/bin/bash
 
 # Package Theme for Upload
-# This script creates a zip file from your current theme ready for Shopify upload
+# Creates a zip file from themes/current/ ready for Shopify upload.
+#
+# Usage: ./scripts/package-theme.sh <plan-id>
+#   <plan-id>  The Cursor plan ID (e.g., bakery_checkout_minimum_fix_730f7d42)
+#
+# Requirements enforced before packaging:
+#   1. All unit tests must pass (npm test)
+#   2. SonarQube analysis must report zero issues (manual via MCP tool)
+#   3. Plan ID must be provided (links bundle to the work that produced it)
+#
+# Output: xios-bakery-theme-<plan-id>-<YYYYMMDD>.zip
 
 set -euo pipefail
 
-echo "Packaging Xio's Bakery theme for upload..."
-
-# Resolve repo root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Extract version from themes/current/config/settings_schema.json
-SETTINGS_JSON="$REPO_ROOT/themes/current/config/settings_schema.json"
+# ---------------------------------------------------------------
+# Validate arguments
+# ---------------------------------------------------------------
+
+if [[ $# -lt 1 || -z "${1:-}" ]]; then
+  echo "[ERROR] Plan ID is required." >&2
+  echo "" >&2
+  echo "Usage: $0 <plan-id>" >&2
+  echo "  Example: $0 bakery_checkout_minimum_fix_730f7d42" >&2
+  exit 1
+fi
+
+PLAN_ID="$1"
+
+echo "======================================================"
+echo " Xio's Bakery - Theme Packaging"
+echo "======================================================"
+echo ""
+echo "[INFO] Plan ID: $PLAN_ID"
+echo ""
+
+# ---------------------------------------------------------------
+# Step 1: Run unit tests
+# ---------------------------------------------------------------
+
+echo "[STEP 1/4] Running unit tests..."
+echo ""
+
+cd "$REPO_ROOT"
+
+if ! npm test; then
+  echo "" >&2
+  echo "[ERROR] Unit tests failed. Fix all failures before packaging." >&2
+  exit 1
+fi
+
+echo ""
+echo "[SUCCESS] All tests passed."
+echo ""
+
+# ---------------------------------------------------------------
+# Step 2: SonarQube quality gate reminder
+# ---------------------------------------------------------------
+
+echo "[STEP 2/4] SonarQube quality gate..."
+echo ""
+echo "  [IMPORTANT] Before continuing, confirm that SonarQube analysis"
+echo "  reports ZERO findings on all files touched in this plan."
+echo "  Use the analyze_file_list MCP tool in Cursor to verify."
+echo ""
+read -r -p "  Have all SonarQube issues been resolved? (y/N): " sonar_confirm
+if [[ ! "$sonar_confirm" =~ ^[Yy]$ ]]; then
+  echo "" >&2
+  echo "[ERROR] SonarQube quality gate not confirmed. Resolve all issues first." >&2
+  exit 1
+fi
+echo ""
+echo "[SUCCESS] SonarQube quality gate confirmed."
+echo ""
+
+# ---------------------------------------------------------------
+# Step 3: Verify theme source exists
+# ---------------------------------------------------------------
+
+echo "[STEP 3/4] Verifying theme source..."
+
+THEME_DIR="$REPO_ROOT/themes/current"
+if [[ ! -d "$THEME_DIR" ]]; then
+  echo "[ERROR] Theme directory not found at $THEME_DIR" >&2
+  exit 1
+fi
+
+SETTINGS_JSON="$THEME_DIR/config/settings_schema.json"
 if [[ ! -f "$SETTINGS_JSON" ]]; then
   echo "[ERROR] settings_schema.json not found at $SETTINGS_JSON" >&2
   exit 1
 fi
 
-version=$(python3 - "$SETTINGS_JSON" <<'PY'
-import json,sys
-p=sys.argv[1]
-with open(p,'r',encoding='utf-8') as f:
-    data=json.load(f)
-# first block has theme_version
-ver = None
-if isinstance(data,list) and data:
-    info = data[0]
-    ver = info.get('theme_version')
-print(ver or '')
-PY
-)
+echo "[SUCCESS] Theme source verified."
+echo ""
 
-if [[ -z "$version" ]]; then
-  echo "[ERROR] Could not parse theme_version from settings_schema.json" >&2
-  exit 1
-fi
+# ---------------------------------------------------------------
+# Step 3: Create ZIP bundle
+# ---------------------------------------------------------------
 
-ts=$(date +"%Y%m%d-%H%M%S")
-outfile="$REPO_ROOT/xios-bakery-theme-v$version-$ts.zip"
+echo "[STEP 4/4] Creating ZIP bundle..."
 
-# Create zip from themes/current
-cd "$REPO_ROOT/themes/current"
-zip -r "$outfile" . -x "*.DS_Store" "*.git*" "node_modules/*" "*.log" >/dev/null
+DATE_STAMP=$(date +"%Y%m%d")
+OUTFILE="$REPO_ROOT/xios-bakery-theme-${PLAN_ID}-${DATE_STAMP}.zip"
+
+cd "$THEME_DIR"
+zip -r "$OUTFILE" . -x "*.DS_Store" "*.git*" "node_modules/*" "*.log" >/dev/null
 
 cd "$REPO_ROOT"
 
-echo "[COMPLETE] Theme packaged successfully"
-echo "[FILE] $outfile"
+echo ""
+echo "======================================================"
+echo " [COMPLETE] Theme packaged successfully"
+echo "======================================================"
+echo ""
+echo " Plan ID : $PLAN_ID"
+echo " Date    : $DATE_STAMP"
+echo " File    : $OUTFILE"
+echo ""
+echo " Next steps:"
+echo "   1. Upload to Shopify Admin > Online Store > Themes"
+echo "   2. Preview and test interactively"
+echo "   3. Publish when verified"
+echo ""

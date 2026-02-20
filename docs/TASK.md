@@ -76,6 +76,37 @@
 - ZIP created via `scripts/package-theme.sh` with versioned filename.
 - Output: `xios-bakery-theme-v13.4.9-checkout-minimum-fix-20260219-132434.zip`.
 
+## Documentation
+- [SUCCESS] Deployment & interactive testing guide created: `docs/GUIA_DESPLIEGUE_MINIMO_PEDIDO_ES.md`
+
+## Edge Case Fix: Minimum Order Amount Validation
+- [SUCCESS] Fixed `custom.js` parsing: values of 0 or negative numbers now fall back to default ($40)
+- [SUCCESS] Updated `settings_schema.json` info text to warn that values must be greater than 0
+- [SUCCESS] Applied to both `themes/current/` and `themes/development/`
+- [SUCCESS] Added edge case test scenarios (7.3, 7.4) to deployment guide
+
+## Localization & UI Improvements (February 2026)
+- [SUCCESS] Added Spanish digital refund message field (`digital_no_refund_message_es`) to settings schema
+- [SUCCESS] Minimum order message now locale-aware (EN/ES) via Liquid `request.locale.iso_code` + JS data attribute
+- [SUCCESS] Digital refund notice renders in correct language based on store locale
+- [SUCCESS] Admin-only warning (via `request.design_mode`) when minimum order amount is set below $20
+- [SUCCESS] All changes applied to both `themes/current/` and `themes/development/`
+- [SUCCESS] Deployment guide updated with localization tests (Paso 8) and editor warning test (Paso 9)
+
+## Testing Suite & Project Documentation (February 2026)
+- [SUCCESS] Initialized `package.json` with Jest test framework
+- [SUCCESS] Created `jest.config.js` configuration
+- [SUCCESS] Created `tests/helpers/cart-validation-logic.js` - extracted pure logic from custom.js
+- [SUCCESS] Created `tests/helpers/cart-dom-setup.js` - mock Shopify cart builder
+- [SUCCESS] Created `tests/cart-validation.test.js` - 13 tests: empty cart, under/over min, digital, physical, mixed, disabled
+- [SUCCESS] Created `tests/config-parsing.test.js` - 24 tests: zero, negative, decimal, NaN, null, Infinity, empty, large values
+- [SUCCESS] Created `tests/locale-messages.test.js` - 12 tests: English, Spanish, custom, fallback templates
+- [SUCCESS] All 49 tests passing
+- [SUCCESS] Created `PLANNING.md` - project architecture, conventions, constraints, documentation index
+- [SUCCESS] Created `.github/DEVELOPMENT.md` - development workflow, testing guide, documentation update rules
+- [SUCCESS] Updated `README.md` with current version, testing instructions, project structure
+- [SUCCESS] Updated original plan with post-completion enhancements section
+
 ---
 
 ## [COMPLETED] Checkout Minimum Order Implementation (February 2026)

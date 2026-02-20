@@ -14,8 +14,11 @@ $(document).ready(function() {
 
   if (location.pathname === '/cart') { 
     
-    const MINIMUM_ORDER_AMOUNT = Number.parseFloat($('[data-minimum-order]').attr('data-minimum-order')) || 40;
-    const ENABLE_MINIMUM_ORDER = $('[data-minimum-order]').attr('data-enable-minimum-order') !== 'false';
+    const $minOrderEl = $('[data-minimum-order]');
+    const rawMinimum = Number.parseFloat($minOrderEl.attr('data-minimum-order'));
+    const MINIMUM_ORDER_AMOUNT = (Number.isFinite(rawMinimum) && rawMinimum > 0) ? rawMinimum : 40;
+    const ENABLE_MINIMUM_ORDER = $minOrderEl.attr('data-enable-minimum-order') !== 'false';
+    const MSG_TEMPLATE = $minOrderEl.attr('data-min-order-msg-template') || 'Minimum order amount is $[MIN]. Current total: $[TOTAL]';
 
     function validateCartItems() {
       $.getJSON('/cart.js', function(cart) {
@@ -43,8 +46,9 @@ $(document).ready(function() {
         }
 
         if (ENABLE_MINIMUM_ORDER && cartTotal < MINIMUM_ORDER_AMOUNT) {
-          const message = 'Minimum order amount is $' + MINIMUM_ORDER_AMOUNT.toFixed(2) + 
-                        '. Current total: $' + cartTotal.toFixed(2);
+          const message = MSG_TEMPLATE
+            .replace('[MIN]', MINIMUM_ORDER_AMOUNT.toFixed(2))
+            .replace('[TOTAL]', cartTotal.toFixed(2));
           $('.custom-cart-qty-msg').text(message).show();
           $('.cart__checkout-button').prop('disabled', true);
         } else {

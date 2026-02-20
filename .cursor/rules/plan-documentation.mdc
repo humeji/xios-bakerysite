@@ -1,0 +1,53 @@
+---
+description: Enforces plan-scoped documentation lifecycle when applying changes tied to a Cursor plan
+alwaysApply: true
+---
+
+# Plan-Scoped Documentation
+
+Every Cursor plan that modifies theme code must have a matching documentation folder under `docs/plans/<plan-id>/`.
+
+## Required Structure
+
+```
+docs/plans/<plan-id>/
+├── README.md             # Required -- high-level record of what was delivered
+├── ...                   # Additional docs as needed (SOWs, guides, etc.)
+```
+
+## When Applying Changes to a Plan
+
+1. **Create the plan folder** if it does not already exist: `docs/plans/<plan-id>/`
+2. **Create or update README.md** with:
+   - Objective (what the plan set out to do)
+   - What was delivered (list of features/fixes)
+   - Files modified
+   - Bundles produced
+   - Open items (if any)
+3. **Create supporting docs** as needed (SOWs, deployment guides, configuration guides)
+4. **Update `TASK.md`** (project root) with a dated ledger entry that:
+   - References the plan ID
+   - Lists completed items
+   - Links to the plan's docs folder: `docs/plans/<plan-id>/`
+
+## When Plan Scope Changes
+
+If requirements change mid-plan (new edge cases, localization, etc.):
+
+1. Update the plan's `README.md` to reflect the new deliverables
+2. Update or create any affected supporting docs in the plan folder
+3. Add a new section to the `TASK.md` ledger entry for the additional work
+
+## Document Naming
+
+- Plan-specific docs go in `docs/plans/<plan-id>/`
+- General project docs (not tied to any plan) stay in `docs/`
+- Each plan's README.md is the single source of truth for what that plan delivered
+
+## Cross-References
+
+When referencing plan docs from other files (README, PLANNING.md, etc.), use the full relative path:
+
+```
+docs/plans/bakery_checkout_minimum_fix_730f7d42/README.md
+```

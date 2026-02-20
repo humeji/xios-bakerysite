@@ -1,0 +1,41 @@
+---
+description: Enforces SonarQube code quality gate on all code changes
+globs: "**/*.{js,ts,jsx,tsx,css,sh,py,liquid}"
+alwaysApply: true
+---
+
+# SonarQube Quality Gate
+
+Every code change in this project must pass SonarQube analysis with zero findings before the change is considered complete.
+
+## When to Scan
+
+Run `analyze_file_list` via the SonarQube MCP tool on **every file you create, modify, or touch** during a task -- including test files, helper modules, scripts, and stylesheets.
+
+## Acceptance Criteria
+
+- **0 findings** (MINOR, MAJOR, or BLOCKER) on all scanned files.
+- If findings are reported, fix them immediately before moving on.
+- After fixing, re-scan to confirm zero findings.
+
+## How to Scan
+
+Use the `user-sonarqube` MCP server's `analyze_file_list` tool:
+
+```json
+{
+  "file_absolute_paths": [
+    "/absolute/path/to/changed-file-1.js",
+    "/absolute/path/to/changed-file-2.js"
+  ]
+}
+```
+
+## Common SonarQube Patterns to Avoid
+
+- Zero-fraction numbers (`100.50` -> use `100.5`)
+- Global `NaN` / `Infinity` (use `Number.NaN`, `Number.POSITIVE_INFINITY`)
+- Default parameters not in last position
+- Negated conditions where a positive check is clearer
+- Unused variables or imports
+- Cognitive complexity exceeding thresholds

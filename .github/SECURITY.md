@@ -1,16 +1,39 @@
 # Security Policy
 
+## Current Security Status
+
+[SECURE] All critical security vulnerabilities have been resolved. Theme is production-ready.
+
+### Security Audit History
+
+| Date | Version | Auditor | Status | Report |
+|------|---------|---------|--------|--------|
+| 2025-08-23 | v13.4.3-tiktok-link-fix2 | AI Security Assistant | [COMPLETE] All issues resolved | [View Report](../security/audits/2025/SECURITY_AUDIT_REPORT.md) |
+
+### Completed Security Fixes
+
+- [x] **68+ XSS vulnerabilities resolved** -- All `innerHTML` replaced with `safeSetHTML()`
+- [x] **Content Security Policy implemented** -- Conditional CSP: IG/FB always on; Pop Convert allowed when enabled
+- [x] **Security headers added** -- X-Frame-Options, X-Content-Type-Options, etc.
+- [x] **Input sanitization implemented** -- `security-utils.js` provides safe DOM manipulation
+- [x] **Security testing completed** -- `window.testXSSPrevention()` passes all tests
+
 ## Supported Versions
 
-| Version | Supported          | Security Status |
-| ------- | ------------------ | --------------- |
-| 1.0.x   | :white_check_mark: | :red_circle: Critical vulnerabilities |
+| Version | Supported | Security Status |
+|---------|-----------|-----------------|
+| v13.4.9-checkout-minimum-fix | Yes | [SECURE] |
+| v13.4.3-tiktok-link-fix2 | Yes | [SECURE] |
+| v13.3.x | Yes | [SECURE] |
+| v13.2.x-secure | Yes | [SECURE] |
+
+---
 
 ## Reporting a Vulnerability
 
 We take security vulnerabilities seriously. Please follow these steps to report security issues:
 
-### 🔒 Private Reporting (Preferred)
+### Private Reporting (Preferred)
 
 1. **GitHub Security Advisories** (Recommended)
    - Go to the "Security" tab of this repository
@@ -22,7 +45,7 @@ We take security vulnerabilities seriously. Please follow these steps to report 
    - Subject: "Security Vulnerability - Xios Bakery Theme"
    - Include: vulnerability details, reproduction steps, impact assessment
 
-### 📋 What to Include
+### What to Include
 
 - **Vulnerability Type:** XSS, CSRF, injection, etc.
 - **Location:** File path and line numbers
@@ -30,43 +53,35 @@ We take security vulnerabilities seriously. Please follow these steps to report 
 - **Impact:** Potential security implications
 - **Suggested Fix:** If you have recommendations
 
-### ⏱️ Response Timeline
+### Response Timeline
 
 - **Acknowledgment:** Within 48 hours
 - **Initial Triage:** Within 1 week
 - **Status Updates:** Weekly until resolved
 - **Resolution:** Varies by severity (P0: immediate, P1: 1 week, P2: 1 month)
 
-### 🚨 Current Security Status
+---
 
-**⚠️ CRITICAL WARNING:** This theme currently has known security vulnerabilities and should NOT be used in production environments.
+## Security Best Practices
 
-**Known Issues:**
-- 68+ XSS vulnerabilities in JavaScript files
-- Insecure URL handling
-- Missing Content Security Policy
-- No input sanitization
+- Re-test `window.testXSSPrevention()` after major edits to JavaScript files
+- Keep third-party toggles (e.g., Pop Convert) OFF unless needed
+- Never expose sourcemaps in production deployments
+- All DOM manipulation must use `security-utils.js` safe functions
+- Run SonarQube analysis on all changed files before packaging
 
-**Status:** Under active remediation
+### Resources
 
-### 🛡️ Security Measures
-
-We are implementing:
-- Regular security audits
-- Automated vulnerability scanning
-- Security-focused code reviews
-- Dependency vulnerability monitoring
-
-### 📚 Resources
-
-- [Security Audit Reports](./security/audits/)
+- [Security Audit Reports](../security/audits/)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Shopify Security Guidelines](https://shopify.dev/docs/themes/best-practices/security)
 
-### 🏆 Recognition
+### Recognition
 
 We appreciate security researchers who help improve our theme's security. Contributors may be recognized in our security acknowledgments (with permission).
 
 ---
 
 **Note:** Please do not create public GitHub issues for security vulnerabilities. Use the private reporting methods above.
+
+**Last Updated:** February 2026 (v13.4.9)

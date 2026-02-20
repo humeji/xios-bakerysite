@@ -1,0 +1,27 @@
+{
+  "name": "xios-bakerysite",
+  "version": "13.4.9",
+  "description": "Xio's Bakery - Shopify Theme (secure, production-ready)",
+  "private": true,
+  "scripts": {
+    "test": "jest --verbose",
+    "test:watch": "jest --watch --verbose",
+    "test:ci": "jest --ci --coverage",
+    "package": "./scripts/package-theme.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/humeji/xios-bakerysite.git"
+  },
+  "author": "Hugo Mejia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/humeji/xios-bakerysite/issues"
+  },
+  "homepage": "https://github.com/humeji/xios-bakerysite#readme",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jquery": "^4.0.0"
+  }
+}

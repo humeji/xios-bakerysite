@@ -1,0 +1,16 @@
+---
+description: Enforces packaging rules before creating a new theme ZIP bundle
+globs: scripts/package-theme.sh
+alwaysApply: true
+---
+
+# Theme Packaging Workflow
+
+Before creating a new ZIP bundle, ALL prerequisites in [`scripts/README.md`](../../scripts/README.md) must be satisfied. This includes:
+
+1. All unit tests passing (`npm test`)
+2. SonarQube reporting zero findings on all changed files
+3. All documentation being current (TASK.md, PLANNING.md, plan docs, README)
+4. ZIP naming convention followed: `xios-bakery-theme-<plan-id>-<YYYYMMDD>.zip`
+
+Always consult `scripts/README.md` for the authoritative checklist and usage instructions.

@@ -39,6 +39,7 @@ Before running the script, ensure every item is satisfied:
 - [ ] `TASK.md` (root) updated with a ledger entry for the work being bundled
 - [ ] `PLANNING.md` updated if architecture, settings, or validation logic changed
 - [ ] Plan docs (`docs/plans/<plan-id>/README.md`) created or updated
+- [ ] `CHANGELOG.md` updated with a new entry for this version/bundle
 - [ ] Root `README.md` updated if version, features, or project structure changed
 - [ ] `.github/DEVELOPMENT.md` updated if workflow or testing process changed
 

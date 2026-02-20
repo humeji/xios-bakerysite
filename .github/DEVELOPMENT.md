@@ -138,7 +138,7 @@ When making changes tied to a plan, update the relevant documentation:
 | Theme settings | `PLANNING.md` (configuration table), plan's deployment guide |
 | New feature | `TASK.md`, `PLANNING.md`, plan docs, add tests, update README if needed |
 | Security changes | `.github/SECURITY.md`, `security/README.md` |
-| Deployment process | `.github/DEVELOPMENT.md`, `docs/SHOPIFY_DEPLOYMENT_GUIDE.md` |
+| Deployment process | `.github/DEVELOPMENT.md`, `scripts/README.md` |
 
 ### Plan-Scoped Documentation
 

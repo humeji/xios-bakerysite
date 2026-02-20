@@ -28,3 +28,7 @@ Review architecture, conventions, and constraints so new work aligns with existi
 ## 5. `TASK.md`
 
 Read the most recent entries to understand what was last delivered and avoid conflicts or rework.
+
+## 6. `CHANGELOG.md`
+
+Scan the latest entries to understand the current theme version, what was shipped in recent bundles, and the overall version progression.

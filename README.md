@@ -129,9 +129,10 @@ Tests cover:
 | Document | Description |
 |----------|-------------|
 | [TASK.md](TASK.md) | Work ledger -- completed work by date and plan |
+| [CHANGELOG.md](CHANGELOG.md) | Version history -- every bundle shipped |
 | [PLANNING.md](PLANNING.md) | Architecture, conventions, constraints |
 | [.github/DEVELOPMENT.md](.github/DEVELOPMENT.md) | Development workflow and testing |
-| [docs/SHOPIFY_DEPLOYMENT_GUIDE.md](docs/SHOPIFY_DEPLOYMENT_GUIDE.md) | General deployment guide |
+| [scripts/README.md](scripts/README.md) | Packaging script usage and checklist |
 | [security/README.md](security/README.md) | Security audit documentation |
 
 ### Plan: Checkout Minimum Fix

@@ -47,7 +47,7 @@ security/
 
 **Theme Package:** `xios-bakery-theme-v13.4.3-tiktok-link-fix2-<timestamp>.zip`  
 **Status:** Ready for immediate production deployment  
-**Validation:** Follow [SHOPIFY_DEPLOYMENT_GUIDE.md](../SHOPIFY_DEPLOYMENT_GUIDE.md)
+**Validation:** See [scripts/README.md](../scripts/README.md) for packaging and deployment steps
 
 ## File Naming Convention
 

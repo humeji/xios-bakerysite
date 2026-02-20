@@ -48,6 +48,7 @@ xios-bakerysite/
 ├── docs/                     # Project documentation
 ├── security/                 # Security audit reports and guides
 ├── .github/                  # GitHub config, workflows, development guide
+├── ig-fixed.xml              # Reference HTML: corrected Instagram embed snippet
 └── package.json              # Node dependencies (dev-only, for testing)
 ```
 
@@ -190,9 +191,9 @@ For packaging prerequisites, naming conventions, versioning, and checklist, see 
 | `.cursor/rules/plan-documentation.mdc` | EN | Cursor rule enforcing plan-scoped documentation |
 | `.github/SECURITY.md` | EN | Security policy, audit history, vulnerability reporting |
 | `.cursor/rules/plan-kickoff.mdc` | EN | Cursor rule enforcing plan kickoff review |
-| `docs/SHOPIFY_DEPLOYMENT_GUIDE.md` | EN | General deployment and validation steps |
-| `docs/TASK.md` | EN | Legacy task log (security remediation Aug 2025) |
+| `CHANGELOG.md` | EN | Version history -- every bundle shipped, reverse chronological |
 | `security/README.md` | EN | Security audit reports and XSS remediation |
+| `ig-fixed.xml` | EN | Reference HTML snippet: corrected Instagram profile embed (`@xios.bakery`) using oEmbed blockquote + `embed.js`. Not consumed by the theme directly -- paste into a Liquid section or custom HTML block when updating the storefront Instagram widget. |
 
 ### Plan-Scoped Documents
 

@@ -25,10 +25,7 @@ docs/plans/<plan-id>/
    - Bundles produced
    - Open items (if any)
 3. **Create supporting docs** as needed (SOWs, deployment guides, configuration guides)
-4. **Update `TASK.md`** (project root) with a dated ledger entry that:
-   - References the plan ID
-   - Lists completed items
-   - Links to the plan's docs folder: `docs/plans/<plan-id>/`
+4. **Update `CHANGELOG.md`** (project root) with an entry for the new version once bundled
 
 ## When Plan Scope Changes
 
@@ -36,7 +33,6 @@ If requirements change mid-plan (new edge cases, localization, etc.):
 
 1. Update the plan's `README.md` to reflect the new deliverables
 2. Update or create any affected supporting docs in the plan folder
-3. Add a new section to the `TASK.md` ledger entry for the additional work
 
 ## Document Naming
 

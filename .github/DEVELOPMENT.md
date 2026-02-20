@@ -68,7 +68,6 @@ Use the `analyze_file_list` MCP tool (via the `user-sonarqube` server in Cursor)
 
 Before packaging, update all relevant documentation:
 
-- `TASK.md` (root) -- add a ledger entry for the work being bundled
 - `PLANNING.md` -- update if architecture, settings, or validation logic changed
 - `README.md` -- update if version, features, or project structure changed
 - Deployment guide -- update if cart/checkout behavior changed
@@ -133,10 +132,10 @@ When making changes tied to a plan, update the relevant documentation:
 
 | What Changed | Update These |
 |-------------|-------------|
-| Any plan work | `TASK.md` (root), plan's `README.md` in `docs/plans/<plan-id>/` |
+| Any plan work | `CHANGELOG.md`, plan's `README.md` in `docs/plans/<plan-id>/` |
 | Cart validation logic | `PLANNING.md` (validation matrix), plan's deployment guide, tests |
 | Theme settings | `PLANNING.md` (configuration table), plan's deployment guide |
-| New feature | `TASK.md`, `PLANNING.md`, plan docs, add tests, update README if needed |
+| New feature | `CHANGELOG.md`, `PLANNING.md`, plan docs, add tests, update README if needed |
 | Security changes | `.github/SECURITY.md`, `security/README.md` |
 | Deployment process | `.github/DEVELOPMENT.md`, `scripts/README.md` |
 

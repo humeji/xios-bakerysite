@@ -36,7 +36,6 @@ Before running the script, ensure every item is satisfied:
 
 - [ ] All unit tests pass (`npm test`)
 - [ ] SonarQube reports zero findings on every file touched in this plan (use the `analyze_file_list` MCP tool)
-- [ ] `TASK.md` (root) updated with a ledger entry for the work being bundled
 - [ ] `PLANNING.md` updated if architecture, settings, or validation logic changed
 - [ ] Plan docs (`docs/plans/<plan-id>/README.md`) created or updated
 - [ ] `CHANGELOG.md` updated with a new entry for this version/bundle

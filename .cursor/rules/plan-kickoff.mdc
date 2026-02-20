@@ -15,23 +15,19 @@ Read the full changelog to understand the current theme version, what was shippe
 
 Review the README.md in each completed plan folder under `docs/plans/<plan-id>/`. These contain objectives, deliverables, files modified, and open items from prior plans. Understanding what was previously delivered and any open items is essential context for scoping new work effectively.
 
-## 3. `TASK.md`
-
-Read the most recent entries to understand what was last worked on, what files were touched, and avoid conflicts or rework.
-
-## 4. `PLANNING.md`
+## 3. `PLANNING.md`
 
 Review architecture, conventions, and constraints so new work aligns with existing patterns.
 
-## 5. `.github/DEVELOPMENT.md`
+## 4. `.github/DEVELOPMENT.md`
 
 Review the development workflow, testing requirements, SonarQube quality gate, and packaging checklist. All plans must follow these steps.
 
-## 6. `.github/SECURITY.md`
+## 5. `.github/SECURITY.md`
 
 Review the known vulnerability list and current remediation status. New plans must not reintroduce resolved issues or ignore documented security constraints.
 
-## 7. `.github/workflows/`
+## 6. `.github/workflows/`
 
 Read all files in this directory. Currently contains:
 

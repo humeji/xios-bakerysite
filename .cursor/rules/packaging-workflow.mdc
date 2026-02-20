@@ -10,7 +10,7 @@ Before creating a new ZIP bundle, ALL prerequisites in [`scripts/README.md`](../
 
 1. All unit tests passing (`npm test`)
 2. SonarQube reporting zero findings on all changed files
-3. All documentation being current (TASK.md, PLANNING.md, plan docs, README)
+3. All documentation being current (CHANGELOG.md, PLANNING.md, plan docs, README)
 4. ZIP naming convention followed: `xios-bakery-theme-<plan-id>-<YYYYMMDD>.zip`
 
 Always consult `scripts/README.md` for the authoritative checklist and usage instructions.

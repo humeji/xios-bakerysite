@@ -18,7 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Bilingual support (English/Spanish) for all customer-facing cart messages
 - Admin-only warning banner when minimum is set below $20
 - 49 automated unit tests (Jest) for validation, parsing, and localization
-- Project standards: PLANNING.md, TASK.md, CHANGELOG.md, .github/DEVELOPMENT.md
+- Project standards: PLANNING.md, CHANGELOG.md, .github/DEVELOPMENT.md
 - Cursor rules for packaging, SonarQube, plan docs, and plan kickoff
 - SonarQube quality gate enforced on all code changes
 

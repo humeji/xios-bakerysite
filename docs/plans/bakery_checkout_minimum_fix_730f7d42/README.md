@@ -30,7 +30,7 @@ Replace the cookie-count checkout blocking with a configurable $40 minimum order
 ### Quality & Infrastructure (Feb 20)
 
 - 49 automated unit tests (Jest) covering validation, parsing, and localization
-- Project documentation: PLANNING.md, .github/DEVELOPMENT.md, root TASK.md
+- Project documentation: PLANNING.md, CHANGELOG.md, .github/DEVELOPMENT.md
 - Packaging rules: tests must pass, docs must be current, plan-ID naming convention
 
 ## Validation Matrix

@@ -46,9 +46,9 @@ xios-bakerysite/
 │   └── helpers/              # Test utilities and extracted logic
 ├── scripts/                  # Build/deployment scripts
 ├── docs/                     # Project documentation
+│   └── reference/            # Known-good third-party embed snippets
 ├── security/                 # Security audit reports and guides
 ├── .github/                  # GitHub config, workflows, development guide
-├── ig-fixed.xml              # Reference HTML: corrected Instagram embed snippet
 └── package.json              # Node dependencies (dev-only, for testing)
 ```
 
@@ -166,8 +166,8 @@ When adding new cart/checkout features:
 2. Run `npm test` -- all tests must pass
 3. Run SonarQube analysis on all touched files -- zero findings required
 4. Update all relevant documentation (see Documentation Index below)
-5. Update `TASK.md` at the project root with a ledger entry for the work
-6. Run `./scripts/package-theme.sh <plan-id>` to create the ZIP bundle
+5. Run `./scripts/package-theme.sh <plan-id>` to create the ZIP bundle
+6. Add a new entry to `CHANGELOG.md` for the version being shipped
 7. Upload ZIP to Shopify Admin > Online Store > Themes
 8. Preview the theme, run interactive tests per deployment guide
 9. Publish when verified
@@ -182,7 +182,7 @@ For packaging prerequisites, naming conventions, versioning, and checklist, see 
 
 | Document | Language | Purpose |
 |----------|----------|---------|
-| `TASK.md` | EN | Work ledger -- tracks completed work by date and plan ID |
+| `CHANGELOG.md` | EN | Version history -- every bundle shipped, reverse chronological |
 | `PLANNING.md` | EN | This file -- architecture, conventions, constraints |
 | `README.md` | EN | Quick start, project overview |
 | `.github/DEVELOPMENT.md` | EN | Development workflow, testing, packaging |
@@ -193,7 +193,7 @@ For packaging prerequisites, naming conventions, versioning, and checklist, see 
 | `.cursor/rules/plan-kickoff.mdc` | EN | Cursor rule enforcing plan kickoff review |
 | `CHANGELOG.md` | EN | Version history -- every bundle shipped, reverse chronological |
 | `security/README.md` | EN | Security audit reports and XSS remediation |
-| `ig-fixed.xml` | EN | Reference HTML snippet: corrected Instagram profile embed (`@xios.bakery`) using oEmbed blockquote + `embed.js`. Not consumed by the theme directly -- paste into a Liquid section or custom HTML block when updating the storefront Instagram widget. |
+| `docs/reference/instagram-embed-xiosbakery.html` | EN | Known-good Instagram oEmbed snippet for `@xios.bakery` (version 14). Not consumed by the theme directly -- copy into a Liquid section or custom HTML block when updating the storefront Instagram widget. Kept under version control to diff against future Instagram embed changes. |
 
 ### Plan-Scoped Documents
 

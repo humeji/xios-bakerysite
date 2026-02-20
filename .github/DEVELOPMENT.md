@@ -115,26 +115,57 @@ Production ZIPs are created exclusively by the CI/CD release workflow. Never upl
 
 ### Creating a Production Release
 
+#### Prerequisites
+
+Before tagging a release, make sure:
+
+- Your feature branch has been merged to `main` via a PR
+- The `test-and-lint` CI check passed on the PR
+- `CHANGELOG.md` has an entry for the new version
+
+#### Step-by-Step
+
 ```bash
-# 1. Ensure all tests and lint pass
-npm test
-npm run lint:ci
+# 1. Switch to main and pull the latest merged code
+git checkout main
+git pull
 
-# 2. Commit and push all changes
-git add .
-git commit -m "Prepare release v13.5.0-plan-name"
-git push
+# 2. Create a version tag
+git tag v13.6.0-your-plan-name
 
-# 3. Wait for CI to pass on the push
-
-# 4. Create and push a version tag
-git tag v13.5.0-plan-name
+# 3. Push the tag -- this triggers the release workflow
 git push --tags
-
-# 5. GitHub Actions runs: tests -> lint -> package ZIP -> create Release
-# 6. Download the ZIP from GitHub Releases
-# 7. Upload to Shopify Admin
 ```
+
+That's it. The release workflow runs automatically and does the rest.
+
+#### What Happens After You Push the Tag
+
+| Step | Automated Action | On Failure |
+|------|-----------------|------------|
+| 1 | `npm ci` (install dependencies) | Pipeline fails |
+| 2 | `npm test` (Jest unit tests) | Pipeline fails -- no ZIP created |
+| 3 | `npm run lint:ci` (ESLint + SonarJS) | Pipeline fails -- no ZIP created |
+| 4 | `package-theme.sh --ci <tag>` (create ZIP) | Pipeline fails -- no release |
+| 5 | GitHub Release created with ZIP attached | -- |
+
+#### After the Release
+
+1. Monitor progress at [Actions](https://github.com/humeji/xios-bakerysite/actions)
+2. Once complete, go to [Releases](https://github.com/humeji/xios-bakerysite/releases)
+3. Download the ZIP from the release page
+4. Upload to [Shopify Admin > Online Store > Themes](https://xiosbakery.myshopify.com/admin/themes)
+5. Preview the theme and verify changes
+6. Publish when ready
+
+#### Tag Naming Convention
+
+Tags follow the format `v<version>-<description>`, matching the `CHANGELOG.md` heading:
+
+| Tag | CHANGELOG Heading |
+|-----|-------------------|
+| `v13.5.0-cicd-pipeline` | `[13.5.0-cicd-pipeline]` |
+| `v13.4.9-checkout-minimum-fix` | `[13.4.9-checkout-minimum-fix]` |
 
 ### CI Workflows
 

@@ -5,30 +5,34 @@ alwaysApply: true
 
 # Plan Kickoff -- Required Review
 
-Before writing any code for a new Cursor plan in this project, review these files to understand the project's security posture, development workflow, and CI configuration:
+Before writing any code for a new Cursor plan in this project, review these files to understand what has already been built, the project's security posture, development workflow, and CI configuration:
 
-## 1. `.github/workflows/`
+## 1. `CHANGELOG.md`
 
-Read all files in this directory. Currently contains:
+Read the full changelog to understand the current theme version, what was shipped in every prior bundle, and the overall version progression. This prevents duplicating work that was already delivered or introducing changes that conflict with prior releases.
 
-- `security.yml.example` -- Semgrep and dependency-check CI pipeline template. Understand what security scanning is configured (or planned) so new code does not introduce patterns that would fail these checks.
+## 2. `docs/plans/`
 
-## 2. `.github/SECURITY.md`
+Review the README.md in each completed plan folder under `docs/plans/<plan-id>/`. These contain objectives, deliverables, files modified, and open items from prior plans. Understanding what was previously delivered and any open items is essential context for scoping new work effectively.
 
-Review the known vulnerability list and current remediation status. New plans must not reintroduce resolved issues or ignore documented security constraints.
+## 3. `TASK.md`
 
-## 3. `.github/DEVELOPMENT.md`
-
-Review the development workflow, testing requirements, SonarQube quality gate, and packaging checklist. All plans must follow these steps.
+Read the most recent entries to understand what was last worked on, what files were touched, and avoid conflicts or rework.
 
 ## 4. `PLANNING.md`
 
 Review architecture, conventions, and constraints so new work aligns with existing patterns.
 
-## 5. `TASK.md`
+## 5. `.github/DEVELOPMENT.md`
 
-Read the most recent entries to understand what was last delivered and avoid conflicts or rework.
+Review the development workflow, testing requirements, SonarQube quality gate, and packaging checklist. All plans must follow these steps.
 
-## 6. `CHANGELOG.md`
+## 6. `.github/SECURITY.md`
 
-Scan the latest entries to understand the current theme version, what was shipped in recent bundles, and the overall version progression.
+Review the known vulnerability list and current remediation status. New plans must not reintroduce resolved issues or ignore documented security constraints.
+
+## 7. `.github/workflows/`
+
+Read all files in this directory. Currently contains:
+
+- `security.yml.example` -- Semgrep and dependency-check CI pipeline template. Understand what security scanning is configured (or planned) so new code does not introduce patterns that would fail these checks.

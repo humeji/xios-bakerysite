@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - Python 3.10+ (used by the packaging script)
-- Node.js 18+ (for running Jest tests)
+- Node.js 18+ (for running Jest tests and ESLint)
 - A text editor (VS Code recommended)
 - Access to Shopify Admin: https://xiosbakery.myshopify.com/admin
 
@@ -22,11 +22,12 @@ python3 -m venv venv
 source venv/bin/activate        # macOS / Linux
 # venv\Scripts\activate          # Windows
 
-# Install Node dependencies
+# Install Node dependencies (also sets up husky pre-commit hooks)
 npm install
 
 # Verify setup
 npm test
+npm run lint
 ```
 
 ### Reactivating the Environment
@@ -52,7 +53,13 @@ Before starting any task, read `PLANNING.md` to understand the architecture, con
 - Keep both directories in sync -- all changes must be applied to both
 - Follow the patterns described in `PLANNING.md`
 
-### 3. Run Tests
+### 3. Commit Code
+
+A pre-commit hook (husky + lint-staged) runs ESLint with SonarJS rules on all staged JS files. If lint fails, the commit is blocked. Fix the issues before committing.
+
+To bypass in emergencies: `git commit --no-verify` (CI will still catch lint errors).
+
+### 4. Run Tests
 
 ```bash
 npm test
@@ -60,11 +67,20 @@ npm test
 
 All tests must pass before packaging. If you changed cart validation logic in `custom.js`, update the corresponding functions in `tests/helpers/cart-validation-logic.js` and add/update tests.
 
-### 4. Run SonarQube Analysis
+### 5. Run Linting
+
+```bash
+npm run lint        # Show all findings
+npm run lint:ci     # Strict mode: zero warnings allowed
+```
+
+ESLint uses `eslint-plugin-sonarjs` to enforce the same rules as SonarQube for IDE. This runs automatically on commit (pre-commit hook) and in CI (GitHub Actions).
+
+### 6. Run SonarQube Analysis
 
 Use the `analyze_file_list` MCP tool (via the `user-sonarqube` server in Cursor) to scan every file you created or modified. Zero findings are required -- resolve all MINOR, MAJOR, and BLOCKER issues before proceeding.
 
-### 5. Update Documentation
+### 7. Update Documentation
 
 Before packaging, update all relevant documentation:
 
@@ -72,9 +88,66 @@ Before packaging, update all relevant documentation:
 - `README.md` -- update if version, features, or project structure changed
 - Deployment guide -- update if cart/checkout behavior changed
 
-### 6. Package and Deploy
+### 8. Release
 
-See [`scripts/README.md`](../scripts/README.md) for the full packaging prerequisites, checklist, naming convention, and deployment steps.
+See the **CI/CD & Release Process** section below.
+
+---
+
+## CI/CD & Release Process
+
+### Quality Gates (Three Layers)
+
+| Layer | What Runs | When |
+|-------|-----------|------|
+| Pre-commit hook | ESLint + SonarJS on staged files | Every `git commit` |
+| CI pipeline | `npm test` + `npm run lint:ci` | Every push / PR |
+| Release pipeline | Tests + lint + ZIP packaging | On version tag push |
+
+### Build Policy
+
+| Build Type | How | Purpose | Upload to Shopify? |
+|------------|-----|---------|-------------------|
+| **Production** | Push a git tag (`v13.x.x-plan-name`) | CI-validated release bundle | YES |
+| **Local** | `./scripts/package-theme.sh <plan-id>` | Dev testing only | NO |
+
+Production ZIPs are created exclusively by the CI/CD release workflow. Never upload a local build to Shopify production.
+
+### Creating a Production Release
+
+```bash
+# 1. Ensure all tests and lint pass
+npm test
+npm run lint:ci
+
+# 2. Commit and push all changes
+git add .
+git commit -m "Prepare release v13.5.0-plan-name"
+git push
+
+# 3. Wait for CI to pass on the push
+
+# 4. Create and push a version tag
+git tag v13.5.0-plan-name
+git push --tags
+
+# 5. GitHub Actions runs: tests -> lint -> package ZIP -> create Release
+# 6. Download the ZIP from GitHub Releases
+# 7. Upload to Shopify Admin
+```
+
+### CI Workflows
+
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| CI | `.github/workflows/ci.yml` | Push to any branch, PR to main | Run tests + ESLint/SonarJS |
+| Release | `.github/workflows/release.yml` | Tag push (`v*`) | Tests + lint + ZIP + GitHub Release |
+
+### Branch Protection (Recommended)
+
+Configure on GitHub: **Settings > Branches > Branch protection rules** for `main`:
+- Require status checks: `test-and-lint` must pass before merging
+- This ensures no code reaches `main` without passing all quality gates
 
 ---
 
@@ -99,6 +172,8 @@ tests/
 | `npm test` | Run all tests once |
 | `npm run test:watch` | Re-run tests on file changes |
 | `npm run test:ci` | CI mode with coverage report |
+| `npm run lint` | Run ESLint + SonarJS rules |
+| `npm run lint:ci` | Strict lint: zero warnings allowed |
 
 ### Adding Tests for New Features
 
@@ -122,7 +197,7 @@ The test helpers in `tests/helpers/cart-validation-logic.js` mirror the logic fr
 
 ## Versioning & Packaging
 
-See [`scripts/README.md`](../scripts/README.md) for versioning format, naming conventions, prerequisites checklist, and step-by-step usage.
+See [`scripts/README.md`](../scripts/README.md) for versioning format, naming conventions, the `--ci` flag, and the full build policy (local vs production).
 
 ---
 
@@ -177,3 +252,5 @@ The current system uses `requires_shipping === false` to detect digital products
 | Security | `assets/security-utils.js`, `layout/theme.liquid` (CSP) |
 | Styling | `assets/custom.css` |
 | Localization | `locales/en.default.json`, `locales/es.json` |
+| CI/CD | `.github/workflows/ci.yml`, `.github/workflows/release.yml` |
+| Pre-commit | `.husky/pre-commit`, `eslint.config.mjs` |

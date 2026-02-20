@@ -24,9 +24,12 @@ A Shopify storefront theme for Xio's Bakery, a bakery business that sells physic
 | JavaScript | Vanilla JS + jQuery (loaded via Shopify CDN) |
 | Styling | CSS (custom.css + Shopify component CSS) |
 | Testing | Jest (Node environment) |
-| Packaging | Bash script + Python 3 (`scripts/package-theme.sh`) |
+| Linting | ESLint + eslint-plugin-sonarjs (SonarQube rules) |
+| Pre-commit | husky + lint-staged (ESLint on staged files) |
+| CI/CD | GitHub Actions (test + lint on push; ZIP + Release on tag) |
+| Packaging | Bash script (`scripts/package-theme.sh`) |
 | Environment | Python 3.10+ venv, Node.js 18+ |
-| Deployment | Manual ZIP upload to Shopify Admin |
+| Deployment | ZIP upload to Shopify Admin (production ZIPs from CI only) |
 
 ### Directory Structure
 
@@ -48,8 +51,10 @@ xios-bakerysite/
 ├── docs/                     # Project documentation
 │   └── reference/            # Known-good third-party embed snippets
 ├── security/                 # Security audit reports and guides
-├── .github/                  # GitHub config, workflows, development guide
-└── package.json              # Node dependencies (dev-only, for testing)
+├── .github/                  # GitHub config, CI/CD workflows, development guide
+├── .husky/                   # Git hooks (pre-commit: ESLint via lint-staged)
+├── eslint.config.mjs         # ESLint flat config with SonarJS rules
+└── package.json              # Node dependencies (dev-only, for testing + linting)
 ```
 
 ### Key Custom Files
@@ -162,17 +167,35 @@ When adding new cart/checkout features:
 
 ## Deployment Workflow
 
-1. Make changes in `themes/current/` and `themes/development/`
-2. Run `npm test` -- all tests must pass
-3. Run SonarQube analysis on all touched files -- zero findings required
-4. Update all relevant documentation (see Documentation Index below)
-5. Run `./scripts/package-theme.sh <plan-id>` to create the ZIP bundle
-6. Add a new entry to `CHANGELOG.md` for the version being shipped
-7. Upload ZIP to Shopify Admin > Online Store > Themes
-8. Preview the theme, run interactive tests per deployment guide
-9. Publish when verified
+### Build Policy
 
-For packaging prerequisites, naming conventions, versioning, and checklist, see [`scripts/README.md`](scripts/README.md).
+| Build Type | How | Purpose | Upload to Shopify? |
+|------------|-----|---------|-------------------|
+| **Production** | Push a git tag (`v13.x.x-plan-name`) | CI-validated release | YES |
+| **Local** | `./scripts/package-theme.sh <plan-id>` | Dev testing only | NO |
+
+Production ZIPs are created exclusively by the CI/CD release workflow. Local builds are for development testing only.
+
+### Development to Release
+
+1. Make changes in `themes/current/` and `themes/development/`
+2. Commit (pre-commit hook runs ESLint/SonarJS on staged files)
+3. Push branch, open PR -- CI runs `npm test` + `npm run lint:ci` automatically
+4. Run SonarQube for IDE on all touched files -- zero findings required
+5. Update all relevant documentation (see Documentation Index below)
+6. Merge PR after CI passes
+7. When ready to release:
+   ```bash
+   git tag v13.5.0-plan-name
+   git push --tags
+   ```
+8. GitHub Actions runs tests + lint + packages ZIP + creates GitHub Release
+9. Download ZIP from [GitHub Releases](https://github.com/humeji/xios-bakerysite/releases)
+10. Upload ZIP to Shopify Admin > Online Store > Themes
+11. Preview the theme, run interactive tests per deployment guide
+12. Publish when verified
+
+For packaging prerequisites, naming conventions, versioning, and the `--ci` flag, see [`scripts/README.md`](scripts/README.md).
 
 ---
 
@@ -186,13 +209,15 @@ For packaging prerequisites, naming conventions, versioning, and checklist, see 
 | `PLANNING.md` | EN | This file -- architecture, conventions, constraints |
 | `README.md` | EN | Quick start, project overview |
 | `.github/DEVELOPMENT.md` | EN | Development workflow, testing, packaging |
+| `.github/workflows/ci.yml` | EN | CI workflow: test + lint on push/PR |
+| `.github/workflows/release.yml` | EN | Release workflow: test + lint + ZIP + GitHub Release on tag push |
 | `.cursor/rules/packaging-workflow.mdc` | EN | Cursor rule enforcing packaging requirements |
 | `.cursor/rules/sonarqube-quality-gate.mdc` | EN | Cursor rule enforcing SonarQube zero-issue gate |
 | `.cursor/rules/plan-documentation.mdc` | EN | Cursor rule enforcing plan-scoped documentation |
-| `.github/SECURITY.md` | EN | Security policy, audit history, vulnerability reporting |
 | `.cursor/rules/plan-kickoff.mdc` | EN | Cursor rule enforcing plan kickoff review |
-| `CHANGELOG.md` | EN | Version history -- every bundle shipped, reverse chronological |
+| `.github/SECURITY.md` | EN | Security policy, audit history, vulnerability reporting |
 | `security/README.md` | EN | Security audit reports and XSS remediation |
+| `eslint.config.mjs` | EN | ESLint flat config with SonarJS rules for quality gates |
 | `docs/reference/instagram-embed-xiosbakery.html` | EN | Known-good Instagram oEmbed snippet for `@xios.bakery` (version 14). Not consumed by the theme directly -- copy into a Liquid section or custom HTML block when updating the storefront Instagram widget. Kept under version control to diff against future Instagram embed changes. |
 
 ### Plan-Scoped Documents
@@ -202,6 +227,7 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 | Plan | Folder | Status |
 |------|--------|--------|
 | Checkout Minimum Fix | `docs/plans/bakery_checkout_minimum_fix_730f7d42/` | [COMPLETE] |
+| CI/CD Pipeline Setup | `docs/plans/ci_cd_pipeline_setup_713a17f2/` | [COMPLETE] |
 
 **Contents of `bakery_checkout_minimum_fix_730f7d42/`:**
 
@@ -220,7 +246,8 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 - **No build tools**: Shopify themes load assets directly -- no webpack, bundler, or transpiler
 - **No ES modules in theme JS**: Browser scripts use IIFE/global patterns, not `import/export`
 - **jQuery dependency**: The theme relies on jQuery (loaded via Shopify CDN), so custom JS uses `$`
-- **Manual deployment**: No Shopify CLI -- changes are deployed via ZIP upload
+- **CI/CD releases only**: Production ZIPs are built by GitHub Actions on tag push; local builds are for dev testing only
+- **No Shopify CLI**: Changes are deployed via ZIP upload to Shopify Admin
 - **Two themes in sync**: `themes/current/` and `themes/development/` must always match
 - **Sourcemaps disabled**: Never expose sourcemaps in production deployments
 

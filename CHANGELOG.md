@@ -6,6 +6,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
+## [13.5.0-cicd-pipeline] - 2026-02-20
+
+**Plan:** `ci_cd_pipeline_setup_713a17f2`
+
+### Added
+- GitHub Actions CI workflow: runs Jest tests + ESLint/SonarJS on every push and PR
+- GitHub Actions Release workflow: validates, packages ZIP, and creates GitHub Release on version tag push
+- ESLint + eslint-plugin-sonarjs for automated code quality enforcement (same rules as SonarQube for IDE)
+- ESLint flat config (`eslint.config.mjs`) with full enforcement on custom files and relaxed rules for Shopify Dawn stock files
+- Pre-commit hook (husky + lint-staged) that blocks commits with lint errors
+- `npm run lint` and `npm run lint:ci` scripts
+- Build policy: production ZIPs are CI-only; local builds are for dev testing
+
+### Changed
+- `scripts/package-theme.sh` now supports `--ci` flag for non-interactive CI execution
+- Local packaging script runs display a warning that builds are for development only
+- `scripts/README.md` restructured with separate Production Releases and Local Development sections
+- `.github/DEVELOPMENT.md` updated with CI/CD workflows, build policy, and release process
+- `PLANNING.md` updated with CI/CD in tech stack, deployment workflow, and documentation index
+
+### Fixed
+- `themes/*/assets/magnify.js`: implicit global variable (added `let` keyword)
+- `themes/*/assets/show-more.js`: unused variable removed
+- `themes/current/assets/third-party-security.js`: ignored exceptions now log debug messages; constructor-for-side-effects resolved
+- `tests/cart-validation.test.js`: removed 3 unused imports
+
+### Removed
+- `.github/workflows/security.yml.example` (superseded by `ci.yml` and `release.yml`)
+
+---
+
 ## [13.4.9-checkout-minimum-fix] - 2026-02-20
 
 **Plan:** `bakery_checkout_minimum_fix_730f7d42`

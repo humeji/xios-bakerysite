@@ -36,14 +36,14 @@ class ThirdPartySecurityManager {
    */
   monitorPopConvert() {
     // Check if Pop Convert is already loaded
-    if (window.pc && window.pc.version) {
+    if (globalThis.pc?.version) {
       // Pop Convert detected (logging suppressed)
       this.validatePopConvertSecurity();
     }
 
     // Monitor for Pop Convert initialization
     const checkPopConvert = () => {
-      if (window.pc && !this.loadedScripts.has('pop-convert')) {
+      if (globalThis.pc && !this.loadedScripts.has('pop-convert')) {
         this.loadedScripts.add('pop-convert');
         // Pop Convert initialized securely (logging suppressed)
         this.validatePopConvertSecurity();
@@ -66,7 +66,7 @@ class ThirdPartySecurityManager {
    * Validate Pop Convert security configuration
    */
   validatePopConvertSecurity() {
-    if (window.pc) {
+    if (globalThis.pc) {
       // Ensure Pop Convert is not modifying critical DOM elements
       this.protectCriticalElements();
       
@@ -101,7 +101,7 @@ class ThirdPartySecurityManager {
    * Monitor DOM changes for suspicious activity
    */
   monitorDOMChanges() {
-    if (!window.MutationObserver) return;
+    if (!globalThis.MutationObserver) return;
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -153,7 +153,8 @@ class ThirdPartySecurityManager {
       return this.allowedDomains.some(allowed => 
         domain === allowed || domain.endsWith('.' + allowed)
       );
-    } catch (e) {
+    } catch (error) {
+      console.debug('[SECURITY] Invalid URL passed to isAllowedDomain:', error.message);
       return false;
     }
   }
@@ -203,15 +204,15 @@ class ThirdPartySecurityManager {
     
     if (!isHarmless) {
       // Log security errors for monitoring
-      if (window.Shopify && window.Shopify.analytics) {
+      if (globalThis.Shopify?.analytics) {
         try {
-          window.Shopify.analytics.publish('security_error', {
+          globalThis.Shopify.analytics.publish('security_error', {
             message: message,
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent
           });
-        } catch (e) {
-          // Fail silently if analytics is not available
+        } catch (error) {
+          console.debug('[SECURITY] Analytics publish unavailable:', error.message);
         }
       }
     }
@@ -222,8 +223,8 @@ class ThirdPartySecurityManager {
    */
   logThirdPartyActivity() {
     // Only log in development or when debug is enabled
-    if (window.location.hostname.includes('localhost') || 
-        window.location.search.includes('debug=true')) {
+    if (globalThis.location.hostname.includes('localhost') || 
+        globalThis.location.search.includes('debug=true')) {
       
       console.log('[SECURITY] Third-party security manager initialized');
       console.log('[SECURITY] Monitoring domains:', this.allowedDomains);
@@ -241,13 +242,13 @@ class ThirdPartySecurityManager {
 }
 
 // Initialize security manager when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    new ThirdPartySecurityManager();
-  });
-} else {
-  new ThirdPartySecurityManager();
+function initSecurityManager() {
+  const manager = new ThirdPartySecurityManager();
+  globalThis.__thirdPartySecurityManager = manager;
 }
 
-// Expose for debugging
-window.__thirdPartySecurityManager = ThirdPartySecurityManager;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSecurityManager);
+} else {
+  initSecurityManager();
+}

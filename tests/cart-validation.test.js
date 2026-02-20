@@ -1,7 +1,4 @@
 const {
-  parseMinimumOrder,
-  parseEnableFlag,
-  buildMessage,
   evaluateCart,
 } = require('./helpers/cart-validation-logic');
 const { buildCart } = require('./helpers/cart-dom-setup');

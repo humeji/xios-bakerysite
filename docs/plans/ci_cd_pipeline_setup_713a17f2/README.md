@@ -8,15 +8,26 @@
 
 ## Objective
 
-Implement a CI/CD pipeline using GitHub Actions to automate testing, linting, and release packaging. Enforce code quality gates at three layers: pre-commit (local), CI (push/PR), and release (tag push). Establish a build policy where production ZIPs are created exclusively by CI.
+Implement a CI/CD pipeline using GitHub Actions to automate testing, linting, and release packaging. Enforce code quality gates at three layers: pre-commit (local), CI (push/PR), and release (tag push). Establish a build policy where production ZIPs are created exclusively by CI. Protect the `main` branch with enforced status checks.
 
 ## What Was Delivered
+
+### Repository Configuration
+
+- **Visibility changed to public** -- GitHub Free does not enforce branch protection rules or repository rulesets on private repositories. Making the repo public was required for rule enforcement at no cost.
+- **Repository ruleset** ("Protect main") created via the GitHub API:
+  - Targets `refs/heads/main`
+  - Enforcement: **active**
+  - Requires a pull request to merge (direct pushes to `main` are blocked)
+  - Requires the `test-and-lint` CI status check to pass before merging
+  - Ruleset ID: `13059466` ([view on GitHub](https://github.com/humeji/xios-bakerysite/rules/13059466))
 
 ### Quality Gates
 
 - **Pre-commit hook** (husky + lint-staged): Runs ESLint with SonarJS rules on staged JS files before every commit
 - **CI workflow** (`.github/workflows/ci.yml`): Runs `npm test` + `npm run lint:ci` on every push and PR
 - **Release workflow** (`.github/workflows/release.yml`): Runs full validation, packages ZIP, and creates a GitHub Release on version tag push
+- **Branch ruleset**: Requires PR + passing `test-and-lint` check before merging to `main`
 
 ### ESLint + SonarJS Integration
 
@@ -74,6 +85,18 @@ Implement a CI/CD pipeline using GitHub Actions to automate testing, linting, an
 
 - `.github/workflows/security.yml.example`
 
+## GitHub Configuration (Not in Code)
+
+These settings were applied directly to the GitHub repository and are not tracked in version control:
+
+- **Repository visibility**: Public (required for free ruleset enforcement)
+- **Repository ruleset "Protect main"**: Active, requires PR + `test-and-lint` status check for merges to `main`
+
 ## Open Items
 
-- **Branch protection**: Configure on GitHub (Settings > Branches) to require the `test-and-lint` status check before merging to `main`. This is a manual step that cannot be automated via code.
+None -- all items have been completed.
+
+## Lessons Learned
+
+- **GitHub Free limitation**: Branch protection rules (classic) and repository rulesets are **not enforced** on private repositories under GitHub Free plans. The GitHub UI allows creating these rules, but they are advisory only. Enforcement requires either a public repository or a paid GitHub Team/Enterprise plan.
+- **Rulesets vs. classic branch protection**: GitHub's newer "Repository rulesets" (Settings > Rules > Rulesets) are the recommended approach over classic "Branch protection rules" (Settings > Branches). Rulesets offer more flexibility and are the direction GitHub is heading.

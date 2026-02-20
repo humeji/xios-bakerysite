@@ -31,4 +31,5 @@ Review the known vulnerability list and current remediation status. New plans mu
 
 Read all files in this directory. Currently contains:
 
-- `security.yml.example` -- Semgrep and dependency-check CI pipeline template. Understand what security scanning is configured (or planned) so new code does not introduce patterns that would fail these checks.
+- `ci.yml` -- CI pipeline that runs Jest tests and ESLint/SonarJS on every push and PR. All new code must pass this gate.
+- `release.yml` -- Release pipeline triggered by version tags (`v*`). Runs tests + lint, packages the theme ZIP, and creates a GitHub Release. Production bundles come exclusively from this workflow.

@@ -2,7 +2,7 @@
 function createOverlay(image) {
   const overlayImage = document.createElement('img');
   overlayImage.setAttribute('src', `${image.src}`);
-  overlay = document.createElement('div');
+  let overlay = document.createElement('div');
   prepareOverlay(overlay, overlayImage);
 
   image.style.opacity = '50%';

@@ -38,3 +38,13 @@ jobs:
         with:
           files: xios-bakery-theme-*.zip
           generate_release_notes: true
+          body: |
+            ## Deployment
+
+            1. Download the `.zip` file below
+            2. Go to [Shopify Admin > Online Store > Themes](https://xiosbakery.myshopify.com/admin/themes)
+            3. Click **Add theme > Upload ZIP file** and select the downloaded ZIP
+            4. Preview the theme and verify changes
+            5. Publish when ready
+
+            For the full development workflow and release process, see [DEVELOPMENT.md](https://github.com/humeji/xios-bakerysite/blob/main/.github/DEVELOPMENT.md#creating-a-production-release).

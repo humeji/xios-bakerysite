@@ -21,8 +21,13 @@ class ThirdPartySecurityManager {
   }
 
   init() {
+    // Monitor for Pop Convert script loading
     this.monitorPopConvert();
+    
+    // Set up security event listeners
     this.setupSecurityListeners();
+    
+    // Log third-party activity for debugging
     this.logThirdPartyActivity();
   }
 
@@ -30,17 +35,22 @@ class ThirdPartySecurityManager {
    * Monitor Pop Convert script and ensure it's loading securely
    */
   monitorPopConvert() {
-    if (globalThis.pc?.version) {
+    // Check if Pop Convert is already loaded
+    if (window.pc && window.pc.version) {
+      // Pop Convert detected (logging suppressed)
       this.validatePopConvertSecurity();
     }
 
+    // Monitor for Pop Convert initialization
     const checkPopConvert = () => {
-      if (globalThis.pc && !this.loadedScripts.has('pop-convert')) {
+      if (window.pc && !this.loadedScripts.has('pop-convert')) {
         this.loadedScripts.add('pop-convert');
+        // Pop Convert initialized securely (logging suppressed)
         this.validatePopConvertSecurity();
       }
     };
 
+    // Check periodically for Pop Convert
     const interval = setInterval(() => {
       checkPopConvert();
       if (this.loadedScripts.has('pop-convert')) {
@@ -48,6 +58,7 @@ class ThirdPartySecurityManager {
       }
     }, 1000);
 
+    // Clear interval after 30 seconds to prevent memory leaks
     setTimeout(() => clearInterval(interval), 30000);
   }
 
@@ -55,8 +66,11 @@ class ThirdPartySecurityManager {
    * Validate Pop Convert security configuration
    */
   validatePopConvertSecurity() {
-    if (globalThis.pc) {
+    if (window.pc) {
+      // Ensure Pop Convert is not modifying critical DOM elements
       this.protectCriticalElements();
+      
+      // Monitor for suspicious activity
       this.monitorDOMChanges();
     }
   }
@@ -75,6 +89,7 @@ class ThirdPartySecurityManager {
     criticalSelectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
+        // Freeze element to prevent modification
         if (Object.freeze) {
           Object.freeze(element);
         }
@@ -86,7 +101,7 @@ class ThirdPartySecurityManager {
    * Monitor DOM changes for suspicious activity
    */
   monitorDOMChanges() {
-    if (!globalThis.MutationObserver) return;
+    if (!window.MutationObserver) return;
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -110,6 +125,7 @@ class ThirdPartySecurityManager {
    * Validate newly added elements for security
    */
   validateNewElement(element) {
+    // Check for suspicious script injections
     if (element.tagName === 'SCRIPT') {
       const src = element.src;
       if (src && !this.isAllowedDomain(src)) {
@@ -119,6 +135,7 @@ class ThirdPartySecurityManager {
       }
     }
 
+    // Check for inline event handlers
     Array.from(element.attributes || []).forEach(attr => {
       if (attr.name.toLowerCase().startsWith('on')) {
         console.warn('[SECURITY] Removed inline event handler:', attr.name);
@@ -133,18 +150,21 @@ class ThirdPartySecurityManager {
   isAllowedDomain(url) {
     try {
       const domain = new URL(url).hostname;
-      return this.allowedDomains.some(allowed =>
+      return this.allowedDomains.some(allowed => 
         domain === allowed || domain.endsWith('.' + allowed)
       );
-    } catch {
+    } catch (e) { // eslint-disable-line sonarjs/no-ignored-exceptions
       return false;
     }
   }
+
+  // Console filtering is now handled directly in theme.liquid for immediate execution
 
   /**
    * Set up security event listeners
    */
   setupSecurityListeners() {
+    // Listen for CSP violations
     document.addEventListener('securitypolicyviolation', (e) => {
       console.warn('[SECURITY] CSP Violation:', {
         violatedDirective: e.violatedDirective,
@@ -152,12 +172,15 @@ class ThirdPartySecurityManager {
         documentURI: e.documentURI
       });
     });
+
+    // Console filtering is now handled in setupConsoleFiltering()
   }
 
   /**
    * Handle security-related errors
    */
   handleSecurityError(message) {
+    // Filter out known harmless errors and warnings
     const harmlessErrors = [
       'Partitioned cookie or storage access',
       'Instagram',
@@ -175,18 +198,19 @@ class ThirdPartySecurityManager {
       'ErrorUtils caught an error',
       'blurred pcjs.production.min.js'
     ];
-
+    
     const isHarmless = harmlessErrors.some(error => message.includes(error));
-
+    
     if (!isHarmless) {
-      if (globalThis.Shopify?.analytics) {
+      // Log security errors for monitoring
+      if (window.Shopify && window.Shopify.analytics) {
         try {
-          globalThis.Shopify.analytics.publish('security_error', {
+          window.Shopify.analytics.publish('security_error', {
             message: message,
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent
           });
-        } catch {
+        } catch (e) { // eslint-disable-line sonarjs/no-ignored-exceptions
           // Fail silently if analytics is not available
         }
       }
@@ -197,12 +221,14 @@ class ThirdPartySecurityManager {
    * Log third-party activity for debugging
    */
   logThirdPartyActivity() {
-    if (globalThis.location.hostname.includes('localhost') ||
-        globalThis.location.search.includes('debug=true')) {
-
+    // Only log in development or when debug is enabled
+    if (window.location.hostname.includes('localhost') || 
+        window.location.search.includes('debug=true')) {
+      
       console.log('[SECURITY] Third-party security manager initialized');
       console.log('[SECURITY] Monitoring domains:', this.allowedDomains);
-
+      
+      // Log when scripts are loaded
       const originalAppendChild = Node.prototype.appendChild;
       Node.prototype.appendChild = function(child) {
         if (child.tagName === 'SCRIPT' && child.src) {
@@ -217,10 +243,11 @@ class ThirdPartySecurityManager {
 // Initialize security manager when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    globalThis.__thirdPartySecurityInstance = new ThirdPartySecurityManager();
+    new ThirdPartySecurityManager(); // eslint-disable-line sonarjs/constructor-for-side-effects
   });
 } else {
-  globalThis.__thirdPartySecurityInstance = new ThirdPartySecurityManager();
+  new ThirdPartySecurityManager(); // eslint-disable-line sonarjs/constructor-for-side-effects
 }
 
-globalThis.__thirdPartySecurityManager = ThirdPartySecurityManager;
+// Expose for debugging
+window.__thirdPartySecurityManager = ThirdPartySecurityManager;

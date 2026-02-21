@@ -1,11 +1,3 @@
-function _stripDangerousAttrs(root) {
-  root.querySelectorAll('*').forEach((el) => {
-    Array.from(el.attributes).forEach((a) => {
-      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
-    });
-  });
-}
-
 class CartRemoveButton extends HTMLElement {
   constructor() {
     super();
@@ -79,14 +71,13 @@ class CartItems extends HTMLElement {
           const html = new DOMParser().parseFromString(responseText, 'text/html');
           const sourceQty = html.querySelector('cart-items');
           if (sourceQty) {
-            if (globalThis.safeSetHTML) {
-              globalThis.safeSetHTML(this, sourceQty.innerHTML);
+            if (window.safeSetHTML) {
+              window.safeSetHTML(this, sourceQty.innerHTML);
             } else {
               // Fallback sanitization
               const tempContainer = document.createElement('div');
               tempContainer.innerHTML = sourceQty.innerHTML;
               tempContainer.querySelectorAll('script').forEach((s) => s.remove());
-              _stripDangerousAttrs(tempContainer);
               this.replaceChildren(...tempContainer.childNodes);
             }
           }
@@ -129,10 +120,10 @@ class CartItems extends HTMLElement {
       line,
       quantity,
       sections: this.getSectionsToRender().map((section) => section.section),
-      sections_url: globalThis.location.pathname,
+      sections_url: window.location.pathname,
     });
 
-    fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body })
+    fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
       .then((response) => {
         return response.text();
       })
@@ -162,35 +153,44 @@ class CartItems extends HTMLElement {
             parsedState.sections[section.section],
             section.selector
           );
-          if (globalThis.safeSetHTML && elementToReplace) {
-            globalThis.safeSetHTML(elementToReplace, safeHTML);
+          if (window.safeSetHTML && elementToReplace) {
+            window.safeSetHTML(elementToReplace, safeHTML);
           } else if (elementToReplace) {
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = safeHTML;
             tempContainer.querySelectorAll('script').forEach((s) => s.remove());
-            _stripDangerousAttrs(tempContainer);
             elementToReplace.replaceChildren(...tempContainer.childNodes);
           }
         });
         const updatedValue = parsedState.items[line - 1] ? parsedState.items[line - 1].quantity : undefined;
         let message = '';
-        if (items.length === parsedState.items.length && updatedValue !== Number.parseInt(quantityElement.value)) {
-          if (updatedValue === undefined) {
-            message = globalThis.cartStrings.error;
+        if (items.length === parsedState.items.length && updatedValue !== parseInt(quantityElement.value)) {
+          if (typeof updatedValue === 'undefined') {
+            message = window.cartStrings.error;
           } else {
-            message = globalThis.cartStrings.quantityError.replace('[quantity]', updatedValue);
+            message = window.cartStrings.quantityError.replace('[quantity]', updatedValue);
           }
         }
         this.updateLiveRegions(line, message);
 
-        this.manageFocusAfterUpdate(line, name, parsedState, cartDrawerWrapper);
+        const lineItem =
+          document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
+        if (lineItem && lineItem.querySelector(`[name="${name}"]`)) {
+          cartDrawerWrapper
+            ? trapFocus(cartDrawerWrapper, lineItem.querySelector(`[name="${name}"]`))
+            : lineItem.querySelector(`[name="${name}"]`).focus();
+        } else if (parsedState.item_count === 0 && cartDrawerWrapper) {
+          trapFocus(cartDrawerWrapper.querySelector('.drawer__inner-empty'), cartDrawerWrapper.querySelector('a'));
+        } else if (document.querySelector('.cart-item') && cartDrawerWrapper) {
+          trapFocus(cartDrawerWrapper, document.querySelector('.cart-item__name'));
+        }
 
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cart-items', cartData: parsedState, variantId: variantId });
       })
       .catch(() => {
         this.querySelectorAll('.loading__spinner').forEach((overlay) => overlay.classList.add('hidden'));
         const errors = document.getElementById('cart-errors') || document.getElementById('CartDrawer-CartErrors');
-        errors.textContent = globalThis.cartStrings.error;
+        errors.textContent = window.cartStrings.error;
       })
       .finally(() => {
         this.disableLoading(line);
@@ -217,22 +217,6 @@ class CartItems extends HTMLElement {
     setTimeout(() => {
       cartStatus.setAttribute('aria-hidden', true);
     }, 1000);
-  }
-
-  manageFocusAfterUpdate(line, name, parsedState, cartDrawerWrapper) {
-    const lineItem =
-      document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
-    if (lineItem?.querySelector(`[name="${name}"]`)) {
-      if (cartDrawerWrapper) {
-        trapFocus(cartDrawerWrapper, lineItem.querySelector(`[name="${name}"]`));
-      } else {
-        lineItem.querySelector(`[name="${name}"]`).focus();
-      }
-    } else if (parsedState.item_count === 0 && cartDrawerWrapper) {
-      trapFocus(cartDrawerWrapper.querySelector('.drawer__inner-empty'), cartDrawerWrapper.querySelector('a'));
-    } else if (document.querySelector('.cart-item') && cartDrawerWrapper) {
-      trapFocus(cartDrawerWrapper, document.querySelector('.cart-item__name'));
-    }
   }
 
   getSectionInnerHTML(html, selector) {
@@ -277,7 +261,7 @@ if (!customElements.get('cart-note')) {
           'input',
           debounce((event) => {
             const body = JSON.stringify({ note: event.target.value });
-            fetch(`${routes.cart_update_url}`, { ...fetchConfig(), body });
+            fetch(`${routes.cart_update_url}`, { ...fetchConfig(), ...{ body } });
           }, ON_CHANGE_DEBOUNCE_TIMER)
         );
       }

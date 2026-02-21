@@ -1,11 +1,3 @@
-function _stripDangerousAttrs(root) {
-  root.querySelectorAll('*').forEach((el) => {
-    Array.from(el.attributes).forEach((a) => {
-      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
-    });
-  });
-}
-
 class PredictiveSearch extends SearchForm {
   constructor() {
     super();
@@ -141,7 +133,15 @@ class PredictiveSearch extends SearchForm {
 
     if (moveUp && !selectedElement) return;
 
-    const selectedElementIndex = allVisibleElements.indexOf(selectedElement);
+    let selectedElementIndex = -1;
+    let i = 0;
+
+    while (selectedElementIndex === -1 && i <= allVisibleElements.length) {
+      if (allVisibleElements[i] === selectedElement) {
+        selectedElementIndex = i;
+      }
+      i++;
+    }
 
     this.statusElement.textContent = '';
 
@@ -181,7 +181,7 @@ class PredictiveSearch extends SearchForm {
     })
       .then((response) => {
         if (!response.ok) {
-          const error = new Error(response.status);
+          var error = new Error(response.status);
           this.close();
           throw error;
         }
@@ -210,7 +210,7 @@ class PredictiveSearch extends SearchForm {
 
   setLiveRegionLoadingState() {
     this.statusElement = this.statusElement || this.querySelector('.predictive-search-status');
-    this.loadingText = this.loadingText || this.dataset.loadingText;
+    this.loadingText = this.loadingText || this.getAttribute('data-loading-text');
 
     this.setLiveRegionText(this.loadingText);
     this.setAttribute('loading', true);
@@ -226,13 +226,12 @@ class PredictiveSearch extends SearchForm {
   }
 
   renderSearchResults(resultsMarkup) {
-    if (globalThis.safeSetHTML) {
-      globalThis.safeSetHTML(this.predictiveSearchResults, resultsMarkup);
+    if (window.safeSetHTML) {
+      window.safeSetHTML(this.predictiveSearchResults, resultsMarkup);
     } else {
       const temp = document.createElement('div');
       temp.innerHTML = resultsMarkup;
       temp.querySelectorAll('script').forEach((s) => s.remove());
-      _stripDangerousAttrs(temp);
       this.predictiveSearchResults.replaceChildren(...temp.childNodes);
     }
     this.setAttribute('results', true);

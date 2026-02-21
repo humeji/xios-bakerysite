@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/humeji/xios-bakerysite#readme",
   "devDependencies": {
-    "eslint": "^9.39.3",
+    "eslint": "^10.0.1",
     "eslint-plugin-sonarjs": "^4.0.0",
     "globals": "^17.3.0",
     "husky": "^9.1.7",

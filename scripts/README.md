@@ -1,5 +1,17 @@
 # Scripts
 
+## create-shopify-branch.sh
+
+Creates (or recreates) the orphan `shopify` branch from `themes/current/` and pushes it to origin. This branch places all theme files at root level so Shopify's GitHub integration can detect a valid theme.
+
+```bash
+./scripts/create-shopify-branch.sh
+```
+
+Safe to run from any branch -- uses a temporary clone, so your working tree is not affected. After the first run, the `shopify` branch is kept in sync automatically by the `sync-shopify-branch.yml` GitHub Action.
+
+---
+
 ## package-theme.sh
 
 Creates a Shopify-ready ZIP bundle from `themes/current/`.
@@ -68,7 +80,7 @@ The ZIP is created at the repository root. The date stamp is generated automatic
 |------|--------|------------|
 | 1/4 | Runs `npm test` | Aborts -- fix failing tests first |
 | 2/4 | Prompts for SonarQube confirmation | Aborts -- resolve all findings first |
-| 3/4 | Verifies `themes/current/` and `settings_schema.json` exist | Aborts -- theme source missing |
+| 3/4 | Verifies `themes/current/`, `settings_schema.json`, and `settings_data.json` exist | Aborts -- theme source missing |
 | 4/4 | Creates the ZIP bundle | -- |
 
 #### The `--ci` Flag
@@ -97,6 +109,7 @@ Before running the script locally, ensure every item is satisfied:
 - [ ] `CHANGELOG.md` updated with a new entry for this version/bundle
 - [ ] Root `README.md` updated if version, features, or project structure changed
 - [ ] `.github/DEVELOPMENT.md` updated if workflow or testing process changed
+- [ ] `themes/current/config/settings_data.json` is present and up-to-date with the live theme's customizer settings (logo, colors, typography, etc.)
 
 ### Versioning
 

@@ -171,8 +171,33 @@ Tags follow the format `v<version>-<description>`, matching the `CHANGELOG.md` h
 
 | Workflow | File | Trigger | Purpose |
 |----------|------|---------|---------|
-| CI | `.github/workflows/ci.yml` | Push to any branch, PR to main | Run tests + ESLint/SonarJS |
+| CI | `.github/workflows/ci.yml` | Push to any branch (except `shopify`), PR to main | Run tests + ESLint/SonarJS |
 | Release | `.github/workflows/release.yml` | Tag push (`v*`) | Tests + lint + ZIP + GitHub Release |
+| Sync Shopify | `.github/workflows/sync-shopify-branch.yml` | Push to `main` changing `themes/current/**`, or manual dispatch | Rebuilds orphan `shopify` branch with theme files at root |
+
+### Shopify GitHub Integration
+
+The repo is connected to the Shopify store via the **Shopify GitHub integration**. Because Shopify requires theme files at the branch root (not nested under `themes/current/`), an auto-generated orphan branch called `shopify` serves as the connection point.
+
+**How it works:**
+
+1. A GitHub Action rebuilds the `shopify` branch every time `themes/current/` changes on `main`
+2. The workflow copies `themes/current/*` to the branch root and force-pushes
+3. Shopify detects the update and makes the new version available in the theme library
+
+**Manual rebuild:**
+
+```bash
+./scripts/create-shopify-branch.sh
+```
+
+Or trigger the workflow manually from GitHub Actions > Sync Shopify Branch > Run workflow.
+
+**Rules:**
+
+- Never commit directly to the `shopify` branch -- it is rebuilt from scratch on every sync
+- The `shopify` branch is excluded from CI (it has no `package.json` or tests)
+- In Shopify Admin > Themes > Connect theme, select branch `shopify`
 
 ### Branch Protection (Active)
 
@@ -270,6 +295,18 @@ Every Cursor plan that modifies theme code must have a folder under `docs/plans/
 6. Add tests for any new JS logic
 7. Update `PLANNING.md` configuration table
 
+### Updating Store Customizer Settings (settings_data.json)
+
+The file `config/settings_data.json` stores the actual values for the store's customizer settings (logo, colors, typography, social links, color schemes, etc.). This file is included in every theme ZIP so that new uploads preserve the store's branding.
+
+**When to update:** If the store owner changes the logo, colors, or other customizer settings through the Shopify admin, the repo copy must be refreshed:
+
+1. Go to Shopify Admin > Online Store > Themes
+2. On the **live** theme, click "..." > navigate to code editor
+3. Open `config/settings_data.json` and copy the contents
+4. Replace `themes/current/config/settings_data.json` and `themes/development/config/settings_data.json`
+5. The packaging script validates this file exists before creating a ZIP
+
 ### Adding a New Product Type Exemption
 
 The current system uses `requires_shipping === false` to detect digital products. If a new exemption pattern is needed:
@@ -286,7 +323,7 @@ The current system uses `requires_shipping === false` to detect digital products
 | Area | Primary Files |
 |------|--------------|
 | Cart validation | `assets/custom.js`, `sections/main-cart-items.liquid`, `snippets/cart-drawer.liquid` |
-| Theme settings | `config/settings_schema.json` |
+| Theme settings | `config/settings_schema.json`, `config/settings_data.json` |
 | Security | `assets/security-utils.js`, `layout/theme.liquid` (CSP) |
 | Styling | `assets/custom.css` |
 | Localization | `locales/en.default.json`, `locales/es.json` |

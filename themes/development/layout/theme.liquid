@@ -8,7 +8,7 @@
     <link rel="canonical" href="{{ canonical_url }}">
 
     {%- if settings.favicon != blank -%}
-      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
@@ -32,6 +32,7 @@
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'security-utils.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'third-party-security.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'security-test.js' | asset_url }}" defer="defer"></script>
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -44,52 +45,112 @@
 
     {{ content_for_header }}
 
+    <!-- CSP: unsafe-inline/unsafe-eval required by Shopify platform (see 2026 security audit) -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval'
-        https://code.jquery.com 
-        *.shopify.com 
-        *.shopifycdn.com 
-        cdn.shopify.com
+        https://code.jquery.com
+        *.shopify.com
+        *.shopifycdn.com
         checkout.shopifycs.com
         connect.facebook.net
+        *.facebook.com
+        *.instagram.com
+        *.cdninstagram.com
+        {% if settings.pop_convert_enabled %}
         script.pop-convert.com
         cdn.s3.pop-convert.com
-        www.instagram.com
+        {% endif %}
         monorail-edge.shopifysvc.com;
-      style-src 'self' 'unsafe-inline' 
-        https://code.jquery.com 
-        code.jquery.com
-        https://fonts.googleapis.com 
+      style-src 'self' 'unsafe-inline'
+        https://code.jquery.com
+        https://fonts.googleapis.com
         https://fonts.gstatic.com
-        *.shopify.com 
-        *.shopifycdn.com;
-      img-src 'self' data: blob:
-        *.shopify.com 
+        *.shopify.com
         *.shopifycdn.com
-        www.facebook.com;
-      font-src 'self' 
-        https://fonts.googleapis.com 
+        *.cdninstagram.com;
+      img-src 'self' data: blob:
+        *.shopify.com
+        *.shopifycdn.com
+        *.facebook.com
+        *.instagram.com
+        *.cdninstagram.com;
+      font-src 'self'
         https://fonts.gstatic.com
         cdn.shopify.com
-        *.shopifycdn.com;
-      connect-src 'self' 
-        *.shopify.com 
+        *.shopifycdn.com
+        https://xiosbakery.com;
+      connect-src 'self'
+        *.shopify.com
         checkout.shopifycs.com
         monorail-edge.shopifysvc.com
         error-analytics-sessions-production.shopifysvc.com
+        shop.app
+        *.facebook.com
+        connect.facebook.net
+        *.instagram.com
+        *.cdninstagram.com
+        {% if settings.pop_convert_enabled %}
         cdn.pop-convert.com
         cdn.micro.pop-convert.com
         micro.pop-convert.com
-        shop.app
-        *.facebook.com
-        connect.facebook.net;
+        {% endif %}
+        https://xiosbakery.com;
       frame-src 'self'
-        *.shopify.com 
+        *.shopify.com
         checkout.shopifycs.com
         shop.app
-        www.instagram.com;
+        *.instagram.com;
+      upgrade-insecure-requests;
     ">
+
+    <!-- Pop Convert conditional loader -->
+    {% if settings.pop_convert_enabled %}
+      <script>
+        (function(){
+          var src = '{{ settings.pop_convert_script_url | escape }}';
+          if (!/^https:\/\//.test(src)) { src = 'https://script.pop-convert.com/production.pc.min.js'; }
+          var s = document.createElement('script');
+          s.async = true; s.defer = true; s.src = src;
+          document.head.appendChild(s);
+        })();
+      </script>
+    {% endif %}
+
+    <!-- Neutralizer removed to avoid interfering with core script loading. Pop Convert is controlled via toggle above. -->
+    
+    <!-- Additional security headers removed here (must be server headers). -->
+    
+    <!-- Unified neutralizer enabled above; redundant older block removed to prevent render issues -->
+
+    <!-- Tybo credit suppression (CSS + light JS) -->
+    <style>
+      /* Hide common Tybo elements anywhere on the page */
+      #tybofooter,
+      [id*="tybofooter" i],
+      a[href*="tybo.agency" i],
+      a[href*="tybo" i] img,
+      img[alt*="tybo" i],
+      img[src*="tybo" i] {
+        display: none !important;
+        visibility: hidden !important;
+      }
+    </style>
+    <script>
+      (function(){
+        function removeTybo(){
+          try {
+            var nodes = document.querySelectorAll('#tybofooter, [id*="tybofooter" i], a[href*="tybo.agency" i], a[href*="tybo" i] img, img[alt*="tybo" i], img[src*="tybo" i]');
+            nodes.forEach(function(n){ try { n.remove(); } catch(e){} });
+          } catch(e){}
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', removeTybo); else removeTybo();
+        // Retry a few times in case it injects late
+        setTimeout(removeTybo, 1000);
+        setTimeout(removeTybo, 3000);
+        setTimeout(removeTybo, 7000);
+      })();
+    </script>
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
@@ -309,15 +370,9 @@
     {{ 'custom.css' | asset_url | stylesheet_tag }} 
 
     {%- comment -%}
-      Optimized font loading: Use font-display: swap and remove aggressive preloading
-      to eliminate unused preload warnings while maintaining performance
+      Optimized font loading: Use font-display: swap without preloading
+      to eliminate unused preload warnings. Fonts will load on-demand with swap behavior.
     {%- endcomment -%}
-    {%- unless settings.type_body_font.system? -%}
-      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
-    {%- endunless -%}
-    {%- if settings.type_header_font != settings.type_body_font and settings.type_header_font.system? == false -%}
-      <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-    {%- endif -%}
 
     {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
       <link rel="stylesheet" href="{{ 'component-localization-form.css' | asset_url }}" media="print" onload="this.media='all'">
@@ -411,3 +466,4 @@
     {%- endif -%}
   </body>
 </html>
+

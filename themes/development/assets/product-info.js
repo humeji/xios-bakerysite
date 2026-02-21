@@ -1,3 +1,11 @@
+function _stripDangerousAttrs(root) {
+  root.querySelectorAll('*').forEach((el) => {
+    Array.from(el.attributes).forEach((a) => {
+      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
+    });
+  });
+}
+
 if (!customElements.get('product-info')) {
   customElements.define(
     'product-info',
@@ -39,10 +47,10 @@ if (!customElements.get('product-info')) {
 
       setQuantityBoundries() {
         const data = {
-          cartQuantity: this.input.dataset.cartQuantity ? parseInt(this.input.dataset.cartQuantity) : 0,
-          min: this.input.dataset.min ? parseInt(this.input.dataset.min) : 1,
-          max: this.input.dataset.max ? parseInt(this.input.dataset.max) : null,
-          step: this.input.step ? parseInt(this.input.step) : 1,
+          cartQuantity: this.input.dataset.cartQuantity ? Number.parseInt(this.input.dataset.cartQuantity) : 0,
+          min: this.input.dataset.min ? Number.parseInt(this.input.dataset.min) : 1,
+          max: this.input.dataset.max ? Number.parseInt(this.input.dataset.max) : null,
+          step: this.input.step ? Number.parseInt(this.input.step) : 1,
         };
 
         let min = data.min;
@@ -57,7 +65,7 @@ if (!customElements.get('product-info')) {
       }
 
       fetchQuantityRules() {
-        if (!this.currentVariant || !this.currentVariant.value) return;
+        if (!this.currentVariant?.value) return;
         this.querySelector('.quantity__rules-cart .loading__spinner').classList.remove('hidden');
         fetch(`${this.dataset.url}?variant=${this.currentVariant.value}&section_id=${this.dataset.section}`)
           .then((response) => {
@@ -89,8 +97,14 @@ if (!customElements.get('product-info')) {
               const valueUpdated = updated.getAttribute(attribute);
               if (valueUpdated !== null) current.setAttribute(attribute, valueUpdated);
             }
+          } else if (globalThis.safeSetHTML) {
+            globalThis.safeSetHTML(current, updated.innerHTML);
           } else {
-            current.innerHTML = updated.innerHTML;
+            const temp = document.createElement('div');
+            temp.innerHTML = updated.innerHTML;
+            temp.querySelectorAll('script').forEach((s) => s.remove());
+            _stripDangerousAttrs(temp);
+            current.replaceChildren(...temp.childNodes);
           }
         }
       }

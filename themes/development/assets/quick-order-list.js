@@ -1,3 +1,11 @@
+function _stripDangerousAttrs(root) {
+  root.querySelectorAll('*').forEach((el) => {
+    Array.from(el.attributes).forEach((a) => {
+      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
+    });
+  });
+}
+
 class QuickOrderListRemoveButton extends HTMLElement {
   constructor() {
     super();
@@ -20,10 +28,10 @@ class QuickOrderListRemoveAllButton extends HTMLElement {
     this.quickOrderList = this.closest('quick-order-list');
 
     allVariants.forEach((variant) => {
-      const cartQty = parseInt(variant.dataset.cartQty);
+      const cartQty = Number.parseInt(variant.dataset.cartQty);
       if (cartQty > 0) {
         hasVariantsInCart = true;
-        items[parseInt(variant.dataset.variantId)] = 0;
+        items[Number.parseInt(variant.dataset.variantId)] = 0;
       }
     });
 
@@ -104,8 +112,8 @@ class QuickOrderList extends HTMLElement {
   }
 
   onChange(event) {
-    const inputValue = parseInt(event.target.value);
-    const cartQuantity = parseInt(event.target.dataset.cartQuantity);
+    const inputValue = Number.parseInt(event.target.value);
+    const cartQuantity = Number.parseInt(event.target.dataset.cartQuantity);
     const index = event.target.dataset.index;
     const name = document.activeElement.getAttribute('name');
 
@@ -119,12 +127,20 @@ class QuickOrderList extends HTMLElement {
   }
 
   onCartUpdate() {
-    fetch(`${window.location.pathname}?section_id=${this.sectionId}`)
+    fetch(`${globalThis.location.pathname}?section_id=${this.sectionId}`)
       .then((response) => response.text())
       .then((responseText) => {
         const html = new DOMParser().parseFromString(responseText, 'text/html');
         const sourceQty = html.querySelector(this.quickOrderListId);
-        this.innerHTML = sourceQty.innerHTML;
+        if (globalThis.safeSetHTML) {
+          globalThis.safeSetHTML(this, sourceQty.innerHTML);
+        } else {
+          const temp = document.createElement('div');
+          temp.innerHTML = sourceQty.innerHTML;
+          temp.querySelectorAll('script').forEach((s) => s.remove());
+          _stripDangerousAttrs(temp);
+          this.replaceChildren(...temp.childNodes);
+        }
       })
       .catch((e) => {
         console.error(e);
@@ -164,7 +180,7 @@ class QuickOrderList extends HTMLElement {
   renderSections(parsedState) {
     this.getSectionsToRender().forEach((section) => {
       const sectionElement = document.getElementById(section.id);
-      if (sectionElement && sectionElement.parentElement && sectionElement.parentElement.classList.contains('drawer')) {
+      if (sectionElement?.parentElement?.classList.contains('drawer')) {
         parsedState.items.length > 0
           ? sectionElement.parentElement.classList.remove('is-empty')
           : sectionElement.parentElement.classList.add('is-empty');
@@ -174,11 +190,18 @@ class QuickOrderList extends HTMLElement {
         });
       }
       const elementToReplace =
-        sectionElement && sectionElement.querySelector(section.selector)
-          ? sectionElement.querySelector(section.selector)
-          : sectionElement;
+        sectionElement?.querySelector(section.selector) ?? sectionElement;
       if (elementToReplace) {
-        elementToReplace.innerHTML = this.getSectionInnerHTML(parsedState.sections[section.section], section.selector);
+        const sectionHTML = this.getSectionInnerHTML(parsedState.sections[section.section], section.selector);
+        if (globalThis.safeSetHTML) {
+          globalThis.safeSetHTML(elementToReplace, sectionHTML);
+        } else {
+          const temp = document.createElement('div');
+          temp.innerHTML = sectionHTML;
+          temp.querySelectorAll('script').forEach((s) => s.remove());
+          _stripDangerousAttrs(temp);
+          elementToReplace.replaceChildren(...temp.childNodes);
+        }
       }
     });
   }
@@ -189,13 +212,13 @@ class QuickOrderList extends HTMLElement {
     const body = JSON.stringify({
       updates: items,
       sections: this.getSectionsToRender().map((section) => section.section),
-      sections_url: window.location.pathname,
+      sections_url: globalThis.location.pathname,
     });
 
     this.updateMessage();
     this.setErrorMessage();
 
-    fetch(`${routes.cart_update_url}`, { ...fetchConfig(), ...{ body } })
+    fetch(`${routes.cart_update_url}`, { ...fetchConfig(), body })
       .then((response) => {
         return response.text();
       })
@@ -204,7 +227,7 @@ class QuickOrderList extends HTMLElement {
         this.renderSections(parsedState);
       })
       .catch(() => {
-        this.setErrorMessage(window.cartStrings.error);
+        this.setErrorMessage(globalThis.cartStrings.error);
       })
       .finally(() => {
         this.querySelector('.variant-remove-total .loading__spinner').classList.add('hidden');
@@ -219,7 +242,7 @@ class QuickOrderList extends HTMLElement {
       quantity,
       id,
       sections: this.getSectionsToRender().map((section) => section.section),
-      sections_url: window.location.pathname,
+      sections_url: globalThis.location.pathname,
     });
     let fetchConfigType;
     if (action === this.actions.add) {
@@ -228,26 +251,25 @@ class QuickOrderList extends HTMLElement {
       body = JSON.stringify({
         items: [
           {
-            quantity: parseInt(quantity),
-            id: parseInt(id),
+            quantity: Number.parseInt(quantity),
+            id: Number.parseInt(id),
           },
         ],
         sections: this.getSectionsToRender().map((section) => section.section),
-        sections_url: window.location.pathname,
+        sections_url: globalThis.location.pathname,
       });
     }
 
     this.updateMessage();
     this.setErrorMessage();
 
-    fetch(`${routeUrl}`, { ...fetchConfig(fetchConfigType), ...{ body } })
+    fetch(`${routeUrl}`, { ...fetchConfig(fetchConfigType), body })
       .then((response) => {
         return response.text();
       })
       .then((state) => {
         const parsedState = JSON.parse(state);
         const quantityElement = document.getElementById(`Quantity-${id}`);
-        const items = document.querySelectorAll('.variant-item');
 
         if (parsedState.description || parsedState.errors) {
           const variantItem = document.querySelector(
@@ -269,7 +291,7 @@ class QuickOrderList extends HTMLElement {
 
         let hasError = false;
 
-        const currentItem = parsedState.items.find((item) => item.variant_id === parseInt(id));
+        const currentItem = parsedState.items.find((item) => item.variant_id === Number.parseInt(id));
         const updatedValue = currentItem ? currentItem.quantity : undefined;
         if (updatedValue && updatedValue !== quantity) {
           this.updateError(updatedValue, id);
@@ -277,7 +299,7 @@ class QuickOrderList extends HTMLElement {
         }
 
         const variantItem = document.getElementById(`Variant-${id}`);
-        if (variantItem && variantItem.querySelector(`[name="${name}"]`)) {
+        if (variantItem?.querySelector(`[name="${name}"]`)) {
           variantItem.querySelector(`[name="${name}"]`).focus();
         }
         publish(PUB_SUB_EVENTS.cartUpdate, { source: this.quickOrderListId, cartData: parsedState });
@@ -285,18 +307,18 @@ class QuickOrderList extends HTMLElement {
         if (hasError) {
           this.updateMessage();
         } else if (action === this.actions.add) {
-          this.updateMessage(parseInt(quantity));
+          this.updateMessage(Number.parseInt(quantity));
         } else if (action === this.actions.update) {
-          this.updateMessage(parseInt(quantity - quantityElement.dataset.cartQuantity));
+          this.updateMessage(Number.parseInt(quantity - quantityElement.dataset.cartQuantity));
         } else {
-          this.updateMessage(-parseInt(quantityElement.dataset.cartQuantity));
+          this.updateMessage(-Number.parseInt(quantityElement.dataset.cartQuantity));
         }
       })
       .catch((error) => {
         this.querySelectorAll('.loading__spinner').forEach((overlay) => overlay.classList.add('hidden'));
         this.resetQuantityInput(id);
         console.error(error);
-        this.setErrorMessage(window.cartStrings.error);
+        this.setErrorMessage(globalThis.cartStrings.error);
       })
       .finally(() => {
         this.toggleLoading(id);
@@ -315,7 +337,7 @@ class QuickOrderList extends HTMLElement {
     const errorElements = document.querySelectorAll('.quick-order-list-error');
 
     errorElements.forEach((errorElement) => {
-      errorElement.innerHTML = '';
+      errorElement.textContent = '';
       if (!message) return;
       const updatedMessageElement = this.errorMessageTemplate.cloneNode(true);
       updatedMessageElement.content.querySelector('.quick-order-list-error-message').innerText = message;
@@ -327,8 +349,8 @@ class QuickOrderList extends HTMLElement {
     const messages = this.querySelectorAll('.quick-order-list__message-text');
     const icons = this.querySelectorAll('.quick-order-list__message-icon');
 
-    if (quantity === null || isNaN(quantity)) {
-      messages.forEach((message) => (message.innerHTML = ''));
+    if (quantity === null || Number.isNaN(quantity)) {
+      messages.forEach((message) => (message.textContent = ''));
       icons.forEach((icon) => icon.classList.add('hidden'));
       return;
     }
@@ -336,15 +358,18 @@ class QuickOrderList extends HTMLElement {
     const isQuantityNegative = quantity < 0;
     const absQuantity = Math.abs(quantity);
 
-    const textTemplate = isQuantityNegative
-      ? absQuantity === 1
-        ? window.quickOrderListStrings.itemRemoved
-        : window.quickOrderListStrings.itemsRemoved
-      : quantity === 1
-      ? window.quickOrderListStrings.itemAdded
-      : window.quickOrderListStrings.itemsAdded;
+    let textTemplate;
+    if (isQuantityNegative) {
+      textTemplate = absQuantity === 1
+        ? globalThis.quickOrderListStrings.itemRemoved
+        : globalThis.quickOrderListStrings.itemsRemoved;
+    } else {
+      textTemplate = quantity === 1
+        ? globalThis.quickOrderListStrings.itemAdded
+        : globalThis.quickOrderListStrings.itemsAdded;
+    }
 
-    messages.forEach((msg) => (msg.innerHTML = textTemplate.replace('[quantity]', absQuantity)));
+    messages.forEach((msg) => (msg.textContent = textTemplate.replace('[quantity]', absQuantity)));
 
     if (!isQuantityNegative) {
       icons.forEach((i) => i.classList.remove('hidden'));
@@ -353,10 +378,10 @@ class QuickOrderList extends HTMLElement {
 
   updateError(updatedValue, id) {
     let message = '';
-    if (typeof updatedValue === 'undefined') {
-      message = window.cartStrings.error;
+    if (updatedValue === undefined) {
+      message = globalThis.cartStrings.error;
     } else {
-      message = window.cartStrings.quantityError.replace('[quantity]', updatedValue);
+      message = globalThis.cartStrings.quantityError.replace('[quantity]', updatedValue);
     }
     this.updateLiveRegions(id, message);
   }
@@ -365,10 +390,10 @@ class QuickOrderList extends HTMLElement {
     const variantItemErrorDesktop = document.getElementById(`Quick-order-list-item-error-desktop-${id}`);
     const variantItemErrorMobile = document.getElementById(`Quick-order-list-item-error-mobile-${id}`);
     if (variantItemErrorDesktop) {
-      variantItemErrorDesktop.querySelector('.variant-item__error-text').innerHTML = message;
+      variantItemErrorDesktop.querySelector('.variant-item__error-text').textContent = message;
       variantItemErrorDesktop.closest('tr').classList.remove('hidden');
     }
-    if (variantItemErrorMobile) variantItemErrorMobile.querySelector('.variant-item__error-text').innerHTML = message;
+    if (variantItemErrorMobile) variantItemErrorMobile.querySelector('.variant-item__error-text').textContent = message;
 
     this.variantItemStatusElement.setAttribute('aria-hidden', true);
 

@@ -5,7 +5,7 @@
  * @param {Element} root
  */
 function removeDangerousEventAttributes(root) {
-  if (!root || !root.querySelectorAll) return;
+  if (!root?.querySelectorAll) return;
   root.querySelectorAll('*').forEach((element) => {
     // Clone attributes array to avoid live collection issues
     Array.from(element.attributes).forEach((attr) => {
@@ -67,8 +67,8 @@ function safeReplaceWithSanitizedElement(targetElement, sourceElement) {
 }
 
 // Expose to global scope for theme scripts
-window.safeSetHTML = safeSetHTML;
-window.safeReplaceWithSanitizedElement = safeReplaceWithSanitizedElement;
-window.__xiosSecurityUtilsLoaded = true;
+globalThis.safeSetHTML = safeSetHTML;
+globalThis.safeReplaceWithSanitizedElement = safeReplaceWithSanitizedElement;
+globalThis.__xiosSecurityUtilsLoaded = true;
 
 

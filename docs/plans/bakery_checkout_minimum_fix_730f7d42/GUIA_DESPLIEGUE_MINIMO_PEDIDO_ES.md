@@ -1,25 +1,25 @@
-# Guia de Despliegue y Pruebas - Minimo de Pedido v13.4.9
+# Guia de Despliegue y Pruebas - Minimo de Pedido
 
-**Version del Tema:** v13.4.9-checkout-minimum-fix  
 **Fecha:** 20 de febrero de 2026  
 **Preparado por:** Hugo Mejia  
-**Sitio:** xiosbakery.com
+**Sitio:** xiosbakery.com  
+**Versiones del tema:** Disponibles en https://github.com/humeji/xios-bakerysite/releases
 
 ---
 
 ## Resumen de Cambios Incluidos
 
-Este paquete ZIP contiene las siguientes modificaciones:
+La version mas reciente del tema (disponible en la [pagina de versiones de GitHub](https://github.com/humeji/xios-bakerysite/releases)) incluye las siguientes modificaciones de este plan, junto con todas las mejoras de planes posteriores (pipeline CI/CD, auditoria de seguridad, etc.):
 
 | Archivo | Cambio |
 |---------|--------|
-| `config/settings_schema.json` | Seccion "Cart & Checkout Rules" con monto minimo, mensajes en ingles y espanol |
+| `config/settings_schema.json` | Seccion "Cart & Checkout Rules" con monto minimo, mensajes en ingles y español |
 | `assets/custom.js` | Validacion por total del carrito, mensaje localizado, proteccion contra valores invalidos |
 | `sections/main-cart-items.liquid` | Atributos de datos, mensajes localizados, advertencia del editor si minimo < $20 |
 | `snippets/cart-drawer.liquid` | Mismos cambios reflejados en el cajon del carrito |
 | `assets/custom.css` | Estilos para los mensajes de validacion y aviso de productos digitales |
 
-Ademas se incluyen los cambios previamente completados:
+Ademas, cada version publicada a traves del pipeline CI/CD ha sido verificada automaticamente por pruebas unitarias, analisis de calidad de codigo y escaneo de seguridad antes de ser empaquetada. Esto incluye los cambios previamente completados:
 
 - Politica de Privacidad automatica (Shopify)
 - Banner de Cookies automatico
@@ -29,14 +29,29 @@ Ademas se incluyen los cambios previamente completados:
 
 ## Paso 1: Despliegue del Tema (10 minutos)
 
-### 1.1 Subir el ZIP a Shopify
+### 1.1 Descargar la Ultima Version del Tema
+
+1. Ir a la pagina de versiones del proyecto: **https://github.com/humeji/xios-bakerysite/releases**
+2. En la version mas reciente (marcada como **"Latest"**), descargar el archivo `.zip` de la seccion **"Assets"**
+3. Este archivo incluye todas las mejoras anteriores mas las correcciones de seguridad de esta auditoria
+
+### 1.2 Subir el ZIP a Shopify
 
 1. Ir a: **Panel de Shopify > Tienda en linea > Temas**
 2. Hacer clic en **"Agregar tema" > "Subir archivo ZIP"**
-3. Seleccionar: `xios-bakery-theme-v13.4.9-checkout-minimum-fix-20260219-132434.zip`
+3. Seleccionar el archivo `.zip` que descargaste de GitHub en el paso anterior
 4. Esperar a que se complete la subida
 
-### 1.2 Publicar el Tema
+### 1.3 Verificar Logo y Configuracion Visual
+
+El archivo ZIP incluye `config/settings_data.json` con la configuracion del personalizador (logo, colores, tipografia, etc.). Despues de subir el tema, verificar que:
+
+1. Hacer clic en **"Personalizar"** en el tema nuevo (en la Biblioteca de temas)
+2. Confirmar que el **logo de Xio's Bakery** aparece en el encabezado (no debe mostrar "Liquid error")
+3. Confirmar que los **colores y tipografia** se ven correctos
+4. Si el logo no aparece, ir a **Configuracion del tema > Logo** y volver a seleccionar la imagen
+
+### 1.4 Publicar el Tema
 
 1. Una vez subido, el tema aparecera en la seccion **"Biblioteca de temas"**
 2. Hacer clic en los **tres puntos (...)** junto al tema nuevo
@@ -102,7 +117,7 @@ Abrir la tienda en una **ventana de incognito/privada** del navegador para evita
 3. Si se tiene acceso a crear productos de prueba, crear uno digital de prueba con precio de $20
 
 **Verificar (si aplica):**
-- [ ] El mensaje de minimo aparece (en ingles: "Minimum order amount is $40.00. Current total: $XX.XX" o en espanol: "El monto minimo de pedido es $40.00. Total actual: $XX.XX")
+- [ ] El mensaje de minimo aparece (en ingles: "Minimum order amount is $40.00. Current total: $XX.XX" o en español: "El monto minimo de pedido es $40.00. Total actual: $XX.XX")
 - [ ] El mensaje se muestra en un **recuadro rojo/rosado** (fondo `#f8d7da`, borde `#f5c6cb`)
 - [ ] El boton de checkout esta **deshabilitado**
 - [ ] El aviso de no reembolso aparece en un **recuadro amarillo** (fondo `#fff3cd`, borde `#ffc107`)
@@ -309,9 +324,9 @@ Cuando hay productos digitales en el carrito:
 
 ---
 
-## Paso 8: Pruebas de Localizacion - Ingles y Espanol (10 minutos)
+## Paso 8: Pruebas de Localizacion - Ingles y Español (10 minutos)
 
-La tienda soporta ingles y espanol. Todos los mensajes del carrito ahora se adaptan al idioma seleccionado por el visitante.
+La tienda soporta ingles y español. Todos los mensajes del carrito ahora se adaptan al idioma seleccionado por el visitante.
 
 ### 8.1 Verificar Mensajes en Ingles
 
@@ -322,9 +337,9 @@ La tienda soporta ingles y espanol. Todos los mensajes del carrito ahora se adap
 - [ ] El mensaje de minimo dice: "Minimum order amount is $40.00. Current total: $XX.XX"
 - [ ] El aviso de no reembolso (si hay producto digital) dice: "Digital products are non-refundable. By purchasing, you agree to this policy."
 
-### 8.2 Verificar Mensajes en Espanol
+### 8.2 Verificar Mensajes en Español
 
-1. Cambiar el idioma de la tienda a **espanol** (via el selector de idioma en el sitio)
+1. Cambiar el idioma de la tienda a **español** (via el selector de idioma en el sitio)
 2. Agregar un producto al carrito con total menor a $40
 
 **Verificar:**
@@ -337,7 +352,7 @@ La tienda soporta ingles y espanol. Todos los mensajes del carrito ahora se adap
 2. Verificar que existen **dos campos** de mensaje de no reembolso:
    - "Digital product refund message (English)"
    - "Digital product refund message (Spanish)"
-3. Modificar el texto en espanol, guardar, y verificar que aparece el nuevo texto al navegar en espanol
+3. Modificar el texto en español, guardar, y verificar que aparece el nuevo texto al navegar en español
 4. **Restaurar el texto original** y guardar
 
 ---
@@ -445,18 +460,18 @@ Si se detecta un problema critico despues de publicar el tema:
 - [ ] Responsive: mensajes se ven bien en movil
 - [ ] Sin errores JavaScript en la consola
 
-### Localizacion (Ingles/Espanol)
+### Localizacion (Ingles/Español)
 
 - [ ] Mensaje de minimo aparece en ingles cuando la tienda esta en ingles
-- [ ] Mensaje de minimo aparece en espanol cuando la tienda esta en espanol
+- [ ] Mensaje de minimo aparece en español cuando la tienda esta en español
 - [ ] Aviso de no reembolso aparece en el idioma correcto
-- [ ] Campos de mensaje separados para ingles y espanol en configuracion del tema
+- [ ] Campos de mensaje separados para ingles y español en configuracion del tema
 
 ### Configurabilidad
 
 - [ ] Se puede cambiar el monto minimo desde el panel
 - [ ] Se puede desactivar el minimo de pedido
-- [ ] Se puede modificar el texto de no reembolso (ingles y espanol por separado)
+- [ ] Se puede modificar el texto de no reembolso (ingles y español por separado)
 - [ ] Monto en 0 usa el valor por defecto ($40)
 - [ ] Monto negativo usa el valor por defecto ($40)
 - [ ] Monto menor a $20 muestra advertencia en el editor de temas (no en la tienda publica)
@@ -483,4 +498,4 @@ Los siguientes elementos fueron completados previamente y se activan con este te
 
 ---
 
-*Documento preparado para uso interno del desarrollador durante el despliegue del tema v13.4.9 en xiosbakery.com.*
+*Documento preparado para uso interno del desarrollador durante el despliegue del tema en xiosbakery.com. La version mas reciente del tema siempre esta disponible en https://github.com/humeji/xios-bakerysite/releases.*

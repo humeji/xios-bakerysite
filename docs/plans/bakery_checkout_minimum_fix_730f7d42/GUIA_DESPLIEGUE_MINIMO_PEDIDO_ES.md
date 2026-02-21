@@ -29,16 +29,18 @@ Ademas, cada version publicada a traves del pipeline CI/CD ha sido verificada au
 
 ## Paso 1: Despliegue del Tema (10 minutos)
 
-### 1.1 Descargar la Ultima Version del Tema
+### 1.1 Descargar el Tema Version v13.6.6
 
-1. Ir a la pagina de versiones del proyecto: **https://github.com/humeji/xios-bakerysite/releases**
-2. En la version mas reciente (marcada como **"Latest"**), descargar el archivo `.zip` de la seccion **"Assets"**
-3. Este archivo incluye todas las mejoras anteriores mas las correcciones de seguridad de esta auditoria
+1. Abrir este enlace en el navegador: **https://github.com/humeji/xios-bakerysite/releases**
+2. La primera version que aparece en la pagina es **v13.6.6-bakery_checkout_minimum** -- esta es la que necesitas descargar. Junto al titulo veras una etiqueta verde que dice **"Latest"** (en ingles significa "la mas reciente", es decir, la version mas nueva y actualizada del tema)
+3. Desplazate hacia abajo dentro de esa misma version hasta que veas la seccion **"Assets"** (que significa "Archivos"). Haz clic en la flecha **▶** si los archivos no se muestran
+4. Descarga el archivo que empieza con **`xios-bakery-theme-v13.6.6`** (pesa aproximadamente 1 MB). **No** descargues los archivos que dicen "Source code" -- esos no son necesarios
+5. Este archivo `.zip` incluye todas las mejoras anteriores mas las correcciones de seguridad de esta auditoria
 
 ### 1.2 Subir el ZIP a Shopify
 
 1. Ir a: **Panel de Shopify > Tienda en linea > Temas**
-2. Hacer clic en **"Agregar tema" > "Subir archivo ZIP"**
+2. Hacer clic en **"Importar tema" > "Subir archivo .zip"**
 3. Seleccionar el archivo `.zip` que descargaste de GitHub en el paso anterior
 4. Esperar a que se complete la subida
 

@@ -1,9 +1,11 @@
 # Plan: Security Audit 2026
 
 **Plan ID:** `security_audit_2026_b0e62e95`
-**Status:** [COMPLETE]
+**Status:** [INCOMPLETE] -- Requires fresh audit
 **Date:** February 20, 2026
-**Version:** v13.6.0-security-audit-2026
+**Last Updated:** February 21, 2026
+**Original Version:** v13.6.0-security-audit-2026
+**Current Version:** v13.6.6-surgical-safesethtml-fix
 
 ---
 
@@ -13,7 +15,34 @@ Conduct a comprehensive security audit of the Xio's Bakery Shopify theme coverin
 
 ---
 
-## What Was Delivered
+## Current Status
+
+The original security audit deliverables were largely **reverted** during troubleshooting on February 20-21, 2026. The `safeSetHTML` approach used to replace `innerHTML` in Dawn core JS files caused critical regressions:
+
+1. **Broken header/logo** -- CSP changes in `theme.liquid` restricted font loading; `settings_schema.json` version change invalidated Shopify settings
+2. **Broken cart notification popup** -- `safeSetHTML` sanitization in `cart-notification.js`, `cart.js`, `cart-drawer.js`, and `global.js` stripped scripts and event handlers needed by Dawn's section rendering API
+3. **Cart icon counter not updating** -- Same root cause as above
+
+### What Was Reverted
+
+- All `safeSetHTML` + fallback blocks in Dawn core JS files (`cart-notification.js`, `cart.js`, `cart-drawer.js`, `global.js`) -- restored to original `innerHTML` (PRs #23, #24)
+- CSP changes in `theme.liquid` -- restored to production version (PR #15)
+- `settings_data.json` -- restored to production version (PR #15)
+- `theme_version` in `settings_schema.json` -- restored to production value `13.4.8-tybo-hard-hide` (PR #19)
+
+### What Remains Active
+
+- `security-utils.js` -- loaded in `theme.liquid` but `safeSetHTML` is no longer called by Dawn core files
+- `security-test.js` -- loaded in `theme.liquid`
+- `third-party-security.js` -- loaded in `theme.liquid`
+- `textContent` replacements in `global.js` (safe, non-breaking changes)
+- `_stripDangerousAttrs()` additions in non-core files (`facets.js`, `predictive-search.js`, `quick-order-list.js`, `product-info.js`, `pickup-availability.js`, `price-per-item.js`, `quick-add.js`)
+- CI/CD additions: `npm audit` step, `dependabot.yml`
+- Documentation and audit reports
+
+---
+
+## What Was Originally Delivered (v13.6.0)
 
 ### Code Security Remediation
 - Replaced 10 residual raw `innerHTML` assignments in 5 Dawn stock files with `safeSetHTML` + fallback or `textContent`
@@ -47,47 +76,52 @@ Conduct a comprehensive security audit of the Xio's Bakery Shopify theme coverin
 ## Files Modified
 
 ### Theme Code (both `themes/current/` and `themes/development/`)
-- `assets/quick-order-list.js` -- safeSetHTML + textContent + _stripDangerousAttrs
-- `assets/product-info.js` -- safeSetHTML + _stripDangerousAttrs fallback
-- `assets/pickup-availability.js` -- Hardened fallback with cloneNode + sanitize
-- `assets/price-per-item.js` -- innerHTML replaced with textContent
-- `assets/quick-add.js` -- Accepted risk documented, clearing uses textContent
-- `assets/facets.js` -- _stripDangerousAttrs for 6 innerHTML + 4 outerHTML fallbacks
-- `assets/global.js` -- _stripDangerousAttrs for 6 fallback blocks
-- `assets/cart.js` -- _stripDangerousAttrs for 2 fallback blocks
-- `assets/cart-drawer.js` -- _stripDangerousAttrs for 1 fallback block
-- `assets/cart-notification.js` -- _stripDangerousAttrs for 1 fallback block
-- `assets/predictive-search.js` -- _stripDangerousAttrs for 1 fallback block
-- `layout/theme.liquid` -- CSP cleaned, comment added
+- `assets/quick-order-list.js` -- safeSetHTML + textContent + _stripDangerousAttrs [ACTIVE]
+- `assets/product-info.js` -- safeSetHTML + _stripDangerousAttrs fallback [ACTIVE]
+- `assets/pickup-availability.js` -- Hardened fallback with cloneNode + sanitize [ACTIVE]
+- `assets/price-per-item.js` -- innerHTML replaced with textContent [ACTIVE]
+- `assets/quick-add.js` -- Accepted risk documented, clearing uses textContent [ACTIVE]
+- `assets/facets.js` -- _stripDangerousAttrs for 6 innerHTML + 4 outerHTML fallbacks [ACTIVE]
+- `assets/global.js` -- safeSetHTML REVERTED to innerHTML; textContent changes remain [PARTIAL]
+- `assets/cart.js` -- safeSetHTML REVERTED to innerHTML [REVERTED]
+- `assets/cart-drawer.js` -- safeSetHTML REVERTED to innerHTML [REVERTED]
+- `assets/cart-notification.js` -- safeSetHTML REVERTED to innerHTML [REVERTED]
+- `assets/predictive-search.js` -- _stripDangerousAttrs for 1 fallback block [ACTIVE]
+- `layout/theme.liquid` -- CSP changes REVERTED to production [REVERTED]; security script loading remains [ACTIVE]
 
 ### CI/CD
-- `.github/workflows/ci.yml` -- npm audit step added
-- `.github/workflows/release.yml` -- npm audit step added
-- `.github/dependabot.yml` -- Created
+- `.github/workflows/ci.yml` -- npm audit step added [ACTIVE]
+- `.github/workflows/release.yml` -- npm audit step added [ACTIVE]
+- `.github/dependabot.yml` -- Created [ACTIVE]
 
 ### Documentation
-- `.github/SECURITY.md` -- Updated
-- `security/README.md` -- Rewritten
-- `security/audits/2026/SECURITY_AUDIT_REPORT.md` -- Created
-- `security/audits/2026/REPORTE_AUDITORIA_SEGURIDAD.md` -- Created
-- `security/audits/2026/README.md` -- Created
-- `CHANGELOG.md` -- Version entry added
-- `PLANNING.md` -- Version and plan index updated
+- `.github/SECURITY.md` -- Updated [ACTIVE]
+- `security/README.md` -- Rewritten [ACTIVE]
+- `security/audits/2026/SECURITY_AUDIT_REPORT.md` -- Created [NEEDS UPDATE]
+- `security/audits/2026/REPORTE_AUDITORIA_SEGURIDAD.md` -- Created [NEEDS UPDATE]
+- `security/audits/2026/README.md` -- Created [NEEDS UPDATE]
+- `CHANGELOG.md` -- Version entry added [NEEDS UPDATE]
+- `PLANNING.md` -- Version and plan index updated [NEEDS UPDATE]
 - `docs/plans/security_audit_2026_b0e62e95/README.md` -- This file
 
 ### Dependencies
-- `package-lock.json` -- Generated
+- `package-lock.json` -- Generated [ACTIVE]
 
 ---
 
 ## Bundles Produced
 
-No theme ZIP bundle produced for this plan. This was a security audit and remediation plan. The next version tag (`v13.6.0-security-audit-2026`) will trigger the release workflow.
+No dedicated security audit bundle. Changes are included in the incremental releases from v13.6.0 through v13.6.6.
 
 ---
 
 ## Open Items
 
+- **[CRITICAL] Fresh security audit required:** Multiple code changes from v13.6.0 through v13.6.6 have altered the security posture. A new audit must be conducted against the current codebase.
+- **[CRITICAL] safeSetHTML strategy failed for Dawn core files:** The `safeSetHTML` approach breaks Dawn's section rendering API which relies on `innerHTML` with inline scripts. A different hardening strategy is needed for these 4 files (cart-notification.js, cart.js, cart-drawer.js, global.js).
+- **[CRITICAL] CSP changes reverted:** The CSP cleanup in `theme.liquid` was reverted because it broke font loading and header rendering. CSP changes must be re-applied incrementally with testing.
+- **security-utils.js is loaded but unused by core files:** `window.safeSetHTML` is defined globally but no Dawn core file calls it. Consider removing the script load from `theme.liquid` or limiting it to files that still use it.
+- **Audit reports are stale:** `SECURITY_AUDIT_REPORT.md` and its Spanish translation reflect the v13.6.0 state, not the current v13.6.6 state.
 - **minimatch ReDoS (dev-only):** 22 high-severity npm audit findings in eslint/jest transitive dependencies. Monitor for upstream fixes. No production impact.
 - **Shopify CSP limitations:** `unsafe-inline`/`unsafe-eval` required by Shopify platform. Adopt nonce-based CSP when supported.
-- **Quarterly audits:** Next audit recommended Q2 2026.
+- **Next audit:** Must be conducted before any production deployment of security changes.

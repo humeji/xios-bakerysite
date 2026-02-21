@@ -1,17 +1,5 @@
 # Scripts
 
-## create-shopify-branch.sh
-
-Creates (or recreates) the orphan `shopify` branch from `themes/current/` and pushes it to origin. This branch places all theme files at root level so Shopify's GitHub integration can detect a valid theme.
-
-```bash
-./scripts/create-shopify-branch.sh
-```
-
-Safe to run from any branch -- uses a temporary clone, so your working tree is not affected. After the first run, the `shopify` branch is kept in sync automatically by the `sync-shopify-branch.yml` GitHub Action.
-
----
-
 ## package-theme.sh
 
 Creates a Shopify-ready ZIP bundle from `themes/current/`.

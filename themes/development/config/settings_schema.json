@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Dawn",
-    "theme_version": "13.0.0",
+    "theme_version": "13.4.9-checkout-minimum-fix",
     "theme_author": "Shopify",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1511,6 +1511,24 @@
         "label": "Digital product refund message (Spanish)",
         "default": "Los productos digitales no son reembolsables. Al realizar la compra, usted acepta esta política.",
         "info": "Shown when cart contains digital items and store is viewed in Spanish"
+      }
+    ]
+  },
+  {
+    "name": "Integrations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "pop_convert_enabled",
+        "label": "Enable Pop Convert",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "pop_convert_script_url",
+        "label": "Pop Convert script URL",
+        "default": "https://script.pop-convert.com/production.pc.min.js",
+        "info": "Override only if instructed by Pop Convert"
       }
     ]
   }

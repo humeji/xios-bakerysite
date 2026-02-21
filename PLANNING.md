@@ -3,7 +3,7 @@
 **Project:** Shopify Theme for Xio's Bakery  
 **Store URL:** xiosbakery.com  
 **Admin URL:** https://xiosbakery.myshopify.com/admin  
-**Current Version:** v13.4.9-checkout-minimum-fix  
+**Current Version:** v13.7.0-shopify-github-sync  
 **Last Updated:** February 20, 2026
 
 ---
@@ -26,10 +26,10 @@ A Shopify storefront theme for Xio's Bakery, a bakery business that sells physic
 | Testing | Jest (Node environment) |
 | Linting | ESLint + eslint-plugin-sonarjs (SonarQube rules) |
 | Pre-commit | husky + lint-staged (ESLint on staged files) |
-| CI/CD | GitHub Actions (test + lint on push; ZIP + Release on tag) |
+| CI/CD | GitHub Actions (test + lint on push; ZIP + Release on tag; Shopify branch sync) |
 | Packaging | Bash script (`scripts/package-theme.sh`) |
 | Environment | Python 3.10+ venv, Node.js 18+ |
-| Deployment | ZIP upload to Shopify Admin (production ZIPs from CI only) |
+| Deployment | ZIP upload to Shopify Admin, or Shopify GitHub integration (`shopify` branch) |
 
 ### Directory Structure
 
@@ -195,6 +195,23 @@ Production ZIPs are created exclusively by the CI/CD release workflow. Local bui
 11. Preview the theme, run interactive tests per deployment guide
 12. Publish when verified
 
+### Shopify GitHub Integration (Live Sync)
+
+The `shopify` branch is an auto-generated orphan branch that contains only the contents of `themes/current/` at root level. This satisfies Shopify's requirement that theme files be at the branch root.
+
+**How it works:**
+
+- A GitHub Action (`.github/workflows/sync-shopify-branch.yml`) rebuilds the `shopify` branch every time `themes/current/` changes on `main`
+- The `shopify` branch can also be rebuilt manually via `workflow_dispatch` in GitHub Actions
+- In Shopify Admin > Themes > Connect theme, select the `shopify` branch
+- Shopify will automatically detect theme updates when the branch is pushed
+
+**Important:**
+
+- Never commit directly to the `shopify` branch -- it is force-pushed on every sync
+- The `shopify` branch is excluded from CI (no `package.json` or tests on that branch)
+- For initial setup or manual rebuild, run `./scripts/create-shopify-branch.sh`
+
 For packaging prerequisites, naming conventions, versioning, and the `--ci` flag, see [`scripts/README.md`](scripts/README.md).
 
 ---
@@ -211,6 +228,7 @@ For packaging prerequisites, naming conventions, versioning, and the `--ci` flag
 | `.github/DEVELOPMENT.md` | EN | Development workflow, testing, packaging |
 | `.github/workflows/ci.yml` | EN | CI workflow: test + lint on push/PR |
 | `.github/workflows/release.yml` | EN | Release workflow: test + lint + ZIP + GitHub Release on tag push |
+| `.github/workflows/sync-shopify-branch.yml` | EN | Syncs `themes/current/` to the orphan `shopify` branch for Shopify GitHub integration |
 | `.cursor/rules/packaging-workflow.mdc` | EN | Cursor rule enforcing packaging requirements |
 | `.cursor/rules/sonarqube-quality-gate.mdc` | EN | Cursor rule enforcing SonarQube zero-issue gate |
 | `.cursor/rules/plan-documentation.mdc` | EN | Cursor rule enforcing plan-scoped documentation |
@@ -226,8 +244,10 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 
 | Plan | Folder | Status |
 |------|--------|--------|
-| Checkout Minimum Fix | `docs/plans/bakery_checkout_minimum_fix_730f7d42/` | [COMPLETE] |
+| Security Audit 2026 | `docs/plans/security_audit_2026_b0e62e95/` | [COMPLETE] |
 | CI/CD Pipeline Setup | `docs/plans/ci_cd_pipeline_setup_713a17f2/` | [COMPLETE] |
+| Checkout Minimum Fix | `docs/plans/bakery_checkout_minimum_fix_730f7d42/` | [COMPLETE] |
+| Shopify GitHub Sync | `docs/plans/shopify_github_sync_a1b2c3d4/` | [COMPLETE] |
 
 **Contents of `bakery_checkout_minimum_fix_730f7d42/`:**
 
@@ -247,8 +267,9 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 - **No ES modules in theme JS**: Browser scripts use IIFE/global patterns, not `import/export`
 - **jQuery dependency**: The theme relies on jQuery (loaded via Shopify CDN), so custom JS uses `$`
 - **CI/CD releases only**: Production ZIPs are built by GitHub Actions on tag push; local builds are for dev testing only
-- **No Shopify CLI**: Changes are deployed via ZIP upload to Shopify Admin
+- **No Shopify CLI**: Changes are deployed via ZIP upload or Shopify GitHub integration
 - **Two themes in sync**: `themes/current/` and `themes/development/` must always match
+- **`shopify` branch is auto-generated**: Never commit directly to the `shopify` branch; it is rebuilt automatically from `themes/current/` on every push to `main`
 - **Sourcemaps disabled**: Never expose sourcemaps in production deployments
 
 ---

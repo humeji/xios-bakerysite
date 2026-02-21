@@ -1,3 +1,23 @@
+function _stripDangerousAttrs(root) {
+  root.querySelectorAll('*').forEach((el) => {
+    Array.from(el.attributes).forEach((a) => {
+      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
+    });
+  });
+}
+
+function _safeUpdateInnerHTML(destination, sourceHTML) {
+  if (globalThis.safeSetHTML) {
+    globalThis.safeSetHTML(destination, sourceHTML);
+  } else {
+    const temp = document.createElement('div');
+    temp.innerHTML = sourceHTML;
+    temp.querySelectorAll('script').forEach((s) => s.remove());
+    _stripDangerousAttrs(temp);
+    destination.replaceChildren(...temp.childNodes);
+  }
+}
+
 function getFocusableElements(container) {
   return Array.from(
     container.querySelectorAll(
@@ -25,9 +45,9 @@ document.querySelectorAll('[id^="Details-"] summary').forEach((summary) => {
 const trapFocusHandlers = {};
 
 function trapFocus(container, elementToFocus = container) {
-  var elements = getFocusableElements(container);
-  var first = elements[0];
-  var last = elements[elements.length - 1];
+  const elements = getFocusableElements(container);
+  const first = elements[0];
+  const last = elements.at(-1);
 
   removeTrapFocus();
 
@@ -73,12 +93,12 @@ function trapFocus(container, elementToFocus = container) {
 // Here run the querySelector to figure out if the browser supports :focus-visible or not and run code based on it.
 try {
   document.querySelector(':focus-visible');
-} catch (e) {
+} catch {
   focusVisiblePolyfill();
 }
 
 function focusVisiblePolyfill() {
-  const navKeys = [
+  const navKeys = new Set([
     'ARROWUP',
     'ARROWDOWN',
     'ARROWLEFT',
@@ -91,21 +111,21 @@ function focusVisiblePolyfill() {
     'END',
     'PAGEUP',
     'PAGEDOWN',
-  ];
+  ]);
   let currentFocusedElement = null;
   let mouseClick = null;
 
-  window.addEventListener('keydown', (event) => {
-    if (navKeys.includes(event.code.toUpperCase())) {
+  globalThis.addEventListener('keydown', (event) => {
+    if (navKeys.has(event.code.toUpperCase())) {
       mouseClick = false;
     }
   });
 
-  window.addEventListener('mousedown', (event) => {
+  globalThis.addEventListener('mousedown', (event) => {
     mouseClick = true;
   });
 
-  window.addEventListener(
+  globalThis.addEventListener(
     'focus',
     () => {
       if (currentFocusedElement) currentFocusedElement.classList.remove('focused');
@@ -121,10 +141,10 @@ function focusVisiblePolyfill() {
 
 function pauseAllMedia() {
   document.querySelectorAll('.js-youtube').forEach((video) => {
-    video.contentWindow.postMessage('{"event":"command","func":"' + 'pauseVideo' + '","args":""}', '*');
+    video.contentWindow.postMessage('{"event":"command","func":"' + 'pauseVideo' + '","args":""}', globalThis.location.origin);
   });
   document.querySelectorAll('.js-vimeo').forEach((video) => {
-    video.contentWindow.postMessage('{"method":"pause"}', '*');
+    video.contentWindow.postMessage('{"method":"pause"}', globalThis.location.origin);
   });
   document.querySelectorAll('video').forEach((video) => video.pause());
   document.querySelectorAll('product-model').forEach((model) => {
@@ -189,14 +209,14 @@ class QuantityInput extends HTMLElement {
   }
 
   validateQtyRules() {
-    const value = parseInt(this.input.value);
+    const value = Number.parseInt(this.input.value, 10);
     if (this.input.min) {
-      const min = parseInt(this.input.min);
+      const min = Number.parseInt(this.input.min, 10);
       const buttonMinus = this.querySelector(".quantity__button[name='minus']");
       buttonMinus.classList.toggle('disabled', value <= min);
     }
     if (this.input.max) {
-      const max = parseInt(this.input.max);
+      const max = Number.parseInt(this.input.max, 10);
       const buttonPlus = this.querySelector(".quantity__button[name='plus']");
       buttonPlus.classList.toggle('disabled', value >= max);
     }
@@ -216,7 +236,7 @@ function debounce(fn, wait) {
 function throttle(fn, delay) {
   let lastCall = 0;
   return function (...args) {
-    const now = new Date().getTime();
+    const now = Date.now();
     if (now - lastCall < delay) {
       return;
     }
@@ -236,8 +256,8 @@ function fetchConfig(type = 'json') {
  * Shopify Common JS
  *
  */
-if (typeof window.Shopify == 'undefined') {
-  window.Shopify = {};
+if (globalThis.Shopify === undefined) {
+  globalThis.Shopify = {};
 }
 
 Shopify.bind = function (fn, scope) {
@@ -247,8 +267,8 @@ Shopify.bind = function (fn, scope) {
 };
 
 Shopify.setSelectorByValue = function (selector, value) {
-  for (var i = 0, count = selector.options.length; i < count; i++) {
-    var option = selector.options[i];
+  for (let i = 0, count = selector.options.length; i < count; i++) {
+    const option = selector.options[i];
     if (value == option.value || value == option.innerHTML) {
       selector.selectedIndex = i;
       return i;
@@ -264,15 +284,15 @@ Shopify.addListener = function (target, eventName, callback) {
 
 Shopify.postLink = function (path, options) {
   options = options || {};
-  var method = options['method'] || 'post';
-  var params = options['parameters'] || {};
+  const method = options['method'] || 'post';
+  const params = options['parameters'] || {};
 
-  var form = document.createElement('form');
+  const form = document.createElement('form');
   form.setAttribute('method', method);
   form.setAttribute('action', path);
 
-  for (var key in params) {
-    var hiddenField = document.createElement('input');
+  for (const key in params) {
+    const hiddenField = document.createElement('input');
     hiddenField.setAttribute('type', 'hidden');
     hiddenField.setAttribute('name', key);
     hiddenField.setAttribute('value', params[key]);
@@ -280,7 +300,7 @@ Shopify.postLink = function (path, options) {
   }
   document.body.appendChild(form);
   form.submit();
-  document.body.removeChild(form);
+  form.remove();
 };
 
 Shopify.CountryProvinceSelector = function (country_domid, province_domid, options) {
@@ -296,32 +316,32 @@ Shopify.CountryProvinceSelector = function (country_domid, province_domid, optio
 
 Shopify.CountryProvinceSelector.prototype = {
   initCountry: function () {
-    var value = this.countryEl.getAttribute('data-default');
+    const value = this.countryEl.dataset.default;
     Shopify.setSelectorByValue(this.countryEl, value);
     this.countryHandler();
   },
 
   initProvince: function () {
-    var value = this.provinceEl.getAttribute('data-default');
+    const value = this.provinceEl.dataset.default;
     if (value && this.provinceEl.options.length > 0) {
       Shopify.setSelectorByValue(this.provinceEl, value);
     }
   },
 
-  countryHandler: function (e) {
-    var opt = this.countryEl.options[this.countryEl.selectedIndex];
-    var raw = opt.getAttribute('data-provinces');
-    var provinces = JSON.parse(raw);
+  countryHandler: function () {
+    const selectedOpt = this.countryEl.options[this.countryEl.selectedIndex];
+    const raw = selectedOpt.dataset.provinces;
+    const provinces = JSON.parse(raw);
 
     this.clearOptions(this.provinceEl);
-    if (provinces && provinces.length == 0) {
+    if (provinces?.length === 0) {
       this.provinceContainer.style.display = 'none';
     } else {
-      for (var i = 0; i < provinces.length; i++) {
-        var opt = document.createElement('option');
-        opt.value = provinces[i][0];
-        opt.innerHTML = provinces[i][1];
-        this.provinceEl.appendChild(opt);
+      for (const province of provinces) {
+        const newOpt = document.createElement('option');
+        newOpt.value = province[0];
+        newOpt.textContent = province[1];
+        this.provinceEl.appendChild(newOpt);
       }
 
       this.provinceContainer.style.display = '';
@@ -330,15 +350,15 @@ Shopify.CountryProvinceSelector.prototype = {
 
   clearOptions: function (selector) {
     while (selector.firstChild) {
-      selector.removeChild(selector.firstChild);
+      selector.firstChild.remove();
     }
   },
 
   setOptions: function (selector, values) {
-    for (var i = 0, count = values.length; i < values.length; i++) {
-      var opt = document.createElement('option');
-      opt.value = values[i];
-      opt.innerHTML = values[i];
+    for (const val of values) {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = val;
       selector.appendChild(opt);
     }
   },
@@ -381,7 +401,7 @@ class MenuDrawer extends HTMLElement {
     const detailsElement = summaryElement.parentNode;
     const parentMenuElement = detailsElement.closest('.has-submenu');
     const isOpen = detailsElement.hasAttribute('open');
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reducedMotion = globalThis.matchMedia('(prefers-reduced-motion: reduce)');
 
     function addTrapFocus() {
       trapFocus(summaryElement.nextElementSibling, detailsElement.querySelector('button'));
@@ -392,14 +412,14 @@ class MenuDrawer extends HTMLElement {
       if (isOpen) event.preventDefault();
       isOpen ? this.closeMenuDrawer(event, summaryElement) : this.openMenuDrawer(summaryElement);
 
-      if (window.matchMedia('(max-width: 990px)')) {
-        document.documentElement.style.setProperty('--viewport-height', `${window.innerHeight}px`);
+      if (globalThis.matchMedia('(max-width: 990px)')) {
+        document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
       }
     } else {
       setTimeout(() => {
         detailsElement.classList.add('menu-opening');
         summaryElement.setAttribute('aria-expanded', true);
-        parentMenuElement && parentMenuElement.classList.add('submenu-open');
+        parentMenuElement?.classList.add('submenu-open');
         !reducedMotion || reducedMotion.matches
           ? addTrapFocus()
           : summaryElement.nextElementSibling.addEventListener('transitionend', addTrapFocus);
@@ -448,7 +468,7 @@ class MenuDrawer extends HTMLElement {
 
   closeSubmenu(detailsElement) {
     const parentMenuElement = detailsElement.closest('.submenu-open');
-    parentMenuElement && parentMenuElement.classList.remove('submenu-open');
+    parentMenuElement?.classList.remove('submenu-open');
     detailsElement.classList.remove('menu-opening');
     detailsElement.querySelector('summary').setAttribute('aria-expanded', false);
     removeTrapFocus(detailsElement.querySelector('summary'));
@@ -466,7 +486,7 @@ class MenuDrawer extends HTMLElement {
       const elapsedTime = time - animationStart;
 
       if (elapsedTime < 400) {
-        window.requestAnimationFrame(handleAnimation);
+        globalThis.requestAnimationFrame(handleAnimation);
       } else {
         detailsElement.removeAttribute('open');
         if (detailsElement.closest('details[open]')) {
@@ -475,24 +495,20 @@ class MenuDrawer extends HTMLElement {
       }
     };
 
-    window.requestAnimationFrame(handleAnimation);
+    globalThis.requestAnimationFrame(handleAnimation);
   }
 }
 
 customElements.define('menu-drawer', MenuDrawer);
 
 class HeaderDrawer extends MenuDrawer {
-  constructor() {
-    super();
-  }
-
   openMenuDrawer(summaryElement) {
     this.header = this.header || document.querySelector('.section-header');
     this.borderOffset =
       this.borderOffset || this.closest('.header-wrapper').classList.contains('header-wrapper--border-bottom') ? 1 : 0;
     document.documentElement.style.setProperty(
       '--header-bottom-position',
-      `${parseInt(this.header.getBoundingClientRect().bottom - this.borderOffset)}px`
+      `${Number.parseInt(this.header.getBoundingClientRect().bottom - this.borderOffset, 10)}px`
     );
     this.header.classList.add('menu-open');
 
@@ -501,7 +517,7 @@ class HeaderDrawer extends MenuDrawer {
     });
 
     summaryElement.setAttribute('aria-expanded', true);
-    window.addEventListener('resize', this.onResize);
+    globalThis.addEventListener('resize', this.onResize);
     trapFocus(this.mainDetailsToggle, summaryElement);
     document.body.classList.add(`overflow-hidden-${this.dataset.breakpoint}`);
   }
@@ -510,16 +526,16 @@ class HeaderDrawer extends MenuDrawer {
     if (!elementToFocus) return;
     super.closeMenuDrawer(event, elementToFocus);
     this.header.classList.remove('menu-open');
-    window.removeEventListener('resize', this.onResize);
+    globalThis.removeEventListener('resize', this.onResize);
   }
 
   onResize = () => {
     this.header &&
       document.documentElement.style.setProperty(
         '--header-bottom-position',
-        `${parseInt(this.header.getBoundingClientRect().bottom - this.borderOffset)}px`
+        `${Number.parseInt(this.header.getBoundingClientRect().bottom - this.borderOffset, 10)}px`
       );
-    document.documentElement.style.setProperty('--viewport-height', `${window.innerHeight}px`);
+    document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
   };
 }
 
@@ -556,7 +572,7 @@ class ModalDialog extends HTMLElement {
     this.setAttribute('open', '');
     if (popup) popup.loadContent();
     trapFocus(this, this.querySelector('[role="dialog"]'));
-    window.pauseAllMedia();
+    globalThis.pauseAllMedia();
   }
 
   hide() {
@@ -564,7 +580,7 @@ class ModalDialog extends HTMLElement {
     document.body.dispatchEvent(new CustomEvent('modalClosed'));
     this.removeAttribute('open');
     removeTrapFocus(this.openedBy);
-    window.pauseAllMedia();
+    globalThis.pauseAllMedia();
   }
 }
 customElements.define('modal-dialog', ModalDialog);
@@ -577,7 +593,7 @@ class ModalOpener extends HTMLElement {
 
     if (!button) return;
     button.addEventListener('click', () => {
-      const modal = document.querySelector(this.getAttribute('data-modal'));
+      const modal = document.querySelector(this.dataset.modal);
       if (modal) modal.show(button);
     });
   }
@@ -593,7 +609,7 @@ class DeferredMedia extends HTMLElement {
   }
 
   loadContent(focus = true) {
-    window.pauseAllMedia();
+    globalThis.pauseAllMedia();
     if (!this.getAttribute('loaded')) {
       const content = document.createElement('div');
       content.appendChild(this.querySelector('template').content.firstElementChild.cloneNode(true));
@@ -681,7 +697,7 @@ class SliderComponent extends HTMLElement {
       this.prevButton.removeAttribute('disabled');
     }
 
-    if (this.isSlideVisible(this.sliderItemsToShow[this.sliderItemsToShow.length - 1])) {
+    if (this.isSlideVisible(this.sliderItemsToShow.at(-1))) {
       this.nextButton.setAttribute('disabled', 'disabled');
     } else {
       this.nextButton.removeAttribute('disabled');
@@ -735,9 +751,9 @@ class SlideshowComponent extends SliderComponent {
     if (this.announcementBarSlider) {
       this.announcementBarArrowButtonWasClicked = false;
 
-      this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this.reducedMotion = globalThis.matchMedia('(prefers-reduced-motion: reduce)');
       this.reducedMotion.addEventListener('change', () => {
-        if (this.slider.getAttribute('data-autoplay') === 'true') this.setAutoPlay();
+        if (this.slider.dataset.autoplay === 'true') this.setAutoPlay();
       });
 
       [this.prevButton, this.nextButton].forEach((button) => {
@@ -751,7 +767,7 @@ class SlideshowComponent extends SliderComponent {
       });
     }
 
-    if (this.slider.getAttribute('data-autoplay') === 'true') this.setAutoPlay();
+    if (this.slider.dataset.autoplay === 'true') this.setAutoPlay();
   }
 
   setAutoPlay() {
@@ -864,10 +880,10 @@ class SlideshowComponent extends SliderComponent {
   togglePlayButtonState(pauseAutoplay) {
     if (pauseAutoplay) {
       this.sliderAutoplayButton.classList.add('slideshow__autoplay--paused');
-      this.sliderAutoplayButton.setAttribute('aria-label', window.accessibilityStrings.playSlideshow);
+      this.sliderAutoplayButton.setAttribute('aria-label', globalThis.accessibilityStrings.playSlideshow);
     } else {
       this.sliderAutoplayButton.classList.remove('slideshow__autoplay--paused');
-      this.sliderAutoplayButton.setAttribute('aria-label', window.accessibilityStrings.pauseSlideshow);
+      this.sliderAutoplayButton.setAttribute('aria-label', globalThis.accessibilityStrings.pauseSlideshow);
     }
   }
 
@@ -961,15 +977,15 @@ class VariantSelects extends HTMLElement {
     this.removeErrorMessage();
     this.updateVariantStatuses();
 
-    if (!this.currentVariant) {
-      this.toggleAddButton(true, '', true);
-      this.setUnavailable();
-    } else {
+    if (this.currentVariant) {
       this.updateMedia();
       this.updateURL();
       this.updateVariantInput();
       this.renderProductInfo();
       this.updateShareUrl();
+    } else {
+      this.toggleAddButton(true, '', true);
+      this.setUnavailable();
     }
   }
 
@@ -1010,7 +1026,7 @@ class VariantSelects extends HTMLElement {
       }
     } else if (tagName === 'INPUT' && target.type === 'radio') {
       const selectedSwatchValue = this.querySelector(`[data-selected-swatch-value="${name}"]`);
-      if (selectedSwatchValue) selectedSwatchValue.innerHTML = value;
+      if (selectedSwatchValue) selectedSwatchValue.textContent = value;
     }
   }
 
@@ -1031,13 +1047,13 @@ class VariantSelects extends HTMLElement {
 
   updateURL() {
     if (!this.currentVariant || this.dataset.updateUrl === 'false') return;
-    window.history.replaceState({}, '', `${this.dataset.url}?variant=${this.currentVariant.id}`);
+    globalThis.history.replaceState({}, '', `${this.dataset.url}?variant=${this.currentVariant.id}`);
   }
 
   updateShareUrl() {
     const shareButton = document.getElementById(`Share-${this.dataset.section}`);
-    if (!shareButton || !shareButton.updateUrl) return;
-    shareButton.updateUrl(`${window.shopUrl}${this.dataset.url}?variant=${this.currentVariant.id}`);
+    if (!shareButton?.updateUrl) return;
+    shareButton.updateUrl(`${globalThis.shopUrl}${this.dataset.url}?variant=${this.currentVariant.id}`);
   }
 
   updateVariantInput() {
@@ -1077,7 +1093,7 @@ class VariantSelects extends HTMLElement {
       } else if (element.tagName === 'OPTION') {
         element.innerText = availableElement
           ? value
-          : window.variantStrings.unavailable_with_option.replace('[value]', value);
+          : globalThis.variantStrings.unavailable_with_option.replace('[value]', value);
       }
     });
   }
@@ -1086,11 +1102,11 @@ class VariantSelects extends HTMLElement {
     const pickUpAvailability = document.querySelector('pickup-availability');
     if (!pickUpAvailability) return;
 
-    if (this.currentVariant && this.currentVariant.available) {
+    if (this.currentVariant?.available) {
       pickUpAvailability.fetchAvailability(this.currentVariant.id);
     } else {
       pickUpAvailability.removeAttribute('available');
-      pickUpAvailability.innerHTML = '';
+      pickUpAvailability.textContent = '';
     }
   }
 
@@ -1102,90 +1118,80 @@ class VariantSelects extends HTMLElement {
     if (productForm) productForm.handleErrorMessage();
   }
 
+  _resolveSourceEl(html, prefix) {
+    return html.getElementById(`${prefix}-${this.dataset.originalSection || this.dataset.section}`);
+  }
+
+  _resetVariantVisibility(section) {
+    const volumeNote = document.getElementById(`Volume-Note-${section}`);
+    const volumePricing = document.getElementById(`Volume-${section}`);
+    const qtyRules = document.getElementById(`Quantity-Rules-${section}`);
+    if (volumeNote) volumeNote.classList.remove('hidden');
+    if (volumePricing) volumePricing.classList.remove('hidden');
+    if (qtyRules) qtyRules.classList.remove('hidden');
+  }
+
+  _applyVariantDOM(html, sectionId) {
+    const section = this.dataset.section;
+    const source = this._resolveSourceEl(html, 'price');
+    const destination = document.getElementById(`price-${section}`);
+    const skuSource = this._resolveSourceEl(html, 'Sku');
+    const skuDestination = document.getElementById(`Sku-${section}`);
+    const inventorySource = this._resolveSourceEl(html, 'Inventory');
+    const inventoryDestination = document.getElementById(`Inventory-${section}`);
+    const volumePricingSource = this._resolveSourceEl(html, 'Volume');
+    const volumePricingDestination = document.getElementById(`Volume-${section}`);
+    const pricePerItemSource = this._resolveSourceEl(html, 'Price-Per-Item');
+    const pricePerItemDestination = document.getElementById(`Price-Per-Item-${section}`);
+
+    this._resetVariantVisibility(section);
+
+    if (source && destination) _safeUpdateInnerHTML(destination, source.innerHTML);
+    if (inventorySource && inventoryDestination) _safeUpdateInnerHTML(inventoryDestination, inventorySource.innerHTML);
+
+    if (skuSource && skuDestination) {
+      _safeUpdateInnerHTML(skuDestination, skuSource.innerHTML);
+      skuDestination.classList.toggle('hidden', skuSource.classList.contains('hidden'));
+    }
+
+    if (volumePricingSource && volumePricingDestination) {
+      _safeUpdateInnerHTML(volumePricingDestination, volumePricingSource.innerHTML);
+    }
+
+    if (pricePerItemSource && pricePerItemDestination) {
+      _safeUpdateInnerHTML(pricePerItemDestination, pricePerItemSource.innerHTML);
+      pricePerItemDestination.classList.toggle('hidden', pricePerItemSource.classList.contains('hidden'));
+    }
+
+    const price = document.getElementById(`price-${section}`);
+    if (price) price.classList.remove('hidden');
+    if (inventoryDestination) inventoryDestination.classList.toggle('hidden', inventorySource.innerText === '');
+
+    const addButtonUpdated = html.getElementById(`ProductSubmitButton-${sectionId}`);
+    this.toggleAddButton(
+      addButtonUpdated ? addButtonUpdated.hasAttribute('disabled') : true,
+      globalThis.variantStrings.soldOut
+    );
+
+    publish(PUB_SUB_EVENTS.variantChange, {
+      data: { sectionId, html, variant: this.currentVariant },
+    });
+  }
+
   renderProductInfo() {
     const requestedVariantId = this.currentVariant.id;
-    const sectionId = this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section;
+    const sectionId = this.dataset.originalSection || this.dataset.section;
 
-    fetch(
-      `${this.dataset.url}?variant=${requestedVariantId}&section_id=${
-        this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section
-      }`
-    )
+    fetch(`${this.dataset.url}?variant=${requestedVariantId}&section_id=${sectionId}`)
       .then((response) => response.text())
       .then((responseText) => {
-        // prevent unnecessary ui changes from abandoned selections
         if (this.currentVariant.id !== requestedVariantId) return;
-
         const html = new DOMParser().parseFromString(responseText, 'text/html');
-        const destination = document.getElementById(`price-${this.dataset.section}`);
-        const source = html.getElementById(
-          `price-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
-        );
-        const skuSource = html.getElementById(
-          `Sku-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
-        );
-        const skuDestination = document.getElementById(`Sku-${this.dataset.section}`);
-        const inventorySource = html.getElementById(
-          `Inventory-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
-        );
-        const inventoryDestination = document.getElementById(`Inventory-${this.dataset.section}`);
-
-        const volumePricingSource = html.getElementById(
-          `Volume-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
-        );
-
-        const pricePerItemDestination = document.getElementById(`Price-Per-Item-${this.dataset.section}`);
-        const pricePerItemSource = html.getElementById(
-          `Price-Per-Item-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
-        );
-
-        const volumePricingDestination = document.getElementById(`Volume-${this.dataset.section}`);
-        const qtyRules = document.getElementById(`Quantity-Rules-${this.dataset.section}`);
-        const volumeNote = document.getElementById(`Volume-Note-${this.dataset.section}`);
-
-        if (volumeNote) volumeNote.classList.remove('hidden');
-        if (volumePricingDestination) volumePricingDestination.classList.remove('hidden');
-        if (qtyRules) qtyRules.classList.remove('hidden');
-
-        if (source && destination) destination.innerHTML = source.innerHTML;
-        if (inventorySource && inventoryDestination) inventoryDestination.innerHTML = inventorySource.innerHTML;
-        if (skuSource && skuDestination) {
-          skuDestination.innerHTML = skuSource.innerHTML;
-          skuDestination.classList.toggle('hidden', skuSource.classList.contains('hidden'));
-        }
-
-        if (volumePricingSource && volumePricingDestination) {
-          volumePricingDestination.innerHTML = volumePricingSource.innerHTML;
-        }
-
-        if (pricePerItemSource && pricePerItemDestination) {
-          pricePerItemDestination.innerHTML = pricePerItemSource.innerHTML;
-          pricePerItemDestination.classList.toggle('hidden', pricePerItemSource.classList.contains('hidden'));
-        }
-
-        const price = document.getElementById(`price-${this.dataset.section}`);
-
-        if (price) price.classList.remove('hidden');
-
-        if (inventoryDestination) inventoryDestination.classList.toggle('hidden', inventorySource.innerText === '');
-
-        const addButtonUpdated = html.getElementById(`ProductSubmitButton-${sectionId}`);
-        this.toggleAddButton(
-          addButtonUpdated ? addButtonUpdated.hasAttribute('disabled') : true,
-          window.variantStrings.soldOut
-        );
-
-        publish(PUB_SUB_EVENTS.variantChange, {
-          data: {
-            sectionId,
-            html,
-            variant: this.currentVariant,
-          },
-        });
+        this._applyVariantDOM(html, sectionId);
       });
   }
 
-  toggleAddButton(disable = true, text, modifyClass = true) {
+  toggleAddButton(disable = true, text = '', modifyClass = true) {
     const productForm = document.getElementById(`product-form-${this.dataset.section}`);
     if (!productForm) return;
     const addButton = productForm.querySelector('[name="add"]');
@@ -1197,7 +1203,7 @@ class VariantSelects extends HTMLElement {
       if (text) addButtonText.textContent = text;
     } else {
       addButton.removeAttribute('disabled');
-      addButtonText.textContent = window.variantStrings.addToCart;
+      addButtonText.textContent = globalThis.variantStrings.addToCart;
     }
 
     if (!modifyClass) return;
@@ -1216,7 +1222,7 @@ class VariantSelects extends HTMLElement {
     const qtyRules = document.getElementById(`Quantity-Rules-${this.dataset.section}`);
 
     if (!addButton) return;
-    addButtonText.textContent = window.variantStrings.unavailable;
+    addButtonText.textContent = globalThis.variantStrings.unavailable;
     if (price) price.classList.add('hidden');
     if (inventory) inventory.classList.add('hidden');
     if (sku) sku.classList.add('hidden');
@@ -1235,10 +1241,6 @@ class VariantSelects extends HTMLElement {
 customElements.define('variant-selects', VariantSelects);
 
 class ProductRecommendations extends HTMLElement {
-  constructor() {
-    super();
-  }
-
   connectedCallback() {
     const handleIntersection = (entries, observer) => {
       if (!entries[0].isIntersecting) return;
@@ -1247,12 +1249,11 @@ class ProductRecommendations extends HTMLElement {
       fetch(this.dataset.url)
         .then((response) => response.text())
         .then((text) => {
-          const html = document.createElement('div');
-          html.innerHTML = text;
-          const recommendations = html.querySelector('product-recommendations');
+          const parsed = new DOMParser().parseFromString(text, 'text/html');
+          const recommendations = parsed.querySelector('product-recommendations');
 
-          if (recommendations && recommendations.innerHTML.trim().length) {
-            this.innerHTML = recommendations.innerHTML;
+          if (recommendations?.innerHTML.trim().length) {
+            _safeUpdateInnerHTML(this, recommendations.innerHTML);
           }
 
           if (!this.querySelector('slideshow-component') && this.classList.contains('complementary-products')) {

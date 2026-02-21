@@ -263,8 +263,16 @@
                 </li>
               {%- endif -%}
               {%- if settings.social_tiktok_link != blank -%}
+                {%- assign tiktok_url = settings.social_tiktok_link | strip -%}
+                {%- assign tiktok_first_char = tiktok_url | slice: 0, 1 -%}
+                {%- if tiktok_first_char == '@' -%}
+                  {%- assign tiktok_url = 'https://www.tiktok.com/' | append: tiktok_url -%}
+                {%- endif -%}
+                {%- unless tiktok_url contains '://' -%}
+                  {%- assign tiktok_url = 'https://' | append: tiktok_url -%}
+                {%- endunless -%}
                 <li class="list-social__item">
-                  <a href="{{ settings.social_tiktok_link }}" class="list-social__link link">
+                  <a href="{{ tiktok_url }}" class="list-social__link link" target="_blank" rel="noopener noreferrer">
                     {%- render 'icon-tiktok' -%}
                     <span class="visually-hidden">{{ 'general.social.links.tiktok' | t }}</span>
                   </a>

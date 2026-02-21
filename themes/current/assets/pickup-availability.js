@@ -54,13 +54,20 @@ if (!customElements.get('pickup-availability')) {
           return;
         }
 
-        if (window.safeReplaceWithSanitizedElement) {
-          const current = document.createElement('div');
-          const preview = sectionInnerHTML.querySelector('pickup-availability-preview');
-          current.appendChild(preview.cloneNode(true));
-          window.safeReplaceWithSanitizedElement(this, current.firstElementChild);
+        const preview = sectionInnerHTML.querySelector('pickup-availability-preview');
+        if (globalThis.safeReplaceWithSanitizedElement) {
+          const wrapper = document.createElement('div');
+          wrapper.appendChild(preview.cloneNode(true));
+          globalThis.safeReplaceWithSanitizedElement(this, wrapper.firstElementChild);
         } else {
-          this.innerHTML = sectionInnerHTML.querySelector('pickup-availability-preview').outerHTML;
+          const clone = preview.cloneNode(true);
+          clone.querySelectorAll('script').forEach((s) => s.remove());
+          clone.querySelectorAll('*').forEach((el) => {
+            Array.from(el.attributes).forEach((a) => {
+              if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
+            });
+          });
+          this.replaceChildren(...clone.childNodes);
         }
         this.setAttribute('available', '');
 

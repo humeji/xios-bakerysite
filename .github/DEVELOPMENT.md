@@ -171,8 +171,33 @@ Tags follow the format `v<version>-<description>`, matching the `CHANGELOG.md` h
 
 | Workflow | File | Trigger | Purpose |
 |----------|------|---------|---------|
-| CI | `.github/workflows/ci.yml` | Push to any branch, PR to main | Run tests + ESLint/SonarJS |
+| CI | `.github/workflows/ci.yml` | Push to any branch (except `shopify`), PR to main | Run tests + ESLint/SonarJS |
 | Release | `.github/workflows/release.yml` | Tag push (`v*`) | Tests + lint + ZIP + GitHub Release |
+| Sync Shopify | `.github/workflows/sync-shopify-branch.yml` | Push to `main` changing `themes/current/**`, or manual dispatch | Rebuilds orphan `shopify` branch with theme files at root |
+
+### Shopify GitHub Integration
+
+The repo is connected to the Shopify store via the **Shopify GitHub integration**. Because Shopify requires theme files at the branch root (not nested under `themes/current/`), an auto-generated orphan branch called `shopify` serves as the connection point.
+
+**How it works:**
+
+1. A GitHub Action rebuilds the `shopify` branch every time `themes/current/` changes on `main`
+2. The workflow copies `themes/current/*` to the branch root and force-pushes
+3. Shopify detects the update and makes the new version available in the theme library
+
+**Manual rebuild:**
+
+```bash
+./scripts/create-shopify-branch.sh
+```
+
+Or trigger the workflow manually from GitHub Actions > Sync Shopify Branch > Run workflow.
+
+**Rules:**
+
+- Never commit directly to the `shopify` branch -- it is rebuilt from scratch on every sync
+- The `shopify` branch is excluded from CI (it has no `package.json` or tests)
+- In Shopify Admin > Themes > Connect theme, select branch `shopify`
 
 ### Branch Protection (Active)
 

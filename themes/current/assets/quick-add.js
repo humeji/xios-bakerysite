@@ -10,7 +10,7 @@ if (!customElements.get('quick-add-modal')) {
       hide(preventFocus = false) {
         const cartNotification = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
         if (cartNotification) cartNotification.setActiveElement(this.openedBy);
-        this.modalContent.innerHTML = '';
+        this.modalContent.textContent = '';
 
         if (preventFocus) this.openedBy = null;
         super.hide();
@@ -21,7 +21,7 @@ if (!customElements.get('quick-add-modal')) {
         opener.classList.add('loading');
         opener.querySelector('.loading__spinner').classList.remove('hidden');
 
-        fetch(opener.getAttribute('data-product-url'))
+        fetch(opener.dataset.productUrl)
           .then((response) => response.text())
           .then((responseText) => {
             const responseHTML = new DOMParser().parseFromString(responseText, 'text/html');
@@ -34,11 +34,11 @@ if (!customElements.get('quick-add-modal')) {
             this.removeDOMElements();
             this.setInnerHTML(this.modalContent, this.productElement.innerHTML);
 
-            if (window.Shopify && Shopify.PaymentButton) {
+            if (globalThis.Shopify && Shopify.PaymentButton) {
               Shopify.PaymentButton.init();
             }
 
-            if (window.ProductModel) window.ProductModel.loadShopifyXR();
+            if (globalThis.ProductModel) globalThis.ProductModel.loadShopifyXR();
 
             this.removeGalleryListSemantic();
             this.updateImageSizes();
@@ -52,10 +52,11 @@ if (!customElements.get('quick-add-modal')) {
           });
       }
 
+      // SECURITY ACCEPTED RISK (2026-02 audit): raw innerHTML + script re-injection
+      // required by Shopify's product section rendering. The HTML originates from
+      // the store's own server via DOMParser (line 27) and is never user-supplied.
       setInnerHTML(element, html) {
         element.innerHTML = html;
-
-        // Reinjects the script tags to allow execution. By default, scripts are disabled when using element.innerHTML.
         element.querySelectorAll('script').forEach((oldScriptTag) => {
           const newScriptTag = document.createElement('script');
           Array.from(oldScriptTag.attributes).forEach((attribute) => {
@@ -70,7 +71,7 @@ if (!customElements.get('quick-add-modal')) {
         const variantPicker = this.modalContent.querySelector('variant-selects');
         if (!variantPicker) return;
 
-        variantPicker.setAttribute('data-update-url', 'false');
+        variantPicker.dataset.updateUrl = 'false';
       }
 
       removeDOMElements() {
@@ -84,6 +85,8 @@ if (!customElements.get('quick-add-modal')) {
         if (modalDialog) modalDialog.forEach((modal) => modal.remove());
       }
 
+      // SECURITY ACCEPTED RISK: innerHTML replaceAll operates on server-rendered
+      // DOMParser output (this.productElement) to namespace IDs -- never user input.
       preventDuplicatedIDs() {
         const sectionId = this.productElement.dataset.section;
         this.productElement.innerHTML = this.productElement.innerHTML.replaceAll(sectionId, `quickadd-${sectionId}`);

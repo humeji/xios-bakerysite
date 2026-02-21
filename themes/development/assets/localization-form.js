@@ -162,10 +162,9 @@ if (!customElements.get('localization-form')) {
         });
 
         if (this.elements.liveRegion) {
-          this.elements.liveRegion.innerHTML = window.accessibilityStrings.countrySelectorSearchCount.replace(
-            '[count]',
-            visibleCountries
-          );
+          const text = window.accessibilityStrings.countrySelectorSearchCount.replace('[count]', visibleCountries);
+          this.elements.liveRegion.textContent = '';
+          this.elements.liveRegion.textContent = text;
         }
 
         this.querySelector('.country-selector').scrollTop = 0;

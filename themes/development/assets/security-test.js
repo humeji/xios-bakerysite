@@ -7,8 +7,8 @@ function testXSSPrevention() {
 
   testPayloads.forEach((payload, index) => {
     const testDiv = document.createElement('div');
-    if (window.safeSetHTML) {
-      window.safeSetHTML(testDiv, payload);
+    if (globalThis.safeSetHTML) {
+      globalThis.safeSetHTML(testDiv, payload);
     } else {
       const temp = document.createElement('div');
       temp.innerHTML = payload;
@@ -23,6 +23,6 @@ function testXSSPrevention() {
   });
 }
 
-window.testXSSPrevention = testXSSPrevention;
+globalThis.testXSSPrevention = testXSSPrevention;
 
 

@@ -6,6 +6,45 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
+## [13.7.0-shopify-github-sync] - 2026-02-20
+
+**Plan:** `shopify_github_sync_a1b2c3d4`
+
+### Added
+- GitHub Action workflow (`sync-shopify-branch.yml`) that auto-syncs `themes/current/` to an orphan `shopify` branch on every push to `main`
+- Helper script (`scripts/create-shopify-branch.sh`) for initial branch creation without affecting the working tree
+- Shopify GitHub integration section in DEVELOPMENT.md and PLANNING.md
+
+### Changed
+- CI workflow (`ci.yml`) now excludes the `shopify` branch (no `package.json` or tests on that branch)
+- PLANNING.md updated with Shopify GitHub integration details in tech stack, deployment workflow, constraints, and documentation index
+
+---
+
+## [13.6.0-security-audit-2026] - 2026-02-20
+
+**Plan:** `security_audit_2026_b0e62e95`
+
+### Added
+- February 2026 security audit report (English and Spanish) in `security/audits/2026/`
+- `_stripDangerousAttrs()` helper in 9 JS files for hardened fallback sanitization
+- `npm audit` step in CI and Release workflows for dependency vulnerability scanning
+- `.github/dependabot.yml` for automated weekly dependency and GitHub Actions updates
+- `package-lock.json` committed for reproducible builds
+
+### Fixed
+- 10 residual raw `innerHTML` assignments in Dawn stock files replaced with `safeSetHTML` + fallback or `textContent`
+- 4 raw `outerHTML` assignments in `facets.js` replaced with cloneNode + sanitize pattern
+- Fallback sanitization in 9 files hardened to strip `on*` event handler attributes (matching `safeSetHTML` behavior)
+- CSP in `theme.liquid` cleaned: removed 15 duplicate/redundant entries, fixed incorrect `fonts.googleapis.com` in `font-src`
+- `quick-add.js` script re-injection documented as accepted risk with inline security comments
+
+### Changed
+- `.github/SECURITY.md` updated with 2026 audit history and supported version table
+- `security/README.md` rewritten with 2026 audit links and security tools inventory
+
+---
+
 ## [13.5.0-cicd-pipeline] - 2026-02-20
 
 **Plan:** `ci_cd_pipeline_setup_713a17f2`

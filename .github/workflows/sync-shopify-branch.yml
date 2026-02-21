@@ -1,0 +1,45 @@
+name: Sync Shopify Branch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "themes/current/**"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync themes/current to shopify branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+
+          TEMP_DIR=$(mktemp -d)
+          cp -r themes/current/* "$TEMP_DIR/"
+
+          git checkout --orphan shopify-staging
+          git rm -rf . > /dev/null 2>&1
+          git clean -fd > /dev/null 2>&1
+
+          cp -r "$TEMP_DIR"/* .
+          rm -rf "$TEMP_DIR"
+
+          git add -A
+          git commit -m "Sync theme from main (${COMMIT_SHA})" \
+                     -m "Auto-generated from themes/current/ on main branch."
+
+          git push --force origin HEAD:shopify

@@ -1,3 +1,11 @@
+function _stripDangerousAttrs(root) {
+  root.querySelectorAll('*').forEach((el) => {
+    Array.from(el.attributes).forEach((a) => {
+      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
+    });
+  });
+}
+
 class CartNotification extends HTMLElement {
   constructor() {
     super();
@@ -42,12 +50,13 @@ class CartNotification extends HTMLElement {
         parsedState.sections[section.id],
         section.selector
       );
-      if (window.safeSetHTML && targetElement) {
-        window.safeSetHTML(targetElement, safeHTML);
+      if (globalThis.safeSetHTML && targetElement) {
+        globalThis.safeSetHTML(targetElement, safeHTML);
       } else if (targetElement) {
         const tempContainer = document.createElement('div');
         tempContainer.innerHTML = safeHTML;
         tempContainer.querySelectorAll('script').forEach((s) => s.remove());
+        _stripDangerousAttrs(tempContainer);
         targetElement.replaceChildren(...tempContainer.childNodes);
       }
     });

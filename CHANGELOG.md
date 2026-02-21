@@ -6,18 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
-## [13.7.0-shopify-github-sync] - 2026-02-20
+## [13.5.9-exact-production-match] - 2026-02-21
 
-**Plan:** `shopify_github_sync_a1b2c3d4`
-
-### Added
-- GitHub Action workflow (`sync-shopify-branch.yml`) that auto-syncs `themes/current/` to an orphan `shopify` branch on every push to `main`
-- Helper script (`scripts/create-shopify-branch.sh`) for initial branch creation without affecting the working tree
-- Shopify GitHub integration section in DEVELOPMENT.md and PLANNING.md
+### Removed
+- Shopify GitHub integration (`shopify` branch, sync workflow, helper script, Cursor rule) -- disconnected and fully removed
+- Reverted security audit JS refactoring and cart minimum order theme code to match working production state
 
 ### Changed
-- CI workflow (`ci.yml`) now excludes the `shopify` branch (no `package.json` or tests on that branch)
-- PLANNING.md updated with Shopify GitHub integration details in tech stack, deployment workflow, constraints, and documentation index
+- Theme files restored to exact production match to resolve persistent header rendering issue on ZIP upload
 
 ---
 

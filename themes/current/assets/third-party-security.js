@@ -21,13 +21,8 @@ class ThirdPartySecurityManager {
   }
 
   init() {
-    // Monitor for Pop Convert script loading
     this.monitorPopConvert();
-    
-    // Set up security event listeners
     this.setupSecurityListeners();
-    
-    // Log third-party activity for debugging
     this.logThirdPartyActivity();
   }
 
@@ -35,22 +30,17 @@ class ThirdPartySecurityManager {
    * Monitor Pop Convert script and ensure it's loading securely
    */
   monitorPopConvert() {
-    // Check if Pop Convert is already loaded
     if (globalThis.pc?.version) {
-      // Pop Convert detected (logging suppressed)
       this.validatePopConvertSecurity();
     }
 
-    // Monitor for Pop Convert initialization
     const checkPopConvert = () => {
       if (globalThis.pc && !this.loadedScripts.has('pop-convert')) {
         this.loadedScripts.add('pop-convert');
-        // Pop Convert initialized securely (logging suppressed)
         this.validatePopConvertSecurity();
       }
     };
 
-    // Check periodically for Pop Convert
     const interval = setInterval(() => {
       checkPopConvert();
       if (this.loadedScripts.has('pop-convert')) {
@@ -58,7 +48,6 @@ class ThirdPartySecurityManager {
       }
     }, 1000);
 
-    // Clear interval after 30 seconds to prevent memory leaks
     setTimeout(() => clearInterval(interval), 30000);
   }
 
@@ -67,10 +56,7 @@ class ThirdPartySecurityManager {
    */
   validatePopConvertSecurity() {
     if (globalThis.pc) {
-      // Ensure Pop Convert is not modifying critical DOM elements
       this.protectCriticalElements();
-      
-      // Monitor for suspicious activity
       this.monitorDOMChanges();
     }
   }
@@ -89,7 +75,6 @@ class ThirdPartySecurityManager {
     criticalSelectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
-        // Freeze element to prevent modification
         if (Object.freeze) {
           Object.freeze(element);
         }
@@ -125,7 +110,6 @@ class ThirdPartySecurityManager {
    * Validate newly added elements for security
    */
   validateNewElement(element) {
-    // Check for suspicious script injections
     if (element.tagName === 'SCRIPT') {
       const src = element.src;
       if (src && !this.isAllowedDomain(src)) {
@@ -135,7 +119,6 @@ class ThirdPartySecurityManager {
       }
     }
 
-    // Check for inline event handlers
     Array.from(element.attributes || []).forEach(attr => {
       if (attr.name.toLowerCase().startsWith('on')) {
         console.warn('[SECURITY] Removed inline event handler:', attr.name);
@@ -150,22 +133,18 @@ class ThirdPartySecurityManager {
   isAllowedDomain(url) {
     try {
       const domain = new URL(url).hostname;
-      return this.allowedDomains.some(allowed => 
+      return this.allowedDomains.some(allowed =>
         domain === allowed || domain.endsWith('.' + allowed)
       );
-    } catch (error) {
-      console.debug('[SECURITY] Invalid URL passed to isAllowedDomain:', error.message);
+    } catch {
       return false;
     }
   }
-
-  // Console filtering is now handled directly in theme.liquid for immediate execution
 
   /**
    * Set up security event listeners
    */
   setupSecurityListeners() {
-    // Listen for CSP violations
     document.addEventListener('securitypolicyviolation', (e) => {
       console.warn('[SECURITY] CSP Violation:', {
         violatedDirective: e.violatedDirective,
@@ -173,15 +152,12 @@ class ThirdPartySecurityManager {
         documentURI: e.documentURI
       });
     });
-
-    // Console filtering is now handled in setupConsoleFiltering()
   }
 
   /**
    * Handle security-related errors
    */
   handleSecurityError(message) {
-    // Filter out known harmless errors and warnings
     const harmlessErrors = [
       'Partitioned cookie or storage access',
       'Instagram',
@@ -199,11 +175,10 @@ class ThirdPartySecurityManager {
       'ErrorUtils caught an error',
       'blurred pcjs.production.min.js'
     ];
-    
+
     const isHarmless = harmlessErrors.some(error => message.includes(error));
-    
+
     if (!isHarmless) {
-      // Log security errors for monitoring
       if (globalThis.Shopify?.analytics) {
         try {
           globalThis.Shopify.analytics.publish('security_error', {
@@ -211,8 +186,8 @@ class ThirdPartySecurityManager {
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent
           });
-        } catch (error) {
-          console.debug('[SECURITY] Analytics publish unavailable:', error.message);
+        } catch {
+          // Fail silently if analytics is not available
         }
       }
     }
@@ -222,14 +197,12 @@ class ThirdPartySecurityManager {
    * Log third-party activity for debugging
    */
   logThirdPartyActivity() {
-    // Only log in development or when debug is enabled
-    if (globalThis.location.hostname.includes('localhost') || 
+    if (globalThis.location.hostname.includes('localhost') ||
         globalThis.location.search.includes('debug=true')) {
-      
+
       console.log('[SECURITY] Third-party security manager initialized');
       console.log('[SECURITY] Monitoring domains:', this.allowedDomains);
-      
-      // Log when scripts are loaded
+
       const originalAppendChild = Node.prototype.appendChild;
       Node.prototype.appendChild = function(child) {
         if (child.tagName === 'SCRIPT' && child.src) {
@@ -242,13 +215,12 @@ class ThirdPartySecurityManager {
 }
 
 // Initialize security manager when DOM is ready
-function initSecurityManager() {
-  const manager = new ThirdPartySecurityManager();
-  globalThis.__thirdPartySecurityManager = manager;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    globalThis.__thirdPartySecurityInstance = new ThirdPartySecurityManager();
+  });
+} else {
+  globalThis.__thirdPartySecurityInstance = new ThirdPartySecurityManager();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initSecurityManager);
-} else {
-  initSecurityManager();
-}
+globalThis.__thirdPartySecurityManager = ThirdPartySecurityManager;

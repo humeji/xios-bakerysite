@@ -1,11 +1,3 @@
-function _stripDangerousAttrs(root) {
-  root.querySelectorAll('*').forEach((el) => {
-    Array.from(el.attributes).forEach((a) => {
-      if (a.name.toLowerCase().startsWith('on')) el.removeAttribute(a.name);
-    });
-  });
-}
-
 class CartDrawer extends HTMLElement {
   constructor() {
     super();
@@ -85,13 +77,12 @@ class CartDrawer extends HTMLElement {
         ? document.querySelector(section.selector)
         : document.getElementById(section.id);
       const safeHTML = this.getSectionInnerHTML(parsedState.sections[section.id], section.selector);
-      if (globalThis.safeSetHTML && sectionElement) {
-        globalThis.safeSetHTML(sectionElement, safeHTML);
+      if (window.safeSetHTML && sectionElement) {
+        window.safeSetHTML(sectionElement, safeHTML);
       } else if (sectionElement) {
         const tempContainer = document.createElement('div');
         tempContainer.innerHTML = safeHTML;
         tempContainer.querySelectorAll('script').forEach((s) => s.remove());
-        _stripDangerousAttrs(tempContainer);
         sectionElement.replaceChildren(...tempContainer.childNodes);
       }
     });

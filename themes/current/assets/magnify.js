@@ -2,7 +2,7 @@
 function createOverlay(image) {
   const overlayImage = document.createElement('img');
   overlayImage.setAttribute('src', `${image.src}`);
-  let overlay = document.createElement('div');
+  overlay = document.createElement('div'); // eslint-disable-line sonarjs/no-implicit-global -- module-scoped var used by moveWithHover
   prepareOverlay(overlay, overlayImage);
 
   image.style.opacity = '50%';

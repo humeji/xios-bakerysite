@@ -36,14 +36,14 @@ class CustomerAddresses {
 
   _setupCountries() {
     if (Shopify?.CountryProvinceSelector) {
-      this.countrySelectors = [
-        new Shopify.CountryProvinceSelector('AddressCountryNew', 'AddressProvinceNew', {
-          hideElement: 'AddressProvinceContainerNew',
-        }),
-      ];
+      // Shopify's CountryProvinceSelector uses constructor side effects to bind <select> elements
+      this._countryNew = new Shopify.CountryProvinceSelector('AddressCountryNew', 'AddressProvinceNew', {
+        hideElement: 'AddressProvinceContainerNew',
+      });
+      this._countryEdits = [];
       this.elements.countrySelects.forEach((select) => {
         const formId = select.dataset.formId;
-        this.countrySelectors.push(
+        this._countryEdits.push(
           new Shopify.CountryProvinceSelector(`AddressCountry_${formId}`, `AddressProvince_${formId}`, {
             hideElement: `AddressProvinceContainer_${formId}`,
           })
@@ -77,7 +77,6 @@ class CustomerAddresses {
   };
 
   _handleDeleteButtonClick = ({ currentTarget }) => {
-     
     if (confirm(currentTarget.getAttribute(attributes.confirmMessage))) {
       Shopify.postLink(currentTarget.dataset.target, {
         parameters: { _method: 'delete' },

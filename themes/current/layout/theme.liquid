@@ -45,43 +45,52 @@
 
     {{ content_for_header }}
 
-    <!-- CSP: unsafe-inline/unsafe-eval required by Shopify platform (see 2026 security audit) -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval'
-        https://code.jquery.com
-        *.shopify.com
-        *.shopifycdn.com
+        https://code.jquery.com 
+        *.shopify.com 
+        *.shopifycdn.com 
+        cdn.shopify.com
         checkout.shopifycs.com
         connect.facebook.net
         *.facebook.com
+        www.instagram.com
         *.instagram.com
+        static.cdninstagram.com
         *.cdninstagram.com
         {% if settings.pop_convert_enabled %}
         script.pop-convert.com
         cdn.s3.pop-convert.com
         {% endif %}
         monorail-edge.shopifysvc.com;
-      style-src 'self' 'unsafe-inline'
-        https://code.jquery.com
-        https://fonts.googleapis.com
+      style-src 'self' 'unsafe-inline' 
+        https://code.jquery.com 
+        code.jquery.com
+        https://fonts.googleapis.com 
         https://fonts.gstatic.com
-        *.shopify.com
+        *.shopify.com 
         *.shopifycdn.com
+        static.cdninstagram.com
         *.cdninstagram.com;
       img-src 'self' data: blob:
-        *.shopify.com
+        *.shopify.com 
         *.shopifycdn.com
+        www.facebook.com
         *.facebook.com
         *.instagram.com
+        static.cdninstagram.com
         *.cdninstagram.com;
-      font-src 'self'
+      font-src 'self' 
+        https://fonts.googleapis.com 
         https://fonts.gstatic.com
         cdn.shopify.com
         *.shopifycdn.com
+        *.cdninstagram.com
+        xiosbakery.com
         https://xiosbakery.com;
-      connect-src 'self'
-        *.shopify.com
+      connect-src 'self' 
+        *.shopify.com 
         checkout.shopifycs.com
         monorail-edge.shopifysvc.com
         error-analytics-sessions-production.shopifysvc.com
@@ -89,17 +98,21 @@
         *.facebook.com
         connect.facebook.net
         *.instagram.com
+        static.cdninstagram.com
         *.cdninstagram.com
         {% if settings.pop_convert_enabled %}
         cdn.pop-convert.com
         cdn.micro.pop-convert.com
         micro.pop-convert.com
         {% endif %}
+        www.instagram.com
+        xiosbakery.com
         https://xiosbakery.com;
       frame-src 'self'
-        *.shopify.com
+        *.shopify.com 
         checkout.shopifycs.com
         shop.app
+        www.instagram.com
         *.instagram.com;
       upgrade-insecure-requests;
     ">

@@ -70,17 +70,7 @@ class CartItems extends HTMLElement {
         .then((responseText) => {
           const html = new DOMParser().parseFromString(responseText, 'text/html');
           const sourceQty = html.querySelector('cart-items');
-          if (sourceQty) {
-            if (window.safeSetHTML) {
-              window.safeSetHTML(this, sourceQty.innerHTML);
-            } else {
-              // Fallback sanitization
-              const tempContainer = document.createElement('div');
-              tempContainer.innerHTML = sourceQty.innerHTML;
-              tempContainer.querySelectorAll('script').forEach((s) => s.remove());
-              this.replaceChildren(...tempContainer.childNodes);
-            }
-          }
+          this.innerHTML = sourceQty.innerHTML;
         })
         .catch((e) => {
           console.error(e);
@@ -149,18 +139,10 @@ class CartItems extends HTMLElement {
         this.getSectionsToRender().forEach((section) => {
           const elementToReplace =
             document.getElementById(section.id).querySelector(section.selector) || document.getElementById(section.id);
-          const safeHTML = this.getSectionInnerHTML(
+          elementToReplace.innerHTML = this.getSectionInnerHTML(
             parsedState.sections[section.section],
             section.selector
           );
-          if (window.safeSetHTML && elementToReplace) {
-            window.safeSetHTML(elementToReplace, safeHTML);
-          } else if (elementToReplace) {
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = safeHTML;
-            tempContainer.querySelectorAll('script').forEach((s) => s.remove());
-            elementToReplace.replaceChildren(...tempContainer.childNodes);
-          }
         });
         const updatedValue = parsedState.items[line - 1] ? parsedState.items[line - 1].quantity : undefined;
         let message = '';
@@ -200,13 +182,7 @@ class CartItems extends HTMLElement {
   updateLiveRegions(line, message) {
     const lineItemError =
       document.getElementById(`Line-item-error-${line}`) || document.getElementById(`CartDrawer-LineItemError-${line}`);
-    if (lineItemError) {
-      const errorTextEl = lineItemError.querySelector('.cart-item__error-text');
-      if (errorTextEl) {
-        // message is controlled string from theme, but use textContent to avoid any injection
-        errorTextEl.textContent = message;
-      }
-    }
+    if (lineItemError) lineItemError.querySelector('.cart-item__error-text').innerHTML = message;
 
     this.lineItemStatusElement.setAttribute('aria-hidden', true);
 

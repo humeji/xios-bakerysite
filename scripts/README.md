@@ -68,7 +68,7 @@ The ZIP is created at the repository root. The date stamp is generated automatic
 |------|--------|------------|
 | 1/4 | Runs `npm test` | Aborts -- fix failing tests first |
 | 2/4 | Prompts for SonarQube confirmation | Aborts -- resolve all findings first |
-| 3/4 | Verifies `themes/current/` and `settings_schema.json` exist | Aborts -- theme source missing |
+| 3/4 | Verifies `themes/current/`, `settings_schema.json`, and `settings_data.json` exist | Aborts -- theme source missing |
 | 4/4 | Creates the ZIP bundle | -- |
 
 #### The `--ci` Flag
@@ -97,6 +97,7 @@ Before running the script locally, ensure every item is satisfied:
 - [ ] `CHANGELOG.md` updated with a new entry for this version/bundle
 - [ ] Root `README.md` updated if version, features, or project structure changed
 - [ ] `.github/DEVELOPMENT.md` updated if workflow or testing process changed
+- [ ] `themes/current/config/settings_data.json` is present and up-to-date with the live theme's customizer settings (logo, colors, typography, etc.)
 
 ### Versioning
 

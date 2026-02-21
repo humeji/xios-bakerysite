@@ -13,41 +13,46 @@ $(document).ready(function() {
   })    
 
   if (location.pathname === '/cart') { 
+    
+    const $minOrderEl = $('[data-minimum-order]');
+    const rawMinimum = Number.parseFloat($minOrderEl.attr('data-minimum-order'));
+    const MINIMUM_ORDER_AMOUNT = (Number.isFinite(rawMinimum) && rawMinimum > 0) ? rawMinimum : 40;
+    const ENABLE_MINIMUM_ORDER = $minOrderEl.attr('data-enable-minimum-order') !== 'false';
+    const MSG_TEMPLATE = $minOrderEl.attr('data-min-order-msg-template') || 'Minimum order amount is $[MIN]. Current total: $[TOTAL]';
 
     function validateCartItems() {
       $.getJSON('/cart.js', function(cart) {
-        var cartHasCookies = false;
-        var cookiesCount = 0;
-        var selectedCookieType = null;
-        var selectedCookieCount = 0; 
-
-        $('.custom-cart-qty-msg').hide(); 
+        const cartTotal = cart.total_price / 100;
+        let hasDigitalProducts = false;
+        const hasItems = cart.items.length > 0;
 
         $(cart.items).each(function() {
-          if (this.product_type == 'Cookies') {
-            cookiesCount += this.quantity;
-            cartHasCookies = true;
-            
-            if (this.quantity > selectedCookieCount) {
-              selectedCookieCount = this.quantity;
-              selectedCookieType = this.title;
-            }
-
-            if (this.quantity > 4) {
-              $('.custom-cart-qty-msg').text('Please select at least 4 cookies in order to checkout ' + selectedCookieType);
-              $('.custom-cart-qty-msg').show();
-              $('.cart__checkout-button').prop('disabled', true);
-              return false; 
-            }
+          if (this.requires_shipping === false) {
+            hasDigitalProducts = true;
           }
         });
 
-        if (!cartHasCookies || cookiesCount < 4) {
-          $('.cart__checkout-button').prop('disabled', true); 
-          $('.custom-cart-qty-msg').show(); 
+        $('.custom-cart-qty-msg').hide();
+        
+        if (hasDigitalProducts) {
+          $('.digital-no-refund-msg').show();
         } else {
-          $('.cart__checkout-button').prop('disabled', false); 
-          $('.custom-cart-qty-msg').hide(); 
+          $('.digital-no-refund-msg').hide();
+        }
+
+        if (!hasItems) {
+          $('.cart__checkout-button').prop('disabled', true);
+          return;
+        }
+
+        if (ENABLE_MINIMUM_ORDER && cartTotal < MINIMUM_ORDER_AMOUNT) {
+          const message = MSG_TEMPLATE
+            .replace('[MIN]', MINIMUM_ORDER_AMOUNT.toFixed(2))
+            .replace('[TOTAL]', cartTotal.toFixed(2));
+          $('.custom-cart-qty-msg').text(message).show();
+          $('.cart__checkout-button').prop('disabled', true);
+        } else {
+          $('.cart__checkout-button').prop('disabled', false);
         }
       });
     }
@@ -57,13 +62,11 @@ $(document).ready(function() {
     setInterval(validateCartItems, 5000);
 
     $('.btn-cart-remove-item').click(function() {
-
       $('.cart__checkout-button').prop('disabled', true);
       setTimeout(function () {
         validateCartItems();
-        $('.cart__checkout-button').prop('disabled', false);
       }, 2000);
-    }) 
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {

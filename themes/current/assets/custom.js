@@ -42,6 +42,7 @@ $(document).ready(function() {
 
         if (!hasItems) {
           $('.cart__checkout-button').prop('disabled', true);
+          $('.cart__dynamic-checkout-buttons').hide();
           return;
         }
 
@@ -51,8 +52,10 @@ $(document).ready(function() {
             .replace('[TOTAL]', cartTotal.toFixed(2));
           $('.custom-cart-qty-msg').text(message).show();
           $('.cart__checkout-button').prop('disabled', true);
+          $('.cart__dynamic-checkout-buttons').hide();
         } else {
           $('.cart__checkout-button').prop('disabled', false);
+          $('.cart__dynamic-checkout-buttons').show();
         }
       });
     }

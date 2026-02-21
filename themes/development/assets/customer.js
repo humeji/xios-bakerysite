@@ -35,19 +35,15 @@ class CustomerAddresses {
   }
 
   _setupCountries() {
-    if (Shopify?.CountryProvinceSelector) {
-      // Shopify's CountryProvinceSelector uses constructor side effects to bind <select> elements
-      this._countryNew = new Shopify.CountryProvinceSelector('AddressCountryNew', 'AddressProvinceNew', {
+    if (Shopify && Shopify.CountryProvinceSelector) {
+      new Shopify.CountryProvinceSelector('AddressCountryNew', 'AddressProvinceNew', {
         hideElement: 'AddressProvinceContainerNew',
       });
-      this._countryEdits = [];
       this.elements.countrySelects.forEach((select) => {
         const formId = select.dataset.formId;
-        this._countryEdits.push(
-          new Shopify.CountryProvinceSelector(`AddressCountry_${formId}`, `AddressProvince_${formId}`, {
-            hideElement: `AddressProvinceContainer_${formId}`,
-          })
-        );
+        new Shopify.CountryProvinceSelector(`AddressCountry_${formId}`, `AddressProvince_${formId}`, {
+          hideElement: `AddressProvinceContainer_${formId}`,
+        });
       });
     }
   }

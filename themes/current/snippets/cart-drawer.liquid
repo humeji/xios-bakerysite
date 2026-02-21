@@ -70,6 +70,45 @@
           {% render 'icon-close' %}
         </button>
       </div>
+
+      {%- assign min_order_val = settings.minimum_order_amount | default: 40 -%}
+      {%- if request.locale.iso_code == 'es' -%}
+        {%- assign min_order_msg_tpl = 'El monto mínimo de pedido es $[MIN]. Total actual: $[TOTAL]' -%}
+      {%- else -%}
+        {%- assign min_order_msg_tpl = 'Minimum order amount is $[MIN]. Current total: $[TOTAL]' -%}
+      {%- endif -%}
+
+      <div 
+        data-minimum-order="{{ min_order_val }}"
+        data-enable-minimum-order="{{ settings.enable_minimum_order | default: true }}"
+        data-min-order-msg-template="{{ min_order_msg_tpl }}"
+        style="display: none;"
+      ></div>
+
+      {%- if request.design_mode and min_order_val < 20 -%}
+      <div class="cart__admin-warning drawer__cart-notice" style="background:#fff3cd;border:2px solid #ffc107;padding:12px 16px;margin:10px 0;border-radius:4px;">
+        <p style="margin:0;color:#856404;font-weight:bold;">[WARNING] Minimum order amount (${{ min_order_val }}) is below $20. This may not cover delivery costs. Recommended: $40 or higher.</p>
+      </div>
+      {%- endif -%}
+
+      <div class="custom-cart-qty-msg drawer__cart-notice" style="display: none;">
+        {%- if request.locale.iso_code == 'es' -%}
+          <p>El monto mínimo de pedido es ${{ min_order_val }}</p>
+        {%- else -%}
+          <p>Minimum order amount is ${{ min_order_val }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if settings.show_digital_no_refund_message != false -%}
+      <div class="digital-no-refund-msg drawer__cart-notice" style="display: none;">
+        {%- if request.locale.iso_code == 'es' -%}
+          <p>{{ settings.digital_no_refund_message_es | default: 'Los productos digitales no son reembolsables. Al realizar la compra, usted acepta esta política.' }}</p>
+        {%- else -%}
+          <p>{{ settings.digital_no_refund_message | default: 'Digital products are non-refundable. By purchasing, you agree to this policy.' }}</p>
+        {%- endif -%}
+      </div>
+      {%- endif -%}
+
       <cart-drawer-items
         {% if cart == empty %}
           class=" is-empty"

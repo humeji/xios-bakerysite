@@ -9,3 +9,38 @@
 #custom-homepage-instagram-feed-container a {
   text-decoration: none;
 }
+
+/* Cart - Minimum Order & Digital Product Notices */
+
+.custom-cart-qty-msg {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 10px 0;
+}
+
+.custom-cart-qty-msg p {
+  margin: 0;
+  color: #721c24;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.digital-no-refund-msg {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 10px 0;
+}
+
+.digital-no-refund-msg p {
+  margin: 0;
+  color: #856404;
+  font-size: 14px;
+}
+
+.drawer__cart-notice {
+  margin: 0 16px 10px 16px;
+}

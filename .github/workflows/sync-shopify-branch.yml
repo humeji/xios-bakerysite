@@ -21,11 +21,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Sync themes/current to shopify branch
+      - name: Backup current shopify branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          if git ls-remote --exit-code origin shopify > /dev/null 2>&1; then
+            TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+            BACKUP_TAG="shopify-backup/${TIMESTAMP}"
+            git fetch origin shopify
+            git tag "$BACKUP_TAG" origin/shopify
+            git push origin "$BACKUP_TAG"
+            echo "BACKUP_TAG=${BACKUP_TAG}" >> "$GITHUB_ENV"
+            echo "[INFO] Backup created: ${BACKUP_TAG}"
+          else
+            echo "[INFO] No existing shopify branch to back up (first run)."
+          fi
+
+      - name: Sync themes/current to shopify branch
+        run: |
           COMMIT_SHA=$(git rev-parse --short HEAD)
 
           TEMP_DIR=$(mktemp -d)
@@ -43,3 +57,16 @@ jobs:
                      -m "Auto-generated from themes/current/ on main branch."
 
           git push --force origin HEAD:shopify
+
+      - name: Summary
+        run: |
+          echo "## Shopify Branch Sync" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Source commit:** $(git -C . rev-parse --short HEAD 2>/dev/null || echo 'N/A')" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "${BACKUP_TAG:-}" ]; then
+            echo "- **Backup tag:** \`${BACKUP_TAG}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "To rollback: \`git push --force origin ${BACKUP_TAG}^{}:shopify\`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- **Backup:** None (first sync)" >> "$GITHUB_STEP_SUMMARY"
+          fi

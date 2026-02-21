@@ -320,7 +320,7 @@ Shopify.CountryProvinceSelector.prototype = {
       for (var i = 0; i < provinces.length; i++) {
         var opt = document.createElement('option');
         opt.value = provinces[i][0];
-        opt.textContent = provinces[i][1];
+        opt.innerHTML = provinces[i][1];
         this.provinceEl.appendChild(opt);
       }
 
@@ -338,7 +338,7 @@ Shopify.CountryProvinceSelector.prototype = {
     for (var i = 0, count = values.length; i < values.length; i++) {
       var opt = document.createElement('option');
       opt.value = values[i];
-      opt.textContent = values[i];
+      opt.innerHTML = values[i];
       selector.appendChild(opt);
     }
   },
@@ -1010,7 +1010,7 @@ class VariantSelects extends HTMLElement {
       }
     } else if (tagName === 'INPUT' && target.type === 'radio') {
       const selectedSwatchValue = this.querySelector(`[data-selected-swatch-value="${name}"]`);
-      if (selectedSwatchValue) selectedSwatchValue.textContent = value;
+      if (selectedSwatchValue) selectedSwatchValue.innerHTML = value;
     }
   }
 
@@ -1090,7 +1090,7 @@ class VariantSelects extends HTMLElement {
       pickUpAvailability.fetchAvailability(this.currentVariant.id);
     } else {
       pickUpAvailability.removeAttribute('available');
-      pickUpAvailability.textContent = '';
+      pickUpAvailability.innerHTML = '';
     }
   }
 
@@ -1147,34 +1147,19 @@ class VariantSelects extends HTMLElement {
         if (volumePricingDestination) volumePricingDestination.classList.remove('hidden');
         if (qtyRules) qtyRules.classList.remove('hidden');
 
-        if (source && destination) {
-          if (window.safeSetHTML) { window.safeSetHTML(destination, source.innerHTML); }
-          else {
-            const temp = document.createElement('div'); temp.innerHTML = source.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); destination.replaceChildren(...temp.childNodes);
-          }
-        }
-        if (inventorySource && inventoryDestination) {
-          if (window.safeSetHTML) { window.safeSetHTML(inventoryDestination, inventorySource.innerHTML); }
-          else {
-            const temp = document.createElement('div'); temp.innerHTML = inventorySource.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); inventoryDestination.replaceChildren(...temp.childNodes);
-          }
-        }
+        if (source && destination) destination.innerHTML = source.innerHTML;
+        if (inventorySource && inventoryDestination) inventoryDestination.innerHTML = inventorySource.innerHTML;
         if (skuSource && skuDestination) {
-          if (window.safeSetHTML) { window.safeSetHTML(skuDestination, skuSource.innerHTML); }
-          else {
-            const temp = document.createElement('div'); temp.innerHTML = skuSource.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); skuDestination.replaceChildren(...temp.childNodes);
-          }
+          skuDestination.innerHTML = skuSource.innerHTML;
           skuDestination.classList.toggle('hidden', skuSource.classList.contains('hidden'));
         }
 
         if (volumePricingSource && volumePricingDestination) {
-          if (window.safeSetHTML) { window.safeSetHTML(volumePricingDestination, volumePricingSource.innerHTML); }
-          else { const temp = document.createElement('div'); temp.innerHTML = volumePricingSource.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); volumePricingDestination.replaceChildren(...temp.childNodes); }
+          volumePricingDestination.innerHTML = volumePricingSource.innerHTML;
         }
 
         if (pricePerItemSource && pricePerItemDestination) {
-          if (window.safeSetHTML) { window.safeSetHTML(pricePerItemDestination, pricePerItemSource.innerHTML); }
-          else { const temp = document.createElement('div'); temp.innerHTML = pricePerItemSource.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); pricePerItemDestination.replaceChildren(...temp.childNodes); }
+          pricePerItemDestination.innerHTML = pricePerItemSource.innerHTML;
           pricePerItemDestination.classList.toggle('hidden', pricePerItemSource.classList.contains('hidden'));
         }
 
@@ -1262,12 +1247,12 @@ class ProductRecommendations extends HTMLElement {
       fetch(this.dataset.url)
         .then((response) => response.text())
         .then((text) => {
-          const parsed = new DOMParser().parseFromString(text, 'text/html');
-          const recommendations = parsed.querySelector('product-recommendations');
+          const html = document.createElement('div');
+          html.innerHTML = text;
+          const recommendations = html.querySelector('product-recommendations');
 
           if (recommendations && recommendations.innerHTML.trim().length) {
-            if (window.safeSetHTML) { window.safeSetHTML(this, recommendations.innerHTML); }
-            else { const temp = document.createElement('div'); temp.innerHTML = recommendations.innerHTML; temp.querySelectorAll('script').forEach((s)=>s.remove()); this.replaceChildren(...temp.childNodes); }
+            this.innerHTML = recommendations.innerHTML;
           }
 
           if (!this.querySelector('slideshow-component') && this.classList.contains('complementary-products')) {

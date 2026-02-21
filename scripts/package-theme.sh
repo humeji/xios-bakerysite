@@ -128,13 +128,26 @@ if [[ ! -d "$THEME_DIR" ]]; then
   exit 1
 fi
 
-SETTINGS_JSON="$THEME_DIR/config/settings_schema.json"
-if [[ ! -f "$SETTINGS_JSON" ]]; then
-  echo "[ERROR] settings_schema.json not found at $SETTINGS_JSON" >&2
+SETTINGS_SCHEMA="$THEME_DIR/config/settings_schema.json"
+if [[ ! -f "$SETTINGS_SCHEMA" ]]; then
+  echo "[ERROR] settings_schema.json not found at $SETTINGS_SCHEMA" >&2
   exit 1
 fi
 
-echo "[SUCCESS] Theme source verified."
+SETTINGS_DATA="$THEME_DIR/config/settings_data.json"
+if [[ ! -f "$SETTINGS_DATA" ]]; then
+  echo "[ERROR] settings_data.json not found at $SETTINGS_DATA" >&2
+  echo "" >&2
+  echo "  This file contains the store's customizer settings (logo, colors," >&2
+  echo "  typography, etc.). Without it, uploaded themes will display Liquid" >&2
+  echo "  errors and missing branding." >&2
+  echo "" >&2
+  echo "  To fix: export settings_data.json from the live Shopify theme" >&2
+  echo "  and place it at $SETTINGS_DATA" >&2
+  exit 1
+fi
+
+echo "[SUCCESS] Theme source verified (schema + settings data)."
 echo ""
 
 # ---------------------------------------------------------------

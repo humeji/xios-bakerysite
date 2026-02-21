@@ -270,6 +270,18 @@ Every Cursor plan that modifies theme code must have a folder under `docs/plans/
 6. Add tests for any new JS logic
 7. Update `PLANNING.md` configuration table
 
+### Updating Store Customizer Settings (settings_data.json)
+
+The file `config/settings_data.json` stores the actual values for the store's customizer settings (logo, colors, typography, social links, color schemes, etc.). This file is included in every theme ZIP so that new uploads preserve the store's branding.
+
+**When to update:** If the store owner changes the logo, colors, or other customizer settings through the Shopify admin, the repo copy must be refreshed:
+
+1. Go to Shopify Admin > Online Store > Themes
+2. On the **live** theme, click "..." > navigate to code editor
+3. Open `config/settings_data.json` and copy the contents
+4. Replace `themes/current/config/settings_data.json` and `themes/development/config/settings_data.json`
+5. The packaging script validates this file exists before creating a ZIP
+
 ### Adding a New Product Type Exemption
 
 The current system uses `requires_shipping === false` to detect digital products. If a new exemption pattern is needed:
@@ -286,7 +298,7 @@ The current system uses `requires_shipping === false` to detect digital products
 | Area | Primary Files |
 |------|--------------|
 | Cart validation | `assets/custom.js`, `sections/main-cart-items.liquid`, `snippets/cart-drawer.liquid` |
-| Theme settings | `config/settings_schema.json` |
+| Theme settings | `config/settings_schema.json`, `config/settings_data.json` |
 | Security | `assets/security-utils.js`, `layout/theme.liquid` (CSP) |
 | Styling | `assets/custom.css` |
 | Localization | `locales/en.default.json`, `locales/es.json` |

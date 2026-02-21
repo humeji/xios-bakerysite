@@ -70,7 +70,9 @@ class CartItems extends HTMLElement {
         .then((responseText) => {
           const html = new DOMParser().parseFromString(responseText, 'text/html');
           const sourceQty = html.querySelector('cart-items');
-          this.innerHTML = sourceQty.innerHTML;
+          if (sourceQty) {
+            this.innerHTML = sourceQty.innerHTML;
+          }
         })
         .catch((e) => {
           console.error(e);
@@ -182,7 +184,13 @@ class CartItems extends HTMLElement {
   updateLiveRegions(line, message) {
     const lineItemError =
       document.getElementById(`Line-item-error-${line}`) || document.getElementById(`CartDrawer-LineItemError-${line}`);
-    if (lineItemError) lineItemError.querySelector('.cart-item__error-text').innerHTML = message;
+    if (lineItemError) {
+      const errorTextEl = lineItemError.querySelector('.cart-item__error-text');
+      if (errorTextEl) {
+        // message is controlled string from theme, but use textContent to avoid any injection
+        errorTextEl.textContent = message;
+      }
+    }
 
     this.lineItemStatusElement.setAttribute('aria-hidden', true);
 

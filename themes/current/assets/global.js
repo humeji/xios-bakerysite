@@ -320,7 +320,7 @@ Shopify.CountryProvinceSelector.prototype = {
       for (var i = 0; i < provinces.length; i++) {
         var opt = document.createElement('option');
         opt.value = provinces[i][0];
-        opt.innerHTML = provinces[i][1];
+        opt.textContent = provinces[i][1];
         this.provinceEl.appendChild(opt);
       }
 
@@ -338,7 +338,7 @@ Shopify.CountryProvinceSelector.prototype = {
     for (var i = 0, count = values.length; i < values.length; i++) {
       var opt = document.createElement('option');
       opt.value = values[i];
-      opt.innerHTML = values[i];
+      opt.textContent = values[i];
       selector.appendChild(opt);
     }
   },
@@ -1010,7 +1010,7 @@ class VariantSelects extends HTMLElement {
       }
     } else if (tagName === 'INPUT' && target.type === 'radio') {
       const selectedSwatchValue = this.querySelector(`[data-selected-swatch-value="${name}"]`);
-      if (selectedSwatchValue) selectedSwatchValue.innerHTML = value;
+      if (selectedSwatchValue) selectedSwatchValue.textContent = value;
     }
   }
 
@@ -1090,7 +1090,7 @@ class VariantSelects extends HTMLElement {
       pickUpAvailability.fetchAvailability(this.currentVariant.id);
     } else {
       pickUpAvailability.removeAttribute('available');
-      pickUpAvailability.innerHTML = '';
+      pickUpAvailability.textContent = '';
     }
   }
 
@@ -1247,9 +1247,8 @@ class ProductRecommendations extends HTMLElement {
       fetch(this.dataset.url)
         .then((response) => response.text())
         .then((text) => {
-          const html = document.createElement('div');
-          html.innerHTML = text;
-          const recommendations = html.querySelector('product-recommendations');
+          const parsed = new DOMParser().parseFromString(text, 'text/html');
+          const recommendations = parsed.querySelector('product-recommendations');
 
           if (recommendations && recommendations.innerHTML.trim().length) {
             this.innerHTML = recommendations.innerHTML;

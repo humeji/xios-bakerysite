@@ -209,7 +209,11 @@ The `shopify` branch is an auto-generated orphan branch that contains only the c
 **Important:**
 
 - Never commit directly to the `shopify` branch -- it is force-pushed on every sync
+- Never merge the `shopify` branch into any other branch
 - The `shopify` branch is excluded from CI (no `package.json` or tests on that branch)
+- A backup tag (`shopify-backup/YYYYMMDD-HHMMSS`) is created automatically before each sync
+- To rollback: `git push --force origin shopify-backup/YYYYMMDD-HHMMSS^{}:shopify`
+- Always preview the connected theme in Shopify Admin before publishing
 - For initial setup or manual rebuild, run `./scripts/create-shopify-branch.sh`
 
 For packaging prerequisites, naming conventions, versioning, and the `--ci` flag, see [`scripts/README.md`](scripts/README.md).
@@ -233,6 +237,7 @@ For packaging prerequisites, naming conventions, versioning, and the `--ci` flag
 | `.cursor/rules/sonarqube-quality-gate.mdc` | EN | Cursor rule enforcing SonarQube zero-issue gate |
 | `.cursor/rules/plan-documentation.mdc` | EN | Cursor rule enforcing plan-scoped documentation |
 | `.cursor/rules/plan-kickoff.mdc` | EN | Cursor rule enforcing plan kickoff review |
+| `.cursor/rules/shopify-branch-protection.mdc` | EN | Cursor rule preventing direct commits/merges to the `shopify` branch |
 | `.github/SECURITY.md` | EN | Security policy, audit history, vulnerability reporting |
 | `security/README.md` | EN | Security audit reports and XSS remediation |
 | `eslint.config.mjs` | EN | ESLint flat config with SonarJS rules for quality gates |

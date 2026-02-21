@@ -4,6 +4,7 @@ set -euo pipefail
 # Creates (or recreates) the orphan `shopify` branch from themes/current/
 # so that Shopify GitHub integration sees a valid theme at root level.
 # Safe to run from any branch -- uses a temp clone, no working-tree changes.
+# Backs up the existing shopify branch as a tag before overwriting.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 THEME_DIR="${REPO_ROOT}/themes/current"
@@ -16,6 +17,17 @@ fi
 
 REMOTE_URL=$(git -C "$REPO_ROOT" remote get-url origin)
 COMMIT_SHA=$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo "initial")
+
+if git -C "$REPO_ROOT" ls-remote --exit-code origin "$BRANCH" > /dev/null 2>&1; then
+  TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+  BACKUP_TAG="shopify-backup/${TIMESTAMP}"
+  echo "[INFO] Backing up current shopify branch as tag: ${BACKUP_TAG}"
+  git -C "$REPO_ROOT" fetch origin "$BRANCH" > /dev/null 2>&1
+  git -C "$REPO_ROOT" tag "$BACKUP_TAG" "origin/${BRANCH}"
+  git -C "$REPO_ROOT" push origin "$BACKUP_TAG" 2>&1
+  echo "[SUCCESS] Backup tag created: ${BACKUP_TAG}"
+  echo ""
+fi
 
 CLONE_DIR=$(mktemp -d)
 trap 'rm -rf "$CLONE_DIR"' EXIT
@@ -44,3 +56,10 @@ cd "$REPO_ROOT"
 echo ""
 echo "[SUCCESS] Branch '${BRANCH}' pushed to origin."
 echo "[INFO] In Shopify Admin > Themes > Connect theme, select the '${BRANCH}' branch."
+echo ""
+echo "To rollback to the previous version:"
+if [ -n "${BACKUP_TAG:-}" ]; then
+  echo "  git push --force origin ${BACKUP_TAG}^{}:shopify"
+else
+  echo "  (no previous version -- this was the first sync)"
+fi

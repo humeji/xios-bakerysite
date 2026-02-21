@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "current": {
     "logo": "shopify://shop_images/Nuevo_Logo_XioCookies_Cuadrada_a44f63ce-a457-47f7-ae9e-626c8e35ee7e.png",
@@ -102,7 +111,7 @@
     "brand_description": "<p></p>",
     "brand_image_width": 100,
     "social_facebook_link": "https://www.facebook.com/profile.php?id=100092603313289&mibextid=wwXIfr",
-    "social_instagram_link": "https://www.instagram.com/xios.bakery",
+    "social_instagram_link": "https://www.instagram.com/xiocookies/",
     "social_youtube_link": "",
     "social_tiktok_link": "www.tiktok.com/@xiosbakery",
     "social_twitter_link": "",

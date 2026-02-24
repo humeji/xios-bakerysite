@@ -1,64 +1,80 @@
-# Propuesta de Trabajo -- Auditoría de Seguridad 2026 (Revisada)
+# Propuesta de Trabajo -- Auditoria de Seguridad 2026
 
-**Versión:** 2.0
-**Fecha original:** 20 de febrero de 2026
-**Fecha de revisión:** 21 de febrero de 2026
+**Fecha:** 23 de febrero de 2026
+
 **Cliente:** Xiomarly Perez -- Xio's Bakery
+
 **Sitio Web:** xiosbakery.com
+
 **Preparado por:** Hugo Mejia
 
 ---
 
 ## Resumen Ejecutivo
 
-El 20 de febrero de 2026 se inició la auditoría de seguridad pero **no se completó correctamente**. Las vulnerabilidades identificadas no fueron resueltas de forma adecuada, y el código quedó con los problemas de seguridad sin atender. El resultado directo de dejar estos problemas sin resolver fue **2 horas adicionales de depuración** durante el desarrollo de otras funcionalidades, donde la causa raíz de los errores encontrados fue precisamente la falta de corrección de los hallazgos de la auditoría.
+Desde el 20 de febrero de 2026 se han acumulado **3.5 horas de trabajo de depuracion y pruebas** distribuidas en tres sesiones. Estas sesiones fueron necesarias para estabilizar el tema y asegurar que la funcionalidad existente no se rompa al aplicar cambios futuros.
 
-**Problemas causados por no completar la auditoría correctamente:**
+**Cronologia del trabajo de depuracion:**
 
-- El encabezado del sitio dejó de mostrar el logotipo
-- La notificación de "producto agregado al carrito" dejó de funcionar
-- El contador del ícono del carrito dejó de actualizarse
-- Los botones de pago dinámico (Shop Pay, Apple Pay) no se ocultaban correctamente
+| Fecha | Duracion | Que Sucedio |
+|-------|----------|-------------|
+| 20-21 Feb | 2 horas | La auditoria de seguridad rompio el encabezado, carrito y notificaciones. Se crearon 11 PRs de correccion y 37 pruebas de regresion |
+| 23 Feb | 1 hora | La funcionalidad de minimo de pedido no se activo despues de publicar el tema. Causa: las 5 configuraciones del carrito faltaban en `settings_data.json` |
+| 23 Feb | 30 min | Configuracion del correo personalizado (`info@xiosbakery.com`) y actualizacion de guia en espanol |
 
-Estos problemas se corrigieron de forma reactiva (11 PRs), y durante esas 2 horas adicionales de depuración también se crearon **37 pruebas de validación automatizadas** (pruebas de regresión) que verifican que estos errores específicos no vuelvan a ocurrir. Estas pruebas ahora forman parte del pipeline de calidad de tu tienda y servirán como **red de protección durante la próxima auditoría**, asegurando que al aplicar las correcciones de seguridad no se introduzcan los mismos problemas que vimos hoy.
+**Costo total de depuracion hasta hoy:** 3.5 horas x $90/hora = **$315 USD**
 
-Sin embargo, **las vulnerabilidades de seguridad originales siguen sin resolver**. Esto demuestra que no completar una auditoría de seguridad tiene un costo real y medible.
+Este trabajo de depuracion dejo como resultado una base mucho mas solida: el codigo actual (v13.6.7) tiene **86 pruebas automatizadas**, un pipeline CI/CD funcional, y configuracion verificada. La auditoria de seguridad que se propone aqui resolvera las vulnerabilidades pendientes sobre esta base estable.
 
-**Se necesita completar la auditoría con un enfoque correcto y verificado, ahora respaldado por las pruebas de regresión creadas.**
+**Completar la auditoria correctamente ahora evitara futuros ciclos de depuracion, agilizara nuevas funcionalidades y facilitara el mantenimiento del sitio.**
 
 ---
 
-## Por Qué Es Importante Para Tu Negocio
+## Por Que Es Importante Para Tu Negocio
 
-### [RIESGO] Protección de Datos de Tus Clientes
+### [RIESGO] Proteccion de Datos de Tus Clientes
 
-Cada vez que un cliente compra productos de panadería o un recetario en tu tienda, comparte información personal: nombre, correo electrónico, dirección y datos de pago. Si el sitio tiene vulnerabilidades de seguridad, esta información podría estar en riesgo.
+Cada vez que un cliente compra productos de panaderia o un recetario en tu tienda, comparte informacion personal: nombre, correo electronico, direccion y datos de pago. Si el sitio tiene vulnerabilidades de seguridad, esta informacion podria estar en riesgo.
 
 **Lo que esto significa para tu negocio:**
-- Un problema de seguridad puede resultar en **pérdida de confianza** de tus clientes
-- Shopify podría **desactivar tu tienda** temporalmente si detecta vulnerabilidades graves
+- Un problema de seguridad puede resultar en **perdida de confianza** de tus clientes
+- Shopify podria **desactivar tu tienda** temporalmente si detecta vulnerabilidades graves
 - Los clientes que se enteran de problemas de seguridad **dejan de comprar**
 
-### [RIESGO] Cambios Desde la Última Revisión
+### [RIESGO] Por Que El Mantenimiento Reactivo Sale Mas Caro
 
-Desde agosto 2025, se han realizado múltiples actualizaciones al código de tu tienda:
+Las 3.5 horas de depuracion de esta semana demuestran un patron: cuando los problemas no se resuelven de forma planificada, cada cambio futuro tiene el riesgo de generar nuevos problemas en cascada.
 
-| Actualización | Fecha | Qué Cambió |
+| Patron | Ejemplo Esta Semana | Costo |
+|--------|---------------------|-------|
+| Cambio sin pruebas previas | La auditoria rompio el carrito y las notificaciones | 2 hrs ($180) |
+| Configuracion incompleta | Las settings del carrito no estaban en `settings_data.json` | 1 hr ($90) |
+| Soporte no planificado | Configuracion de correo personalizado | 30 min ($45) |
+| **Total reactivo** | | **$315** |
+
+**La auditoria de seguridad ($270) cuesta menos que lo que ya se gasto en depuracion reactiva ($315).** Y a diferencia de la depuracion, la auditoria deja una base estable que previene futuros problemas.
+
+### [RIESGO] Cambios Recientes en Tu Sitio
+
+Desde agosto 2025, se han realizado multiples actualizaciones al codigo de tu tienda:
+
+| Actualizacion | Fecha | Que Cambio |
 |---------------|-------|------------|
-| Corrección de widgets CSS | Diciembre 2025 | Cambios en cómo se muestran elementos del sitio |
-| Mínimo de pedido y productos digitales | Febrero 2026 | Nuevo código para el carrito y validación de pagos |
-| Pipeline de calidad (CI/CD) | Febrero 2026 | Herramientas automáticas de pruebas y publicación |
-| Primer intento de auditoría de seguridad | 20 Feb 2026 | Correcciones aplicadas y luego revertidas |
-| Corrección de regresiones (PRs #14-#24) | 20-21 Feb 2026 | 11 PRs para restaurar funcionalidad del tema |
-| Pruebas de regresión (PR #25) | 21 Feb 2026 | 37 pruebas nuevas para prevenir regresiones futuras |
+| Correccion de widgets CSS | Diciembre 2025 | Cambios en como se muestran elementos del sitio |
+| Minimo de pedido y productos digitales | Febrero 2026 | Nuevo codigo para el carrito y validacion de pagos |
+| Pipeline de calidad (CI/CD) | Febrero 2026 | Herramientas automaticas de pruebas y publicacion |
+| Trabajo de seguridad y depuracion | 20-21 Feb 2026 | Correcciones de seguridad, restauracion de funcionalidad (11 PRs), 37 pruebas de regresion |
+| Correccion de settings del carrito | 23 Feb 2026 | Configuracion explicita para activar minimo de pedido al publicar |
+| Actualizacion automatica de dependencias | 23 Feb 2026 | Paquetes de desarrollo actualizados por Dependabot |
+| Configuracion de correo personalizado | 23 Feb 2026 | `info@xiosbakery.com` configurado como remitente en Shopify |
 
-**El código actual (v13.6.6) tiene la funcionalidad intacta pero las correcciones de seguridad fueron parcialmente revertidas.**
+**El codigo actual (v13.6.7) tiene la funcionalidad intacta, 86 pruebas automatizadas, y las correcciones de seguridad siguen pendientes.**
 
 ---
 
 ## Estado Actual de Seguridad
 
-### Lo Que Sigue Activo del Primer Intento
+### Protecciones Ya Activas en Tu Sitio
 
 | Componente | Estado | Detalle |
 |------------|--------|---------|
@@ -67,94 +83,104 @@ Desde agosto 2025, se han realizado múltiples actualizaciones al código de tu 
 | `third-party-security.js` | [ACTIVO] | Protecciones para scripts de terceros |
 | Cambios de `textContent` en `global.js` | [ACTIVO] | Reemplazos seguros que no afectan funcionalidad |
 | `_stripDangerousAttrs` en archivos no-core | [ACTIVO] | En facets.js, predictive-search.js, etc. |
-| `npm audit` en CI/CD | [ACTIVO] | Escaneo automático de dependencias |
-| `dependabot.yml` | [ACTIVO] | Actualizaciones automáticas de paquetes |
-| 37 pruebas de regresión | [ACTIVO] | Previenen que se repitan los errores de hoy |
+| `npm audit` en CI/CD | [ACTIVO] | Escaneo automatico de dependencias |
+| `dependabot.yml` | [ACTIVO] | Actualizaciones automaticas de paquetes |
+| 86 pruebas automatizadas | [ACTIVO] | 49 originales + 37 de regresion |
+| Settings explicitas en `settings_data.json` | [ACTIVO] | Las 5 settings del carrito ahora estan en el archivo de datos |
 
 ### Vulnerabilidades Que Siguen Sin Resolver
 
-Estos problemas de seguridad fueron identificados pero **no se corrigieron correctamente**, lo que directamente causó 2 horas adicionales de depuración:
-
 | Vulnerabilidad | Estado | Impacto de No Corregirla |
 |----------------|--------|--------------------------|
-| `innerHTML` sin sanitizar en Dawn core JS | [PENDIENTE] | Riesgo de inyección de código (XSS) en carrito y notificaciones |
-| Política CSP débil en `theme.liquid` | [PENDIENTE] | Protección del navegador incompleta contra scripts maliciosos |
-| Configuración de versión del tema | [PENDIENTE] | Incompatibilidad al actualizar que rompe el encabezado |
+| `innerHTML` sin sanitizar en Dawn core JS | [PENDIENTE] | Riesgo de inyeccion de codigo (XSS) en carrito y notificaciones |
+| Politica CSP debil en `theme.liquid` | [PENDIENTE] | Proteccion del navegador incompleta contra scripts maliciosos |
+| Configuracion de version del tema | [PENDIENTE] | Incompatibilidad al actualizar que rompe el encabezado |
 
 ---
 
-## Lo Que Se Hará en la Nueva Auditoría
+## Lo Que Se Hara en la Nueva Auditoria
 
-### Lecciones Aprendidas del Primer Intento
+### Lecciones Aprendidas del Trabajo de Depuracion
 
-El primer intento falló porque las vulnerabilidades no se corrigieron de forma compatible con la plataforma. Específicamente:
+Las 3.5 horas de depuracion de esta semana dejaron lecciones claras que guiaran el enfoque de la auditoria:
 
-1. **Las vulnerabilidades de seguridad son reales** -- los hallazgos de la auditoría (uso inseguro de `innerHTML`, CSP débil, falta de escaneo de dependencias) son problemas legítimos que necesitan corrección
-2. **No corregirlas tiene un costo directo** -- dejar el código con estos problemas sin resolver causó 2 horas adicionales de depuración ($180 USD a tu tarifa). Sin embargo, durante esas 2 horas se crearon 37 pruebas de regresión que ahora protegen contra los mismos errores en la próxima auditoría
-3. **El enfoque de corrección importa** -- Dawn (el tema base de Shopify) depende internamente de `innerHTML` para su sistema de renderizado de secciones, por lo que las correcciones deben respetar esa arquitectura
+1. **Los archivos core de Dawn no se deben modificar directamente** -- El sistema de renderizado de secciones de Dawn depende internamente de `innerHTML`. Las correcciones deben ser compatibles con esta arquitectura
+2. **`settings_data.json` debe estar sincronizado con `settings_schema.json`** -- Los defaults del schema no siempre se aplican al subir un ZIP. Las settings deben estar explicitas en ambos archivos
+3. **Los cambios de CSP deben aplicarse uno por uno** -- Aplicar todos los cambios de CSP juntos hizo imposible identificar cual rompio la carga de fuentes y el encabezado
+4. **Las pruebas de regresion son la red de seguridad** -- Las 86 pruebas actuales atrapan errores antes de que lleguen a produccion. Cada correccion nueva de seguridad necesita sus propias pruebas
 
-**La nueva auditoría corregirá las mismas vulnerabilidades pero con un enfoque compatible con Dawn.**
+**La auditoria aplicara estas lecciones desde el inicio.**
 
-### 1. Auditoría Fresca del Código Actual (v13.6.6)
+### 1. Auditoria Fresca del Codigo Actual (v13.6.7)
 
-Revisión completa de TODOS los archivos JavaScript del tema actual, incluyendo los cambios de las 11 PRs recientes:
+Revision completa de TODOS los archivos JavaScript del tema actual, incluyendo los cambios de los 27 PRs:
 
-- Verificar que los archivos core de Dawn no tengan modificaciones de seguridad que rompan funcionalidad
-- Verificar que los archivos custom (`custom.js`, `security-utils.js`, etc.) estén correctamente protegidos
-- Validar que no se hayan introducido nuevas vulnerabilidades en los 11 PRs recientes
+- Verificar que los archivos core de Dawn no tengan modificaciones que rompan funcionalidad
+- Verificar que los archivos custom (`custom.js`, `security-utils.js`, etc.) esten correctamente protegidos
+- Validar que no se hayan introducido nuevas vulnerabilidades en los PRs recientes
+- Verificar integridad de configuracion (`settings_schema.json` vs `settings_data.json`)
 
 ### 2. Enfoque de Seguridad Alternativo para Dawn Core
 
 En lugar de modificar los archivos core de Dawn directamente:
 
-- **Política CSP incremental:** Aplicar cambios de CSP uno a uno, probando cada cambio en Shopify antes de avanzar
-- **Monitoreo sin modificación:** Usar `security-utils.js` como observador/monitor, no como reemplazo de funciones Dawn
-- **Sanitización en la entrada:** Proteger donde los datos del usuario ENTRAN al sistema, no donde Dawn renderiza secciones internamente
+- **Politica CSP incremental:** Aplicar cambios de CSP uno a uno, probando cada cambio en Shopify antes de avanzar
+- **Monitoreo sin modificacion:** Usar `security-utils.js` como observador/monitor, no como reemplazo de funciones Dawn
+- **Sanitizacion en la entrada:** Proteger donde los datos del usuario ENTRAN al sistema, no donde Dawn renderiza secciones internamente
 
-### 3. Revisión de Política de Seguridad del Navegador (CSP)
+### 3. Revision de Politica de Seguridad del Navegador (CSP)
 
-- Aplicar cambios de CSP **incrementalmente** con verificación en Shopify entre cada cambio
-- Documentar exactamente qué directivas pueden y no pueden modificarse sin romper el tema
+- Aplicar cambios de CSP **incrementalmente** con verificacion en Shopify entre cada cambio
+- Documentar exactamente que directivas pueden y no pueden modificarse sin romper el tema
 - Mantener compatibilidad con las fuentes de Google y CDNs requeridos
 
-### 4. Verificación de Dependencias y CI/CD
+### 4. Verificacion de Dependencias y CI/CD
 
 - Re-ejecutar escaneo completo de dependencias
-- Verificar que `npm audit` y Dependabot estén funcionando correctamente
+- Verificar que `npm audit` y Dependabot esten funcionando correctamente
 - Actualizar dependencias con vulnerabilidades conocidas si es posible
 
 ### 5. Reporte Actualizado
 
-- Actualizar los reportes de auditoría (EN/ES) para reflejar el estado real
-- Documentar qué correcciones se mantuvieron, cuáles se revertieron y por qué
+- Actualizar los reportes de auditoria (EN/ES) para reflejar el estado real
+- Documentar que correcciones se mantuvieron, cuales se revertieron y por que
 - Nuevas recomendaciones basadas en las lecciones aprendidas
 
 ---
 
 ## Tu Sitio Ya Cuenta Con Infraestructura Profesional
 
-Antes de esta auditoría, ya invertimos en construir un **sistema de control de calidad automatizado** (pipeline CI/CD) para tu tienda. Después del trabajo de hoy, este sistema ahora incluye **86 pruebas automáticas** (49 originales + 37 de regresión).
+Antes de esta auditoria, ya invertimos en construir un **sistema de control de calidad automatizado** (pipeline CI/CD) para tu tienda. Despues del trabajo de esta semana, este sistema ahora incluye **86 pruebas automaticas** y configuracion verificada.
 
-### Cómo Funciona a Tu Favor
+### Como Funciona a Tu Favor
 
-| Nivel | Qué Hace | Por Qué Importa |
+| Nivel | Que Hace | Por Que Importa |
 |-------|----------|-----------------|
-| 1. Revisión al guardar | Analiza el código inmediatamente cuando el desarrollador guarda su trabajo | Detecta errores básicos al instante |
-| 2. Revisión al proponer cambios | Ejecuta **86 pruebas automáticas** + análisis de calidad de código | Ningún cambio puede aprobarse si alguna prueba falla |
-| 3. Revisión al publicar | Vuelve a verificar todo, empaqueta los archivos y crea una versión oficial | Solo código verificado llega a tu tienda |
-| 4. **Pruebas de regresión** | **37 pruebas específicas que verifican que los errores de hoy no se repitan** | **Red de seguridad contra regresiones** |
+| 1. Revision al guardar | Analiza el codigo inmediatamente cuando el desarrollador guarda su trabajo | Detecta errores basicos al instante |
+| 2. Revision al proponer cambios | Ejecuta **86 pruebas automaticas** + analisis de calidad de codigo | Ningun cambio puede aprobarse si alguna prueba falla |
+| 3. Revision al publicar | Vuelve a verificar todo, empaqueta los archivos y crea una version oficial | Solo codigo verificado llega a tu tienda |
+| 4. Pruebas de regresion | 37 pruebas especificas que verifican que los errores pasados no se repitan | Red de seguridad contra regresiones |
+| 5. Dependabot | Actualizacion automatica de paquetes con vulnerabilidades conocidas | Seguridad proactiva sin intervencion manual |
+
+### Beneficio Para Futuras Funcionalidades
+
+Con la base actual (86 pruebas + CI/CD + configuracion verificada), agregar nuevas funcionalidades a tu tienda sera:
+
+- **Mas rapido** -- Las pruebas automaticas detectan problemas inmediatamente en lugar de despues de publicar
+- **Mas seguro** -- Cada cambio pasa por 3 capas de verificacion antes de llegar a produccion
+- **Mas economico** -- Menos horas de depuracion reactiva significan menor costo por funcionalidad nueva
 
 ---
 
-## Lo Que Recibirás
+## Lo Que Recibiras
 
-| Entregable | Descripción |
+| Entregable | Descripcion |
 |------------|-------------|
-| Código corregido (enfoque revisado) | Correcciones de seguridad que no rompen funcionalidad del tema |
-| Reporte de auditoría actualizado (EN/ES) | Documento detallado reflejando el estado real post-regresiones |
-| CSP incremental verificada | Política de seguridad aplicada y probada paso a paso |
-| Pruebas de regresión expandidas | Cobertura de pruebas para cada corrección de seguridad aplicada |
-| Documentación actualizada | Política de seguridad, changelog y planes actualizados |
+| Codigo corregido (enfoque revisado) | Correcciones de seguridad que no rompen funcionalidad del tema |
+| Reporte de auditoria actualizado (EN/ES) | Documento detallado reflejando el estado real post-depuracion |
+| CSP incremental verificada | Politica de seguridad aplicada y probada paso a paso |
+| Pruebas de regresion expandidas | Cobertura de pruebas para cada correccion de seguridad aplicada |
+| Documentacion actualizada | Politica de seguridad, changelog y planes actualizados |
 
 ---
 
@@ -164,42 +190,49 @@ Antes de esta auditoría, ya invertimos en construir un **sistema de control de 
 
 | Concepto | Detalle |
 |----------|---------|
-| Tarifa estándar | $150.00 USD/hora |
-| **Tarifa amigos/familia (tu tarifa)** | **$90.00 USD/hora** |
+| Tarifa estandar | $150 USD/hora |
+| **Tarifa amigos/familia (tu tarifa)** | **$90 USD/hora** |
 
-### Tiempo Estimado
+### Tiempo Estimado para la Auditoria
 
 | Tarea | Tiempo |
 |-------|--------|
-| Auditoría fresca del código actual (v13.6.6, ~20 archivos JS) | 40 min |
-| Diseño e implementación de enfoque alternativo para Dawn core | 45 min |
-| Aplicación incremental de CSP con verificación en Shopify | 30 min |
-| Verificación de dependencias y CI/CD | 10 min |
-| Pruebas y verificación (86+ tests + lint + SonarQube) | 20 min |
-| Actualización de reportes y documentación (EN/ES) | 15 min |
-| Creación de pruebas de regresión para cada corrección nueva | 20 min |
+| Auditoria fresca del codigo actual (v13.6.7, ~20 archivos JS) | 40 min |
+| Diseno e implementacion de enfoque alternativo para Dawn core | 45 min |
+| Aplicacion incremental de CSP con verificacion en Shopify | 30 min |
+| Verificacion de dependencias y CI/CD | 10 min |
+| Pruebas y verificacion (86+ tests + lint + SonarQube) | 20 min |
+| Actualizacion de reportes y documentacion (EN/ES) | 15 min |
+| Creacion de pruebas de regresion para cada correccion nueva | 20 min |
 | **Total** | **~3 horas** |
 
 ### Resumen de Costos
 
 | Concepto | Costo |
 |----------|-------|
-| 3 horas x $90.00 USD/hora (tarifa amigos/familia) | **$270.00 USD** |
+| **Trabajo ya facturado: depuracion y pruebas (3.5 hrs)** | **$315 USD** |
+| | |
+| Sesion 1 (20-21 Feb): Regresiones de auditoria + 37 pruebas + 11 PRs | $180 |
+| Sesion 2 (23 Feb): Diagnostico y correccion de `settings_data.json` + release | $90 |
+| Sesion 3 (23 Feb): Configuracion de correo + actualizacion de guia | $45 |
+| | |
+| **Auditoria de seguridad propuesta (3 hrs)** | **$270 USD** |
 | Reporte bilingue actualizado (EN/ES) | Incluido |
-| Pruebas de regresión adicionales | Incluido |
-| **Total** | **$270.00 USD** |
+| Pruebas de regresion adicionales | Incluido |
 
 ---
 
-## Comparación de Costos
+## Comparacion de Costos
 
 | Escenario | Costo Estimado |
 |-----------|---------------|
-| **Esta auditoría de seguridad (revisada)** | **$270 USD** |
-| **Costo ya incurrido por no completar la auditoría (2 hrs)** | **$180 USD (a tu tarifa) -- incluye 37 pruebas de regresión que protegen la próxima auditoría** |
-| Auditoría de seguridad por empresa externa (mínimo) | $500 -- $2,000 USD |
-| Recuperación después de un incidente de seguridad | $1,000 -- $10,000+ USD |
-| Pérdida de ventas por sitio marcado como inseguro | Incalculable |
+| **Depuracion reactiva ya incurrida (3.5 hrs)** | **$315 USD** |
+| **Auditoria de seguridad propuesta (3 hrs)** | **$270 USD** |
+| Auditoria de seguridad por empresa externa (minimo) | $500 -- $2,000 USD |
+| Recuperacion despues de un incidente de seguridad | $1,000 -- $10,000+ USD |
+| Perdida de ventas por sitio marcado como inseguro | Incalculable |
+
+**La depuracion reactiva ($315) ya costo mas que la auditoria planificada ($270).** Completar la auditoria ahora rompe el ciclo de depuracion y deja una base estable para el futuro.
 
 ---
 
@@ -207,68 +240,87 @@ Antes de esta auditoría, ya invertimos en construir un **sistema de control de 
 
 ### Incluido en Este Trabajo ($270 USD)
 
-- [SI] Auditoría fresca de seguridad del código actual (v13.6.6)
-- [SI] Corrección de vulnerabilidades con enfoque que respeta los archivos core de Dawn
-- [SI] Aplicación incremental de CSP con verificación en Shopify
-- [SI] Verificación de dependencias y herramientas automáticas
-- [SI] Actualización de reportes de auditoría en inglés y español
-- [SI] Pruebas de regresión para cada corrección nueva
-- [SI] Actualización de toda la documentación de seguridad del proyecto
+- [SI] Auditoria fresca de seguridad del codigo actual (v13.6.7)
+- [SI] Correccion de vulnerabilidades con enfoque que respeta los archivos core de Dawn
+- [SI] Aplicacion incremental de CSP con verificacion en Shopify
+- [SI] Verificacion de dependencias y herramientas automaticas
+- [SI] Actualizacion de reportes de auditoria en ingles y espanol
+- [SI] Pruebas de regresion para cada correccion nueva
+- [SI] Actualizacion de toda la documentacion de seguridad del proyecto
 
 ### NO Incluido
 
-- Cambios de diseño o funcionalidad del sitio
-- Creación de nuevos productos o páginas
-- Cambios al sistema de pagos o envíos
-- Soporte continuo de seguridad (requeriría un acuerdo separado)
+- Cambios de diseno o funcionalidad del sitio
+- Creacion de nuevos productos o paginas
+- Cambios al sistema de pagos o envios
+- Soporte continuo de seguridad (requeriria un acuerdo separado)
+- Trabajo adicional de depuracion si surgen problemas no relacionados con la auditoria
 
 ---
 
-## Diferencias Con la Propuesta Original (v1.0)
+## Por Que Completar La Auditoria Ahora
 
-| Aspecto | Propuesta v1.0 | Propuesta v2.0 (esta) |
-|---------|---------------|----------------------|
-| Enfoque | Reemplazar `innerHTML` con `safeSetHTML` en archivos Dawn | No modificar archivos core de Dawn |
-| Tiempo estimado | ~2 horas | ~3 horas |
-| Costo | $180 USD | $270 USD |
-| CSP | Aplicar todos los cambios de una vez | Aplicar incrementalmente con pruebas |
-| Pruebas de regresión | 49 pruebas | 86+ pruebas (49 originales + 37 creadas durante las 2 hrs de depuración) |
-| Protección contra regresiones | Ninguna | 37 pruebas específicas que evitan repetir los errores del primer intento |
-| Razón del cambio | -- | La auditoría v1.0 no se completó; los bugs sin resolver causaron 2 horas extra de depuración, pero ese tiempo produjo las pruebas que protegen v2.0 |
+### Evitar Mas Ciclos de Depuracion
+
+Cada sesion de depuracion de esta semana tuvo una causa raiz que una auditoria completa detectaria:
+
+| Sesion | Causa Raiz | La Auditoria Lo Detecta? |
+|--------|------------|--------------------------|
+| 20-21 Feb: Regresiones | Cambios de seguridad incompatibles con Dawn core | Si -- revision de compatibilidad es parte del alcance |
+| 23 Feb: Settings no activas | `settings_data.json` desincronizado | Si -- verificacion de integridad de configuracion es parte del alcance |
+| 23 Feb: Correo generico | Correo publico como remitente en Shopify | No -- soporte operativo, fuera del alcance de seguridad |
+
+**2 de las 3 sesiones de depuracion se evitan** con una auditoria completa de seguridad.
+
+### Agilizar Nuevas Funcionalidades
+
+Con la auditoria completada, agregar nuevas funcionalidades sera mas sencillo porque:
+
+1. **No habra deuda tecnica de seguridad** -- Cualquier funcionalidad nueva no tendra que trabajar alrededor de vulnerabilidades conocidas
+2. **La configuracion estara verificada** -- No habra sorpresas al publicar nuevos ZIPs
+3. **Las pruebas de regresion cubriran seguridad** -- Nuevas funcionalidades no romperan las correcciones de seguridad
+
+### Facilitar Mantenimiento Futuro
+
+1. **Documentacion completa** -- Cada correccion estara documentada con su razon y sus pruebas
+2. **CSP documentada** -- Exactamente que directivas se pueden y no se pueden modificar
+3. **Dependencias actualizadas** -- Menos vulnerabilidades conocidas en paquetes
+4. **Pipeline probado** -- 86+ pruebas que validan automaticamente cualquier cambio
 
 ---
 
 ## Frecuencia Recomendada
 
-| Frecuencia | Nivel de Riesgo | Recomendación |
+| Frecuencia | Nivel de Riesgo | Recomendacion |
 |------------|----------------|---------------|
-| Cada 3 meses | Bajo | Recomendado para comercio electrónico |
-| **Cada 6 meses (situación actual)** | **Moderado** | **Mínimo aceptable** |
-| Más de 6 meses | Alto | No recomendado |
+| Cada 3 meses | Bajo | Recomendado para comercio electronico |
+| **Cada 6 meses (situacion actual)** | **Moderado** | **Minimo aceptable** |
+| Mas de 6 meses | Alto | No recomendado |
 
-**Próxima auditoría recomendada:** Mayo 2026 (Q2)
+**Proxima auditoria recomendada:** Mayo 2026 (Q2)
 
 ---
 
-## Aprobación
+## Aprobacion
 
-Por favor confirma tu aprobación para proceder:
+Por favor confirma tu aprobacion para proceder:
 
-- [ ] **Apruebo** la auditoría de seguridad revisada por **$270.00 USD**
+- [ ] **Apruebo** la auditoria de seguridad por **$270 USD**
 - [ ] **No apruebo** -- Por favor contactarme para discutir
 
 ### Al aprobar este documento, entiendes y aceptas que:
 
-1. Se realizará una auditoría fresca de seguridad del código actual del tema (v13.6.6)
-2. Las correcciones de seguridad seguirán un enfoque que NO modifica archivos core de Dawn
-3. Los cambios de CSP se aplicarán incrementalmente con verificación en Shopify
-4. Recibirás un reporte actualizado en inglés y español
-5. Se agregarán pruebas de regresión para cada corrección nueva
-6. Cualquier trabajo adicional no especificado aquí requerirá un nuevo acuerdo
+1. Se realizara una auditoria fresca de seguridad del codigo actual del tema (v13.6.7)
+2. Las correcciones de seguridad seguiran un enfoque que NO modifica archivos core de Dawn
+3. Los cambios de CSP se aplicaran incrementalmente con verificacion en Shopify
+4. Recibiras un reporte actualizado en ingles y espanol
+5. Se agregaran pruebas de regresion para cada correccion nueva
+6. Cualquier trabajo adicional no especificado aqui requerira un nuevo acuerdo
+7. El trabajo de depuracion previo ($315 USD) se factura por separado de esta propuesta
 
 ---
 
-**Para aprobar, por favor responde a este documento indicando tu aprobación, o envía un mensaje confirmando.**
+**Para aprobar, por favor responde a este documento indicando tu aprobacion, o envia un mensaje confirmando.**
 
 ---
 

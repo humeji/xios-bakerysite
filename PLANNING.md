@@ -236,10 +236,8 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 | Document | Language | Purpose |
 |----------|----------|---------|
 | `README.md` | EN | High-level plan completion record |
-| `SOW_MINIMO_PEDIDO_ES.md` | ES | Statement of work and cost estimate |
-| `SOW_RECETARIOS_FIX_ES.md` | ES | Original SOW from Dec 2025 (predecessor) |
 | `GUIA_DESPLIEGUE_MINIMO_PEDIDO_ES.md` | ES | Deployment and interactive testing guide |
-| `GUIA_CONFIGURACION_CORREO_ES.md` | ES | Email configuration guide (optional add-on) |
+| `GUIA_CONFIGURACION_CORREO_ES.md` | ES | Email configuration guide |
 
 ---
 

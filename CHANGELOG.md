@@ -6,38 +6,98 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
-## [13.5.9-exact-production-match] - 2026-02-21
+## [13.6.7-explicit-cart-settings] - 2026-02-23
 
-### Removed
-- Shopify GitHub integration (`shopify` branch, sync workflow, helper script, Cursor rule) -- disconnected and fully removed
-- Reverted security audit JS refactoring and cart minimum order theme code to match working production state
+### Fixed
+- Added explicit cart & checkout settings (`enable_minimum_order`, `minimum_order_amount`, `show_digital_no_refund_message`, messages EN/ES) to `settings_data.json` so minimum order enforcement activates on first ZIP upload without manual configuration
 
 ### Changed
-- Theme files restored to exact production match to resolve persistent header rendering issue on ZIP upload
+- Bumped eslint from 10.0.1 to 10.0.2 (Dependabot)
+
+### Added
+- 37 regression tests in `tests/regression-2026-02-21.test.js` covering theme version integrity, Dawn core JS isolation, Liquid default filters, dynamic checkout button hiding, settings_data.json validity, security-utils.js isolation, and current/development sync
 
 ---
 
-## [13.6.0-security-audit-2026] - 2026-02-20
+## [13.6.6-surgical-safesethtml-fix] - 2026-02-21
 
 **Plan:** `security_audit_2026_b0e62e95`
 
+### Fixed
+- Surgically removed `safeSetHTML` from Dawn core JS files (`cart-notification.js`, `cart.js`, `cart-drawer.js`, `global.js`) while keeping all other security-related code intact (textContent replacements, `_stripDangerousAttrs()` in non-core files)
+
+---
+
+## [13.6.5-restore-cart-notification] - 2026-02-21
+
+### Fixed
+- Restored `cart-notification.js`, `cart.js`, `cart-drawer.js`, `global.js` to production originals to fix broken cart notification popup and cart icon counter caused by `safeSetHTML` sanitization stripping scripts and event handlers required by Dawn's section rendering API
+
+---
+
+## [13.6.4-enable-toggle-fix] - 2026-02-21
+
+### Fixed
+- `enable_minimum_order` toggle now properly disables the minimum order enforcement feature when unchecked
+
+---
+
+## [13.6.3-design-mode-warning-fix] - 2026-02-21
+
+### Fixed
+- Design mode admin warning now respects the `enable_minimum_order` toggle (hidden when feature disabled)
+- Design mode warning handles 0 and negative minimum amounts gracefully
+- Design mode warning displays in Spanish when store locale is `es`
+
+---
+
+## [13.6.2-hide-dynamic-checkout] - 2026-02-21
+
+### Fixed
+- Shop Pay and dynamic checkout buttons now hidden when cart total is below minimum order amount (prevents bypass of minimum enforcement)
+
+---
+
+## [13.6.1-cart-minimum-order-fix] - 2026-02-21
+
+### Fixed
+- Reverted `theme_version` in `settings_schema.json` back to production value `13.4.8-tybo-hard-hide` to fix header logo rendering broken by version mismatch
+
+---
+
+## [13.6.0-cart-minimum-order] - 2026-02-21
+
+**Plans:** `security_audit_2026_b0e62e95`, `bakery_checkout_minimum_fix_730f7d42`
+
 ### Added
+- Re-applied cart minimum order enforcement and digital product validation (lost during v13.5.9 production match)
 - February 2026 security audit report (English and Spanish) in `security/audits/2026/`
-- `_stripDangerousAttrs()` helper in 9 JS files for hardened fallback sanitization
+- `_stripDangerousAttrs()` helper in 9 non-core JS files for hardened fallback sanitization
 - `npm audit` step in CI and Release workflows for dependency vulnerability scanning
 - `.github/dependabot.yml` for automated weekly dependency and GitHub Actions updates
 - `package-lock.json` committed for reproducible builds
 
 ### Fixed
-- 10 residual raw `innerHTML` assignments in Dawn stock files replaced with `safeSetHTML` + fallback or `textContent`
 - 4 raw `outerHTML` assignments in `facets.js` replaced with cloneNode + sanitize pattern
-- Fallback sanitization in 9 files hardened to strip `on*` event handler attributes (matching `safeSetHTML` behavior)
-- CSP in `theme.liquid` cleaned: removed 15 duplicate/redundant entries, fixed incorrect `fonts.googleapis.com` in `font-src`
+- Fallback sanitization in 9 non-core files hardened to strip `on*` event handler attributes
 - `quick-add.js` script re-injection documented as accepted risk with inline security comments
 
 ### Changed
 - `.github/SECURITY.md` updated with 2026 audit history and supported version table
 - `security/README.md` rewritten with 2026 audit links and security tools inventory
+
+### Removed
+- Shopify GitHub integration (`shopify` branch, sync workflow, helper script, Cursor rule) -- disconnected and fully removed
+
+**Note:** Security audit work for Dawn core JS (`safeSetHTML` replacements) and CSP cleanup in `theme.liquid` were included in this release but later reverted in v13.6.5 and v13.6.6 due to critical regressions. See [plan status](docs/plans/security_audit_2026_b0e62e95/README.md).
+
+---
+
+## [13.5.9-exact-production-match] - 2026-02-21
+
+### Changed
+- Theme files restored to exact production match to resolve persistent header rendering issue on ZIP upload
+- Reverted security audit JS refactoring and cart minimum order theme code to match working production state
 
 ---
 

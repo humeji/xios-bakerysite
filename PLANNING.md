@@ -3,8 +3,8 @@
 **Project:** Shopify Theme for Xio's Bakery  
 **Store URL:** xiosbakery.com  
 **Admin URL:** https://xiosbakery.myshopify.com/admin  
-**Current Version:** v13.5.9-exact-production-match  
-**Last Updated:** February 20, 2026
+**Current Version:** v13.6.7-explicit-cart-settings  
+**Last Updated:** February 24, 2026
 
 ---
 
@@ -124,11 +124,12 @@ Custom settings go in the "Cart & Checkout Rules" section of `settings_schema.js
 ```
 tests/
 ├── helpers/
-│   ├── cart-validation-logic.js   # Extracted pure logic from custom.js
-│   └── cart-dom-setup.js          # Mock cart builder utility
-├── cart-validation.test.js        # Core cart validation scenarios
-├── config-parsing.test.js         # Edge cases for settings parsing
-└── locale-messages.test.js        # Localized message rendering
+│   ├── cart-validation-logic.js       # Extracted pure logic from custom.js
+│   └── cart-dom-setup.js              # Mock cart builder utility
+├── cart-validation.test.js            # Core cart validation scenarios
+├── config-parsing.test.js             # Edge cases for settings parsing
+├── locale-messages.test.js            # Localized message rendering
+└── regression-2026-02-21.test.js      # 37 regression tests from Feb 2026 session
 ```
 
 ### Running Tests
@@ -226,7 +227,8 @@ Plan-specific docs live in `docs/plans/<plan-id>/`. Each plan folder has a `READ
 
 | Plan | Folder | Status |
 |------|--------|--------|
-| Security Audit 2026 | `docs/plans/security_audit_2026_b0e62e95/` | [COMPLETE] |
+| Security Audit 2026 | `docs/plans/security_audit_2026_b0e62e95/` | [INCOMPLETE] -- Requires fresh audit |
+| Promo Popup Section | `docs/plans/promo_popup_section_99da7009/` | [AWAITING DECISION] |
 | CI/CD Pipeline Setup | `docs/plans/ci_cd_pipeline_setup_713a17f2/` | [COMPLETE] |
 | Checkout Minimum Fix | `docs/plans/bakery_checkout_minimum_fix_730f7d42/` | [COMPLETE] |
 | Shopify GitHub Sync | `docs/plans/shopify_github_sync_a1b2c3d4/` | [REMOVED] |

@@ -1,6 +1,6 @@
 # Development Guide - Xio's Bakery Shopify Theme
 
-**Last Updated:** February 20, 2026
+**Last Updated:** February 24, 2026
 
 ---
 
@@ -196,11 +196,12 @@ To view or modify the ruleset: **Settings > Rules > Rulesets > Protect main** ([
 ```
 tests/
 ├── helpers/
-│   ├── cart-validation-logic.js   # Pure logic extracted from custom.js
-│   └── cart-dom-setup.js          # Mock Shopify cart builder
-├── cart-validation.test.js        # Cart scenarios (empty, under/over min, digital, mixed)
-├── config-parsing.test.js         # Edge cases (0, negative, NaN, decimals, Infinity)
-└── locale-messages.test.js        # English/Spanish message template rendering
+│   ├── cart-validation-logic.js       # Pure logic extracted from custom.js
+│   └── cart-dom-setup.js              # Mock Shopify cart builder
+├── cart-validation.test.js            # Cart scenarios (empty, under/over min, digital, mixed)
+├── config-parsing.test.js             # Edge cases (0, negative, NaN, decimals, Infinity)
+├── locale-messages.test.js            # English/Spanish message template rendering
+└── regression-2026-02-21.test.js      # 37 regression tests guarding against bugs from Feb 2026 session
 ```
 
 ### Commands

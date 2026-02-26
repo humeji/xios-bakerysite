@@ -2,35 +2,39 @@
 
 ## Current Security Status
 
-[SECURE] All critical security vulnerabilities have been resolved. Theme is production-ready.
+[INCOMPLETE] Security audit from February 2026 is partially complete. Key remediations for Dawn core JS files and CSP were reverted due to regressions. A fresh audit is required before the next production deployment of security changes. See [plan status](../docs/plans/security_audit_2026_b0e62e95/README.md) for full details.
 
 ### Security Audit History
 
-| Date | Version | Auditor | Status | Report |
-|------|---------|---------|--------|--------|
-| 2026-02-20 | v13.5.0 to v13.6.0 | AI Security Assistant | [COMPLETE] 8 findings, all resolved | [View Report](../security/audits/2026/SECURITY_AUDIT_REPORT.md) |
+| Date | Version Range | Auditor | Status | Report |
+|------|--------------|---------|--------|--------|
+| 2026-02-20 | v13.4.3-tiktok-link-fix2 to v13.6.7-explicit-cart-settings | AI Security Assistant | [INCOMPLETE] 8 findings identified; Dawn core JS and CSP remediations reverted | [View Report](../security/audits/2026/SECURITY_AUDIT_REPORT.md) |
 | 2025-08-23 | v13.4.3-tiktok-link-fix2 | AI Security Assistant | [COMPLETE] All issues resolved | [View Report](../security/audits/2025/SECURITY_AUDIT_REPORT.md) |
 
-### Completed Security Fixes
+### Security Fixes -- Current State
 
-- [x] **68+ XSS vulnerabilities resolved** -- All `innerHTML` replaced with `safeSetHTML()`
-- [x] **Residual raw innerHTML remediated** -- 10 remaining instances in Dawn stock files fixed (Feb 2026)
-- [x] **Fallback sanitization hardened** -- All fallback paths now strip `on*` event attributes (Feb 2026)
-- [x] **Content Security Policy implemented and cleaned** -- Duplicates removed, incorrect directives fixed (Feb 2026)
+- [x] **68+ XSS vulnerabilities resolved (Aug 2025)** -- `innerHTML` replaced with `safeSetHTML()` in custom files
+- [x] **Fallback sanitization hardened** -- `_stripDangerousAttrs()` active in non-core files (facets.js, predictive-search.js, etc.)
 - [x] **Security headers added** -- X-Frame-Options, X-Content-Type-Options, Referrer-Policy
 - [x] **Input sanitization implemented** -- `security-utils.js` provides safe DOM manipulation
 - [x] **Security testing completed** -- `window.testXSSPrevention()` passes all tests
 - [x] **Dependency scanning added** -- npm audit in CI, Dependabot enabled (Feb 2026)
 - [x] **package-lock.json committed** -- Reproducible builds ensured (Feb 2026)
+- [x] **textContent replacements in global.js** -- Safe, non-breaking changes remain active
+- [ ] **Dawn core JS innerHTML** -- `safeSetHTML` in cart-notification.js, cart.js, cart-drawer.js, global.js was REVERTED (broke section rendering API)
+- [ ] **CSP cleanup** -- Changes in theme.liquid were REVERTED (broke font loading and header rendering)
+- [ ] **Dawn base version assessment** -- Theme runs Dawn 13.4.8; Shopify only patches the latest Dawn release
+- [ ] **Fresh audit required** -- Current audit reports reflect v13.6.0 state, not v13.6.7
 
 ## Supported Versions
 
 | Version | Supported | Security Status |
 |---------|-----------|-----------------|
-| v13.6.0-security-audit-2026 | Yes | [SECURE] -- Latest audited version |
+| v13.6.7-explicit-cart-settings | Yes | [PARTIAL] -- Latest release; security audit incomplete |
+| v13.6.0-cart-minimum-order | Yes | [PARTIAL] -- Security remediations partially reverted |
 | v13.5.0-cicd-pipeline | Yes | [SECURE] |
-| v13.4.9-checkout-minimum-fix | Yes | [SECURE] |
-| v13.4.3-tiktok-link-fix2 | Deprecated | [SECURE] -- Superseded by v13.6.0 |
+| v13.4.9-checkout-minimum-fix | Deprecated | [SECURE] -- Superseded by v13.6.x |
+| v13.4.3-tiktok-link-fix2 | Deprecated | [SECURE] -- Superseded by v13.6.x |
 | v13.3.x and older | No | End of support |
 
 ---
@@ -90,4 +94,4 @@ We appreciate security researchers who help improve our theme's security. Contri
 
 **Note:** Please do not create public GitHub issues for security vulnerabilities. Use the private reporting methods above.
 
-**Last Updated:** February 2026 (v13.6.0-security-audit-2026)
+**Last Updated:** February 24, 2026 (v13.6.7-explicit-cart-settings)

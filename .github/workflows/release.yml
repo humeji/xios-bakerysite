@@ -37,7 +37,7 @@ jobs:
         run: ./scripts/package-theme.sh --ci "${{ github.ref_name }}"
 
       - name: Upload ZIP to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: xios-bakery-theme-*.zip
           generate_release_notes: true
